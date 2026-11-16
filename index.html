@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taller de Muebles de Alex | Portafolio</title>
+<meta name="description" content="Portafolio del Taller de Muebles de Alex: calculadora de despiece, catálogo y proyectos.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --madera:#8a5a2b;
+    --madera-oscura:#5c3a1a;
+    --madera-clara:#c98a4b;
+    --beige:#f7f1e6;
+    --beige-2:#efe3d2;
+    --texto:#3b2e24;
+    --texto-suave:#6b5b4d;
+    --blanco:#fffdf9;
+    --sombra:0 12px 34px rgba(92,58,26,.14);
+    --radio:18px;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    background:var(--beige);
+    color:var(--texto);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ line-height:1.2; margin:0 0 .5em; }
+  .contenedor{ width:100%; max-width:1080px; margin:0 auto; padding:0 20px; }
+
+  /* Barra superior */
+  .barra{
+    position:sticky; top:0; z-index:30;
+    background:rgba(247,241,230,.94);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--beige-2);
+  }
+  .barra .contenedor{
+    display:flex; align-items:center; justify-content:space-between;
+    min-height:66px; gap:14px;
+  }
+  .marca{
+    display:flex; align-items:center; gap:10px;
+    font-weight:700; color:var(--madera-oscura);
+    text-decoration:none; font-size:1rem; white-space:nowrap;
+  }
+  .marca i{ color:var(--madera-clara); font-size:1.15rem; }
+  .barra nav{ display:flex; gap:20px; }
+  .barra nav a{
+    color:var(--texto-suave); text-decoration:none; font-size:.94rem;
+    padding:6px 2px; border-bottom:2px solid transparent;
+    transition:color .2s, border-color .2s;
+  }
+  .barra nav a:hover{ color:var(--madera); border-bottom-color:var(--madera-clara); }
+
+  /* Hero */
+  .hero{
+    position:relative; overflow:hidden; text-align:center; color:#fff;
+    padding:88px 0 96px;
+    background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 2px, transparent 2px 16px),
+      linear-gradient(150deg, var(--madera-oscura) 0%, var(--madera) 58%, var(--madera-clara) 100%);
+  }
+  .hero::after{
+    content:""; position:absolute; left:0; right:0; bottom:0; height:72px;
+    background:linear-gradient(to bottom, transparent, var(--beige));
+  }
+  .hero .contenedor{ position:relative; z-index:2; }
+  .insignia{
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.34);
+    font-size:.78rem; letter-spacing:1.4px; text-transform:uppercase;
+    padding:7px 15px; border-radius:999px; margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:clamp(2rem, 6vw, 3.3rem);
+    margin-bottom:16px;
+    text-shadow:0 2px 14px rgba(0,0,0,.2);
+  }
+  .hero p{
+    max-width:600px; margin:0 auto 30px;
+    font-size:1.06rem; color:#fdf4e7;
+  }
+  .boton{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:15px 30px; border-radius:999px;
+    font-size:1rem; font-weight:600; text-decoration:none; cursor:pointer;
+    border:2px solid transparent;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .boton:hover{ transform:translateY(-2px); }
+  .boton-principal{
+    background:var(--blanco); color:var(--madera-oscura);
+    box-shadow:0 12px 28px rgba(0,0,0,.24);
+  }
+  .boton-secundario{ color:#fff; border-color:rgba(255,255,255,.62); }
+  .boton-secundario:hover{ background:rgba(255,255,255,.14); }
+  .botones{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+
+  /* Panel principal */
+  main{ padding:0 0 84px; }
+  .panel{
+    margin-top:-46px; position:relative; z-index:5;
+    display:grid; grid-template-columns:1.35fr 1fr; gap:26px;
+  }
+  .tarjeta{
+    background:var(--blanco);
+    border-radius:var(--radio);
+    box-shadow:var(--sombra);
+    padding:36px;
+    display:flex; flex-direction:column;
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .tarjeta:hover{ transform:translateY(-4px); box-shadow:0 20px 46px rgba(92,58,26,.2); }
+
+  .icono{
+    width:60px; height:60px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.55rem; margin-bottom:20px;
+    background:linear-gradient(135deg, var(--madera-clara), var(--madera));
+    color:#fff;
+    box-shadow:0 10px 20px rgba(138,90,43,.3);
+  }
+  .tarjeta h2{ font-size:1.55rem; color:var(--madera-oscura); margin-bottom:10px; }
+  .tarjeta p{ color:var(--texto-suave); margin:0 0 22px; font-size:.98rem; }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:26px; }
+  .chip{
+    font-size:.76rem; font-weight:600; letter-spacing:.4px;
+    color:var(--madera); background:rgba(201,138,75,.15);
+    padding:6px 12px; border-radius:999px;
+  }
+  .accion{
+    margin-top:auto; align-self:flex-start;
+    display:inline-flex; align-items:center; gap:10px;
+    padding:14px 26px; border-radius:12px;
+    font-weight:700; text-decoration:none; color:#fff;
+    background:linear-gradient(135deg, var(--madera), var(--madera-oscura));
+    transition:filter .2s ease, transform .2s ease;
+  }
+  .accion:hover{ filter:brightness(1.1); transform:translateX(3px); }
+
+  /* Tarjeta vacía */
+  .tarjeta-vacia{
+    background:transparent;
+    border:2px dashed rgba(138,90,43,.38);
+    border-radius:var(--radio);
+    padding:36px;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    min-height:320px;
+    transition:border-color .2s ease, transform .2s ease, background .2s ease;
+  }
+  .tarjeta-vacia:hover{
+    border-color:var(--madera-clara);
+    background:rgba(255,253,249,.6);
+    transform:translateY(-4px);
+  }
+  .mas{
+    width:52px; height:52px; border-radius:50%;
+    border:2px dashed rgba(201,138,75,.7);
+    color:var(--madera-clara);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem; margin-bottom:18px;
+  }
+  .etiqueta{
+    font-size:.7rem; letter-spacing:1.5px; text-transform:uppercase; font-weight:700;
+    color:var(--madera); background:rgba(201,138,75,.16);
+    padding:5px 12px; border-radius:999px; margin-bottom:14px;
+  }
+  .tarjeta-vacia h3{ font-size:1.2rem; color:var(--madera-oscura); margin-bottom:8px; }
+  .tarjeta-vacia p{ margin:0; color:var(--texto-suave); font-size:.92rem; max-width:240px; }
+
+  /* Sección de ideas */
+  .seccion-ideas{ padding:0 0 90px; }
+  .titulo{ text-align:center; color:var(--madera-oscura); font-size:clamp(1.5rem, 4vw, 2rem); margin-bottom:12px; }
+  .subtitulo{ text-align:center; color:var(--texto-suave); max-width:620px; margin:0 auto 40px; }
+  .miniaturas{ display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+  .mini{
+    background:var(--beige-2); border-radius:14px; padding:22px;
+    display:flex; align-items:flex-start; gap:14px;
+    transition:background .2s ease, transform .2s ease;
+  }
+  .mini:hover{ background:#e9dbc6; transform:translateY(-3px); }
+  .mini i{ color:var(--madera); font-size:1.15rem; margin-top:3px; }
+  .mini strong{ display:block; color:var(--madera-oscura); font-size:.98rem; margin-bottom:3px; }
+  .mini span{ font-size:.86rem; color:var(--texto-suave); line-height:1.45; }
+
+  /* Pie */
+  footer{
+    background:var(--madera-oscura); color:#f3e6d4;
+    text-align:center; padding:36px 20px; font-size:.9rem;
+  }
+  footer .iconos{ display:flex; gap:18px; justify-content:center; margin-bottom:12px; }
+  footer .iconos i{ opacity:.8; font-size:1rem; }
+  footer p{ margin:0; }
+
+  /* Responsivo */
+  @media (max-width:900px){
+    .panel{ grid-template-columns:1fr; }
+    .miniaturas{ grid-template-columns:1fr; }
+  }
+  @media (max-width:640px){
+    .hero{ padding:66px 0 78px; }
+    .barra nav{ display:none; }
+    .tarjeta, .tarjeta-vacia{ padding:26px; }
+    .boton{ width:100%; justify-content:center; }
+  }
+</style>
+</head>
+<body>
+
+<header class="barra">
+  <div class="contenedor">
+    <a class="marca" href="index.html"><i class="fa-solid fa-hammer"></i> Taller de Muebles de Alex</a>
+    <nav>
+      <a href="#inicio">Inicio</a>
+      <a href="calculadora.html">Calculadora</a>
+      <a href="#proyectos">Proyectos</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="inicio">
+  <div class="contenedor">
+    <span class="insignia"><i class="fa-solid fa-tree"></i> Carpintería y diseño</span>
+    <h1>Taller de Muebles de Alex</h1>
+    <p>Portafolio de mi trabajo: despiece de muebles, cálculo de tableros, cantos y herrajes, con costos reales de taller.</p>
+    <div class="botones">
+      <a class="boton boton-principal" href="calculadora.html"><i class="fa-solid fa-calculator"></i> Abrir la calculadora</a>
+      <a class="boton boton-secundario" href="#proyectos">Ver próximos proyectos</a>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="contenedor">
+    <div class="panel">
+
+      <a class="tarjeta" href="calculadora.html" style="text-decoration:none;">
+        <div class="icono"><i class="fa-solid fa-ruler-combined"></i></div>
+        <h2>Calculadora de Despiece</h2>
+        <p>Herramienta del taller: mide el mueble en milímetros y obtiene el despiece completo, láminas necesarias, metros de canto, herrajes y costo final.</p>
+        <div class="chips">
+          <span class="chip">Medidas en mm</span>
+          <span class="chip">Tableros y cantos</span>
+          <span class="chip">Puertas y gavetas</span>
+          <span class="chip">Costos y herrajes</span>
+        </div>
+        <span class="accion"><i class="fa-solid fa-arrow-right"></i> Abrir calculadora</span>
+      </a>
+
+      <div class="tarjeta-vacia" id="proyectos">
+        <div class="mas"><i class="fa-solid fa-plus"></i></div>
+        <span class="etiqueta">Próximamente</span>
+        <h3>Catálogo de Mesas</h3>
+        <p>Espacio reservado para fotos, medidas y materiales de las mesas del taller.</p>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<section class="seccion-ideas">
+  <div class="contenedor">
+    <h2 class="titulo">Lo que viene en el taller</h2>
+    <p class="subtitulo">Cada proyecto nuevo deja su espacio aquí, con sus medidas y su lista de materiales.</p>
+    <div class="miniaturas">
+      <div class="mini">
+        <i class="fa-solid fa-table-cells-large"></i>
+        <div><strong>Mesas a medida</strong><span>Medidas y cortes de cada modelo.</span></div>
+      </div>
+      <div class="mini">
+        <i class="fa-solid fa-file-invoice-dollar"></i>
+        <div><strong>Presupuestos</strong><span>Ejemplos reales de clientes.</span></div>
+      </div>
+      <div class="mini">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <div><strong>Inventario</strong><span>Tableros y herrajes disponibles.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="iconos">
+    <i class="fa-solid fa-hammer"></i>
+    <i class="fa-solid fa-ruler"></i>
+    <i class="fa-solid fa-tree"></i>
+  </div>
+  <p>Taller de Muebles de Alex &mdash; hecho a mano, medido dos veces.</p>
+</footer>
+
+</body>
+</html>
