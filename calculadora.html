@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Despiece + Catálogo + Herrajes Colapsables</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  .accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease, padding 0.25s ease;
+  }
+  .accordion-body.is-open {
+    max-height: 5000px;
+    opacity: 1;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .accordion-chevron { transition: transform 0.3s ease; }
+  .accordion-header[aria-expanded="true"] .accordion-chevron { transform: rotate(180deg); }
+  .accordion-header:hover { filter: brightness(1.05); }
+  .accordion-header:focus-visible { outline: 3px solid #fbbf24; outline-offset: 2px; }
+  
+  /* Estilos para el diagrama de cortes */
+  .tablero-corte {
+    position: relative;
+    background-color: #f8fafc;
+    border: 2px solid #475569;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  }
+  .pieza-corte {
+    position: absolute;
+    border: 1px solid rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 9px;
+    line-height: 1.1;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 1px;
+  }
+</style>
+<style media="print">
+  body { background:#fff; font-size:11px; }
+  header, footer, .no-print, button, #formPanel { display:none !important; }
+  .card-mueble, #resumenPanel, #costoPanel, #cantosPanel, #cortesPanel { box-shadow:none !important; border:1px solid #ccc; page-break-inside:avoid; margin-bottom:14px; }
+  #resumenPanel, #costoPanel, #cantosPanel, #cortesPanel { display:block !important; }
+  .accordion-body { max-height: none !important; opacity: 1 !important; overflow: visible !important; }
+  table { page-break-inside:auto; }
+  tr { page-break-inside:avoid; }
+  thead { background:#0f172a !important; color:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .bg-slate-900, .bg-gradient-to-r, .bg-emerald-700, .bg-sky-700 { background:#0f172a !important; color:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .canto-badge { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .edit-precio-btn, .edit-codigo-btn { display:none !important; }
+  .pieza-corte { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+</style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-6">
+
+<div class="max-w-7xl mx-auto">
+
+  <header class="mb-6 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">
+        <i class="fa-solid fa-calculator text-amber-600 mr-2"></i>Calculadora de Despiece + Catálogo
+      </h1>
+      <p class="text-slate-600 mt-1">Catálogo editable · Herrajes colapsables · Adicionales</p>
+    </div>
+    <div class="flex gap-2 no-print flex-wrap">
+      <button onclick="abrirAgregarCodigo()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm transition">
+        <i class="fa-solid fa-plus mr-1"></i> Agregar código
+      </button>
+      <button onclick="exportarCatalogo()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm transition">
+        <i class="fa-solid fa-book mr-1"></i> Catálogo CSV
+      </button>
+      <button onclick="exportarCSVResumen()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm transition">
+        <i class="fa-solid fa-file-csv mr-1"></i> Resumen CSV
+      </button>
+      <button onclick="exportarCSVCompleto()" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm transition">
+        <i class="fa-solid fa-file-export mr-1"></i> Despiece CSV
+      </button>
+      <button onclick="exportarCSVCostos()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg text-sm transition">
+        <i class="fa-solid fa-dollar-sign mr-1"></i> Costos CSV
+      </button>
+      <button onclick="resetAcordeon()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-sm transition no-print">
+        <i class="fa-solid fa-rotate mr-1"></i> Reset secciones
+      </button>
+      <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition">
+        <i class="fa-solid fa-print mr-1"></i> Imprimir
+      </button>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- ===================== FORMULARIO ===================== -->
+    <div id="formPanel" class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-slate-200 h-fit lg:sticky lg:top-4">
+      <h2 class="text-xl font-semibold mb-4 text-slate-800">
+        <i class="fa-solid fa-cube text-amber-600 mr-2"></i>Datos del mueble
+      </h2>
+
+      <div class="mb-4 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 rounded-xl p-4">
+        <label class="text-sm font-bold text-amber-800 block mb-2">
+          <i class="fa-solid fa-barcode text-amber-600 mr-1"></i>Código del catálogo
+        </label>
+        <div class="flex gap-2">
+          <input type="text" id="codigoMueble" list="listaCodigos"
+                 class="flex-1 px-3 py-2 border-2 border-amber-400 rounded-lg text-sm font-mono font-bold text-amber-900 focus:ring-2 focus:ring-amber-500 focus:outline-none uppercase"
+                 placeholder="Ej: BA03001"
+                 oninput="this.value = this.value.toUpperCase(); validarCodigoEnVivo()">
+          <datalist id="listaCodigos"></datalist>
+          <button type="button" onclick="cargarMueblePorCodigo()"
+                  class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition">
+            <i class="fa-solid fa-download"></i>
+          </button>
+        </div>
+        <div id="alertaCodigo" class="mt-2 text-[11px] font-semibold"></div>
+        <div class="flex flex-wrap gap-1 mt-3">
+          <button type="button" onclick="mostrarCategoria('todo')" class="text-[10px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition"><i class="fa-solid fa-list"></i> Todos</button>
+          <button type="button" onclick="mostrarCategoria('bases')" class="text-[10px] bg-amber-100 hover:bg-amber-200 text-amber-800 px-2 py-1 rounded transition"><i class="fa-solid fa-cube"></i> Bases</button>
+          <button type="button" onclick="mostrarCategoria('aereos')" class="text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 py-1 rounded transition"><i class="fa-solid fa-layer-group"></i> Aéreos</button>
+          <button type="button" onclick="mostrarCategoria('columnas')" class="text-[10px] bg-purple-100 hover:bg-purple-200 text-purple-800 px-2 py-1 rounded transition"><i class="fa-solid fa-door-open"></i> Columnas</button>
+          <button type="button" onclick="mostrarCategoria('armarios')" class="text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-2 py-1 rounded transition"><i class="fa-solid fa-warehouse"></i> Armarios</button>
+        </div>
+        <div id="infoCodigo" class="text-xs text-slate-600 mt-2"></div>
+      </div>
+
+      <form id="muebleForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1">Nombre / Código</label>
+          <input type="text" id="nombreMueble" required
+                 class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                 placeholder="Ej. BA060">
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Alto (mm)</label>
+            <input type="number" id="altoMueble" required min="1" value="720" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Ancho (mm)</label>
+            <input type="number" id="anchoMueble" required min="1" value="600" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Prof. (mm)</label>
+            <input type="number" id="profMueble" required min="1" value="580" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Espesor</label>
+            <select id="espesorTablero" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <option value="18" selected>18 mm</option><option value="12">12 mm</option><option value="8">8 mm</option>
+            </select></div>
+          <div><label class="block text-sm font-medium text-slate-700 mb-1">Veta</label>
+            <select id="vetaMueble" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <option value="Vertical" selected>Vertical</option><option value="Horizontal">Horizontal</option>
+            </select></div>
+        </div>
+
+        <div class="border-t border-slate-200 pt-4 space-y-3">
+          <p class="text-sm font-semibold text-slate-800"><i class="fa-solid fa-dollar-sign text-emerald-600 mr-1"></i> Tablero y cantos</p>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Largo lámina (mm)</label><input type="number" id="largoTablero" value="2440" min="1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho lámina (mm)</label><input type="number" id="anchoTablero" value="1830" min="1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block text-xs font-medium text-slate-600 mb-1"><i class="fa-solid fa-cube text-amber-600 mr-1"></i>Precio lámina ESTRUCTURA ($)</label><input type="number" id="precioTableroEstructura" value="100" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1"><i class="fa-solid fa-paint-roller text-emerald-600 mr-1"></i>Precio lámina REVESTIMIENTO ($)</label><input type="number" id="precioTableroRevestimiento" value="150" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Desperdicio (%)</label><input type="number" id="desperdicioPct" value="15" min="0" max="80" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Canto Estructura 0.45mm ($/ML)</label>
+              <input type="number" id="precioCantoEstructura" value="0.50" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Canto Revestimiento 1mm ($/ML)</label>
+              <input type="number" id="precioCantoRevestimiento" value="1.00" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Par Bisagra ($)</label><input type="number" id="precioParBisagra" value="2.50" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Enchapado ($/ML)</label>
+              <input type="number" id="precioEnchapado" value="2.36" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Precio por corte ($)</label>
+              <input type="number" id="precioCorte" value="0.91" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Cortes por lámina (cant.)</label>
+              <input type="number" id="cantidadCortesPorLamina" value="5" min="1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Set 4 Patas global ($)</label>
+              <input type="number" id="precioSetPatasGlobal" value="3.00" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+          </div>
+
+          <!-- COSTOS GENERALES (PORCENTUALES) -->
+          <div class="mt-4 border-t border-slate-200 pt-4">
+            <p class="text-sm font-semibold text-slate-800 mb-2"><i class="fa-solid fa-briefcase text-indigo-600 mr-1"></i> Costos Porcentuales Adicionales</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Mano de Obra (%)</label>
+                <input type="number" id="porcentajeManoObra" value="20" min="0" step="0.1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Gastos Admin. (%)</label>
+                <input type="number" id="porcentajeGastosAdmin" value="15" min="0" step="0.1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-500 mt-1">* Aplicados sobre el subtotal directo de cada mueble.</p>
+          </div>
+          
+        </div>
+
+        <div class="border-t border-slate-200 pt-4 space-y-3">
+          <label class="block text-sm font-semibold text-slate-800"><i class="fa-solid fa-palette text-amber-600 mr-1"></i> Asignación de colores</label>
+          <div class="grid grid-cols-2 gap-2">
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Laterales</label><input type="text" id="colorLateral" value="Blanco" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Piso / Techo</label><input type="text" id="colorPisoTecho" value="Blanco" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Fondo</label><input type="text" id="colorFondo" value="Blanco" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Puertas / Frentes</label><input type="text" id="colorPuerta" value="Roble" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+          </div>
+        </div>
+
+        <!-- ============ SECCIÓN: HERRAJES ============ -->
+        <div class="border-t-2 border-indigo-200 pt-4">
+          <div class="bg-gradient-to-r from-indigo-600 to-blue-600 -mx-2 px-3 py-2 rounded-lg mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-screwdriver-wrench text-white"></i>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wide">Herrajes</h3>
+          </div>
+
+          <!-- Puertas y Gavetas -->
+          <div class="mb-3 border border-slate-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-2 text-left transition"
+                    data-target="acc-puertas-gavetas" aria-expanded="true" aria-controls="acc-puertas-gavetas"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-slate-800">
+                <i class="fa-solid fa-door-closed text-indigo-600"></i> Puertas y Gavetas
+              </span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-slate-500"></i>
+            </button>
+            <div id="acc-puertas-gavetas" class="accordion-body is-open px-3">
+              <div class="space-y-3 py-2">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="incluirPuertas" checked class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                  <span class="text-sm font-medium text-slate-700">Incluir puertas (con bisagras automáticas)</span>
+                </label>
+                <div id="panelPuertas" class="ml-6 space-y-3">
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de puertas</label>
+                    <select id="cantPuertas" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                      <option value="1">1 puerta</option><option value="2" selected>2 puertas</option><option value="3">3 puertas</option><option value="4">4 puertas</option>
+                    </select></div>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="incluirGavetas" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                  <span class="text-sm font-medium text-slate-700">Incluir gavetas</span>
+                </label>
+                <div id="panelGavetas" class="ml-6 space-y-3 hidden">
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">N° de gavetas</label>
+                    <input type="number" id="cantGavetas" value="2" min="1" max="10" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Prof. gaveta (mm)</label>
+                      <input type="number" id="profGaveta" value="500" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto caja (mm)</label>
+                      <input type="number" id="altoGaveta" value="150" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                  </div>
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Tipo de corredera</label>
+                    <select id="tipoCorredera" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                      <option value="telescopica" selected>Telescópica estándar (25 mm)</option>
+                      <option value="oculta">Oculta genérica (10 mm)</option>
+                      <option value="ocultaBlum">Oculta Blum / Push (despiece especial)</option>
+                    </select></div>
+                  <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
+                    <p class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-dollar-sign text-emerald-600"></i> Precio de la corredera</p>
+                    <div id="precioCorrederaTelescopicaWrap">
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par telescópica ($)</label>
+                      <input type="number" id="precioCorrederaTelescopica" value="2.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                    <div id="precioCorrederaOcultaWrap" class="hidden">
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par oculta genérica ($)</label>
+                      <input type="number" id="precioCorrederaOculta" value="3.50" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                    <div id="precioCorrederaBlumWrap" class="hidden">
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par oculta Blum / Push ($)</label>
+                      <input type="number" id="precioCorrederaBlum" value="8.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TIRADORES -->
+          <div class="mb-3 border border-teal-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-teal-50 hover:bg-teal-100 px-3 py-2 text-left transition"
+                    data-target="acc-tiradores" aria-expanded="false" aria-controls="acc-tiradores"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-teal-800"><i class="fa-solid fa-grip text-teal-600"></i> Tiradores (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-teal-500"></i>
+            </button>
+            <div id="acc-tiradores" class="accordion-body px-3">
+              <div class="py-2 space-y-3">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="incluirTirador" class="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500">
+                  <span class="text-sm font-medium text-slate-700">Incluir tiradores</span>
+                </label>
+                <div id="panelTirador" class="ml-6 space-y-3 hidden">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Tipo Principal</label>
+                    <select id="tipoTiradorPrincipal" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                      <option value="sobreponer">Tirador de Sobreponer</option>
+                      <option value="perfil" selected>Tirador Tipo Perfil</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Variedad</label>
+                    <select id="tipoTiradorVariedad" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                      <option value="gola" selected>Gola</option>
+                      <option value="otro">Otro Perfil</option>
+                    </select>
+                  </div>
+
+                  <div id="wrapTiradorPerfilGola" class="space-y-3">
+                    <div>
+                      <label class="block text-xs font-medium text-slate-600 mb-1">Categoría Perfil Gola</label>
+                      <select id="tipoGola" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <option value="C" selected>Perfil C</option>
+                        <option value="L">Perfil L</option>
+                      </select>
+                    </div>
+                    <div id="wrapReduccionAltura" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+                      <p class="text-xs font-semibold text-amber-800"><i class="fa-solid fa-scissors"></i> El Perfil L requiere reducción de altura en frentes</p>
+                      <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Reducción de Altura (mm)</label>
+                        <input type="number" id="reduccionAlturaPerfilL" value="30" min="1" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
+                      <input type="number" id="cantTirador" value="2" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio ($/u)</label>
+                      <input type="number" id="precioTirador" value="5.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Color</label>
+                      <input type="text" id="colorTirador" value="Aluminio" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Altura (mm) (opcional)</label>
+                      <input type="number" id="alturaTirador" value="0" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bisagra Recta -->
+          <div class="mb-3 border border-rose-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-rose-50 hover:bg-rose-100 px-3 py-2 text-left transition"
+                    data-target="acc-bisagra-recta" aria-expanded="false" aria-controls="acc-bisagra-recta"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-rose-800"><i class="fa-solid fa-link text-rose-600"></i> Bisagra Recta (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-rose-500"></i>
+            </button>
+            <div id="acc-bisagra-recta" class="accordion-body px-3">
+              <div class="py-2 space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="incluirBisagraRecta" class="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500">
+                  <span class="text-sm font-medium text-slate-700">Bisagra recta (unidad)</span>
+                </label>
+                <div id="panelBisagraRecta" class="ml-6 mt-1 space-y-2 hidden">
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
+                    <input type="number" id="cantBisagraRecta" value="1" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></div>
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio unitario ($)</label>
+                    <input type="number" id="precioBisagraRecta" value="1.50" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sistema de Elevación -->
+          <div class="mb-3 border border-fuchsia-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-fuchsia-50 hover:bg-fuchsia-100 px-3 py-2 text-left transition"
+                    data-target="acc-elevacion" aria-expanded="false" aria-controls="acc-elevacion"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-fuchsia-800"><i class="fa-solid fa-arrow-up-from-bracket text-fuchsia-600"></i> Sistema de Elevación (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-fuchsia-500"></i>
+            </button>
+            <div id="acc-elevacion" class="accordion-body px-3">
+              <div class="py-2 space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="incluirAmortiguadorAutoelevable" class="w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                  <span class="text-sm font-medium text-slate-700">Amortiguador autoelevable</span>
+                </label>
+                <div id="panelAmortiguadorAutoelevable" class="ml-6 mt-1 mb-2 hidden">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
+                  <input type="number" id="precioAmortiguadorAutoelevable" value="1.92" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2">
+                  <input type="checkbox" id="incluirElevacionPuertaDoble" class="w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                  <span class="text-sm font-medium text-slate-700">Sistema de elevación puerta doble</span>
+                </label>
+                <div id="panelElevacionPuertaDoble" class="ml-6 mt-1 mb-2 hidden">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
+                  <input type="number" id="precioElevacionPuertaDoble" value="124.66" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2">
+                  <input type="checkbox" id="incluirElevacionPuertaSencilla" class="w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                  <span class="text-sm font-medium text-slate-700">Sistema de elevación de puerta sencilla</span>
+                </label>
+                <div id="panelElevacionPuertaSencilla" class="ml-6 mt-1 hidden">
+                  <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
+                  <input type="number" id="precioElevacionPuertaSencilla" value="49.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Platera -->
+          <div class="mb-3 border border-cyan-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-cyan-50 hover:bg-cyan-100 px-3 py-2 text-left transition"
+                    data-target="acc-platera" aria-expanded="false" aria-controls="acc-platera"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-cyan-800"><i class="fa-solid fa-utensils text-cyan-600"></i> Platera Kit Escurridor de Platos</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-cyan-500"></i>
+            </button>
+            <div id="acc-platera" class="accordion-body px-3">
+              <div class="py-2 space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirPlatera60" class="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 60 cm</span></label>
+                <div id="panelPlatera60" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera60" value="29.94" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera70" class="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 70 cm</span></label>
+                <div id="panelPlatera70" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera70" value="29.94" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera80" class="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 80 cm</span></label>
+                <div id="panelPlatera80" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera80" value="29.94" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera90" class="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 90 cm</span></label>
+                <div id="panelPlatera90" class="ml-6 mt-1 hidden"><input type="number" id="precioPlatera90" value="29.94" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Condimenteros -->
+          <div class="mb-3 border border-lime-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-lime-50 hover:bg-lime-100 px-3 py-2 text-left transition"
+                    data-target="acc-condimentero" aria-expanded="false" aria-controls="acc-condimentero"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-lime-800"><i class="fa-solid fa-jar text-lime-600"></i> Condimenteros (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-lime-500"></i>
+            </button>
+            <div id="acc-condimentero" class="accordion-body px-3">
+              <div class="py-2 space-y-2">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirCondimentero15" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 15 cm</span></label>
+                <div id="panelCondimentero15" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero15" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero20" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 20 cm</span></label>
+                <div id="panelCondimentero20" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero20" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero30" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 30 cm</span></label>
+                <div id="panelCondimentero30" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero30" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero35" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 35 cm</span></label>
+                <div id="panelCondimentero35" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero35" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero40" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 40 cm</span></label>
+                <div id="panelCondimentero40" class="ml-6 mt-1 hidden"><input type="number" id="precioCondimentero40" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patas y Tornillos -->
+          <div class="mb-3 border border-slate-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-2 text-left transition"
+                    data-target="acc-patas-tornillos" aria-expanded="false" aria-controls="acc-patas-tornillos"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-slate-800"><i class="fa-solid fa-screwdriver text-orange-600"></i> Patas y Tornillos (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-slate-500"></i>
+            </button>
+            <div id="acc-patas-tornillos" class="accordion-body px-3">
+              <div class="py-2 space-y-3">
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" id="incluirPatas" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                  <span class="text-sm font-medium text-slate-700">Incluir set de patas plásticas regulables (4 uds.)</span>
+                </label>
+                <div id="panelPatas" class="ml-6 space-y-3 hidden">
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio por set de 4 patas ($) <span class="text-amber-600 font-semibold">— sobrescribe el valor global</span></label>
+                    <input type="number" id="precioSetPatas" value="3.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                </div>
+                <div class="border-l-4 border-orange-400 pl-3 py-2 bg-orange-50/40 rounded">
+                  <p class="text-xs font-semibold text-slate-700 mb-2"><i class="fa-solid fa-screwdriver text-orange-600 mr-1"></i> Tornillos (por bolsa 100 uds.)</p>
+                  <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirTornillo6x2" class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x2 x100 und</span></label>
+                  <div id="panelTornillo6x2" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioTornillo6x2" value="2.50" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
+                  <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirTornillo6x1_4" class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x1 1/4 x100 und</span></label>
+                  <div id="panelTornillo6x1_4" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioTornillo6x1_4" value="1.26" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
+                  <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirTornillo5_8x6" class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 5/8 x6 x100 und</span></label>
+                  <div id="panelTornillo5_8x6" class="ml-6 mt-1 hidden"><input type="number" id="precioTornillo5_8x6" value="1.68" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ SECCIÓN: ADICIONALES DE MADERA ============ -->
+        <div class="border-t-2 border-amber-300 pt-4">
+          <div class="bg-gradient-to-r from-amber-600 to-yellow-600 -mx-2 px-3 py-2 rounded-lg mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-tree text-white"></i>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wide">Adicionales para muebles de madera</h3>
+          </div>
+
+          <!-- Repisas -->
+          <div class="mb-3 border border-amber-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-amber-50 hover:bg-amber-100 px-3 py-2 text-left transition"
+                    data-target="acc-repisas" aria-expanded="false" aria-controls="acc-repisas"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-amber-800"><i class="fa-solid fa-layer-group text-amber-600"></i> Repisas</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-amber-500"></i>
+            </button>
+            <div id="acc-repisas" class="accordion-body px-3">
+              <div class="py-2">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirRepisas" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir repisas (espesor 18 mm)</span></label>
+                <div id="panelRepisas" class="ml-6 mt-2 hidden"><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de repisas</label><input type="number" id="cantRepisas" value="1" min="1" max="20" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel / Finta / Rodapié -->
+          <div class="mb-3 border border-amber-200 rounded-lg overflow-hidden">
+            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-amber-50 hover:bg-amber-100 px-3 py-2 text-left transition"
+                    data-target="acc-panel-finta-rodapie" aria-expanded="false" aria-controls="acc-panel-finta-rodapie"
+                    onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
+              <span class="flex items-center gap-2 text-sm font-bold text-amber-800"><i class="fa-solid fa-table-columns text-amber-600"></i> Panel · Finta · Rodapié</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron text-amber-500"></i>
+            </button>
+            <div id="acc-panel-finta-rodapie" class="accordion-body px-3">
+              <div class="py-2 space-y-3">
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirPanel" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir panel</span></label>
+                <div id="panelPanel" class="ml-6 space-y-3 hidden">
+                  <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho (mm)</label><input type="number" id="anchoPanel" value="600" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto (mm)</label><input type="number" id="altoPanel" value="720" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantPanel" value="1" min="1" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
+                      <select id="espesorPanel" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
+                      </select></div>
+                  </div>
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionPanel" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirFinta" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir finta</span></label>
+                <div id="panelFinta" class="ml-6 space-y-3 hidden">
+                  <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho (mm)</label><input type="number" id="anchoFinta" value="600" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto (mm)</label><input type="number" id="altoFinta" value="80" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantFinta" value="1" min="1" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
+                      <select id="espesorFinta" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
+                      </select></div>
+                  </div>
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionFinta" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirRodapie" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir rodapié (alto 150 mm)</span></label>
+                <div id="panelRodapie" class="ml-6 space-y-3 hidden">
+                  <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantRodapie" value="1" min="1" max="20" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
+                      <select id="espesorRodapie" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
+                      </select></div>
+                  </div>
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionRodapie" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NUEVO: Campo cantidad de muebles -->
+        <div class="bg-amber-100 p-3 rounded-lg border border-amber-300">
+          <label class="block text-sm font-bold text-amber-900 mb-1">Cantidad de muebles a agregar (mismo código)</label>
+          <input type="number" id="cantMuebles" value="1" min="1" max="100" class="w-full px-3 py-2 border border-amber-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-lg font-bold">
+        </div>
+
+        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg transition shadow-sm">
+          <i class="fa-solid fa-plus mr-2"></i>Calcular y agregar mueble
+        </button>
+        <button type="button" onclick="limpiarTodo()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg transition text-sm">
+          <i class="fa-solid fa-trash-alt mr-2"></i>Limpiar todo
+        </button>
+      </form>
+
+      <div class="mt-5 pt-4 border-t border-slate-200 text-xs text-slate-500 space-y-1">
+        <p><i class="fa-solid fa-circle-info mr-1 text-amber-500"></i> Normas de bisagras:</p>
+        <p>• Altura 72 cm (720 mm) = <b>1 par de bisagras</b> por puerta</p>
+        <p>• Altura 204 cm (2040 mm) = <b>3 pares de bisagras</b> por puerta</p>
+      </div>
+    </div>
+
+    <!-- ===================== LISTA DE MUEBLES ===================== -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white p-5 rounded-xl shadow-md border border-slate-200">
+        <h2 class="text-xl font-semibold mb-4 text-slate-800">
+          <i class="fa-solid fa-list-check text-amber-600 mr-2"></i>Despiece por mueble
+          <span id="contadorMuebles" class="text-sm font-normal text-slate-500 ml-2"></span>
+        </h2>
+        <div id="listaMuebles" class="space-y-5">
+          <p class="text-slate-500 text-center py-8">
+            <i class="fa-solid fa-box-open text-3xl block mb-2 text-slate-300"></i>
+            No hay muebles agregados todavía.
+          </p>
+        </div>
+      </div>
+
+      <div id="cantosPanel" class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hidden">
+        <div class="bg-sky-700 px-5 py-4">
+          <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+            <i class="fa-solid fa-ruler-combined text-sky-200"></i>Resumen de cantos (metros lineales)
+          </h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-sky-900 text-white"><tr>
+              <th class="text-left py-2 px-3">Mueble</th><th class="text-left py-2 px-3">Pieza</th>
+              <th class="text-center py-2 px-3">Cant.</th><th class="text-center py-2 px-3">Cantos</th>
+              <th class="text-center py-2 px-3">Tipo</th>
+              <th class="text-right py-2 px-3">ML por pieza</th><th class="text-right py-2 px-3">ML totales</th>
+              <th class="text-right py-2 px-3">Costo canto</th>
+            </tr></thead>
+            <tbody id="cuerpoCantos" class="divide-y divide-slate-100"></tbody>
+            <tfoot class="bg-sky-50 font-semibold"><tr>
+              <td class="py-2 px-3" colspan="4">TOTAL</td>
+              <td class="py-2 px-3 text-center" id="cantosTotalTipo">-</td>
+              <td class="py-2 px-3"></td>
+              <td class="py-2 px-3 text-right" id="cantosTotalML">0.00</td>
+              <td class="py-2 px-3 text-right text-sky-700" id="cantosTotalCosto">$0.00</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div id="costoPanel" class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hidden">
+        <div class="bg-emerald-700 px-5 py-4">
+          <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+            <i class="fa-solid fa-dollar-sign text-emerald-200"></i>Análisis de costo
+          </h2>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 p-4 bg-emerald-50 border-b border-emerald-100">
+          <div class="bg-white rounded-lg p-3 border border-emerald-200 shadow-sm"><p class="text-[11px] text-slate-500 uppercase tracking-wide">Área neta piezas</p><p class="text-lg font-bold text-slate-800" id="costoAreaNeta">0.00 m²</p></div>
+          <div class="bg-white rounded-lg p-3 border border-emerald-200 shadow-sm"><p class="text-[11px] text-slate-500 uppercase tracking-wide">+ Desperdicio</p><p class="text-lg font-bold text-amber-700" id="costoAreaTotal">0.00 m²</p></div>
+          <div class="bg-white rounded-lg p-3 border border-emerald-200 shadow-sm"><p class="text-[11px] text-slate-500 uppercase tracking-wide">Tableros estructura</p><p class="text-lg font-bold text-amber-700" id="costoTablerosEstructura">0</p></div>
+          <div class="bg-white rounded-lg p-3 border border-emerald-200 shadow-sm"><p class="text-[11px] text-slate-500 uppercase tracking-wide">Tableros revestimiento</p><p class="text-lg font-bold text-emerald-700" id="costoTablerosRevestimiento">0</p></div>
+          <div class="bg-white rounded-lg p-3 border border-emerald-300 shadow-sm"><p class="text-[11px] text-slate-500 uppercase tracking-wide">Costo total</p><p class="text-lg font-bold text-emerald-700" id="costoTotal">$0.00</p></div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-800 text-white"><tr>
+              <th class="text-left py-2 px-3">Mueble</th>
+              <th class="text-center py-2 px-3">Piezas</th>
+              <th class="text-right py-2 px-3">Área neta</th>
+              <th class="text-right py-2 px-3">Con desp.</th>
+              <th class="text-right py-2 px-3">Estructura ($)</th>
+              <th class="text-right py-2 px-3">Revestimiento ($)</th>
+              <th class="text-right py-2 px-3">Canto Est.</th>
+              <th class="text-right py-2 px-3">Canto Rev.</th>
+              <th class="text-right py-2 px-3">Enchapado ($)</th>
+              <th class="text-right py-2 px-3">Cortes ($)</th>
+              <th class="text-right py-2 px-3">Bisagras</th>
+              <th class="text-right py-2 px-3">Correderas</th>
+              <th class="text-right py-2 px-3">Tiradores</th>
+              <th class="text-right py-2 px-3">Patas</th>
+              <th class="text-right py-2 px-3">Tornillos</th>
+              <th class="text-right py-2 px-3">Bisagra recta</th>
+              <th class="text-right py-2 px-3">Elevación</th>
+              <th class="text-right py-2 px-3">Platera</th>
+              <th class="text-right py-2 px-3">Condimentero</th>
+              <th class="text-right py-2 px-3">Mano Obra (%)</th>
+              <th class="text-right py-2 px-3">Gastos Adm. (%)</th>
+              <th class="text-right py-2 px-3">Total</th>
+            </tr></thead>
+            <tbody id="cuerpoCostos" class="divide-y divide-slate-100"></tbody>
+            <tfoot class="bg-emerald-50 font-semibold"><tr>
+              <td class="py-2 px-3">TOTAL</td>
+              <td class="py-2 px-3 text-center" id="costoTotalPiezas">0</td>
+              <td class="py-2 px-3 text-right" id="costoTotalAreaNeta">0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalAreaDesc">0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalEstructura">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalRevestimiento">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalCantoEst">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalCantoRev">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalEnchapado">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalCortes">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalBisagras">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalCorrederas">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalTiradores">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalPatas">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalTornillos">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalBisagraRecta">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalElevacion">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalPlatera">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalCondimentero">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalManoObra">$0.00</td>
+              <td class="py-2 px-3 text-right" id="costoTotalGastosAdmin">$0.00</td>
+              <td class="py-2 px-3 text-right text-emerald-700" id="costoTotalGeneral">$0.00</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div id="resumenPanel" class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hidden">
+        <div class="bg-slate-900 px-5 py-4">
+          <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-list text-amber-400"></i>Resumen general
+          </h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-800 text-white"><tr>
+              <th class="text-left py-2 px-3">Componente / Herraje</th>
+              <th class="text-center py-2 px-3">Cant. total</th>
+              <th class="text-right py-2 px-3">Ancho (mm)</th>
+              <th class="text-right py-2 px-3">Alto (mm)</th>
+              <th class="text-left py-2 px-3">Material / Color</th>
+              <th class="text-left py-2 px-3">Muebles</th>
+            </tr></thead>
+            <tbody id="cuerpoResumen" class="divide-y divide-slate-100"></tbody>
+            <tfoot class="bg-slate-100 font-semibold"><tr>
+              <td class="py-2 px-3">Total ítems</td>
+              <td class="py-2 px-3 text-center" id="totalPiezasResumen">0</td>
+              <td colspan="4"></td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===================== DIAGRAMA DE CORTES ===================== -->
+      <div id="cortesPanel" class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden hidden">
+        <div class="bg-indigo-700 px-5 py-4 flex items-center justify-between">
+          <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+            <i class="fa-solid fa-scissors text-indigo-200"></i>Optimización de Cortes
+          </h2>
+          <div class="flex gap-3 text-xs no-print">
+            <span class="flex items-center gap-1 text-indigo-200"><i class="fa-solid fa-cube text-amber-300"></i> Estructura</span>
+            <span class="flex items-center gap-1 text-indigo-200"><i class="fa-solid fa-paint-roller text-emerald-300"></i> Revestimiento</span>
+          </div>
+        </div>
+        <div class="p-5 space-y-8">
+          
+          <div id="cortesEstructuraContenedor"></div>
+          <div id="cortesRevestimientoContenedor"></div>
+          
+          <div id="noCortesMsg" class="text-center py-8 text-slate-400 hidden">
+            <i class="fa-solid fa-box-open text-3xl block mb-2"></i>
+            No hay piezas para mostrar.
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="text-center text-slate-400 text-xs py-6 mt-8 border-t border-slate-200">
+    Calculadora de despiece + catálogo + herrajes colapsables
+  </footer>
+</div>
+
+<!-- ============ MODAL: AGREGAR/EDITAR CÓDIGO ============ -->
+<div id="modalAgregar" class="hidden fixed inset-0 z-50 bg-black bg-opacity-50 items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div id="modalHeader" class="bg-emerald-600 px-5 py-3 flex items-center justify-between">
+      <h3 id="modalTitulo" class="text-lg font-bold text-white"><i class="fa-solid fa-plus mr-2"></i>Agregar nuevo código</h3>
+      <button onclick="cerrarAgregarCodigo()" class="text-white hover:text-emerald-200"><i class="fa-solid fa-times text-xl"></i></button>
+    </div>
+    <div class="p-5 overflow-y-auto space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Código *</label><input type="text" id="ncCodigo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm uppercase focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-solid fa-align-left text-emerald-600 mr-1"></i>Descripción breve *</label><input type="text" id="ncDescripcion" maxlength="120" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Categoría *</label>
+          <select id="ncCategoria" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <option value="bases">Bases</option><option value="aereos">Aéreos</option><option value="columnas">Columnas</option><option value="armarios">Armarios</option>
+          </select></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tipo</label><input type="text" id="ncTipo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+      </div>
+      <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nombre / Descripción larga</label><input type="text" id="ncNombre" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Alto (mm)</label><input type="number" id="ncAlto" value="720" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Prof. (mm)</label><input type="number" id="ncProf" value="580" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Precio ($)</label><input type="number" id="ncPrecio" value="0" step="0.01" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Características</label><input type="text" id="ncCaracteristicas" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+      </div>
+      <div class="border-t border-slate-200 pt-3">
+        <p class="text-xs font-bold text-slate-700 mb-2">Componentes</p>
+        <div class="grid grid-cols-2 gap-3">
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncPuertas" class="w-4 h-4 text-emerald-600 rounded"> Puertas <input type="number" id="ncCantPuertas" value="1" min="1" max="6" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncGavetas" class="w-4 h-4 text-emerald-600 rounded"> Gavetas <input type="number" id="ncCantGavetas" value="2" min="1" max="10" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncRepisas" class="w-4 h-4 text-emerald-600 rounded"> Repisas <input type="number" id="ncCantRepisas" value="1" min="1" max="10" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncPanel" class="w-4 h-4 text-emerald-600 rounded"> Panel</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncFinta" class="w-4 h-4 text-emerald-600 rounded"> Finta</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncRodapie" class="w-4 h-4 text-emerald-600 rounded"> Rodapié</label>
+        </div>
+      </div>
+      <div id="ncMensaje" class="text-xs font-semibold"></div>
+    </div>
+    <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex gap-2 justify-end">
+      <button onclick="cerrarAgregarCodigo()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm">Cancelar</button>
+      <button onclick="guardarNuevoCodigo()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium"><i class="fa-solid fa-save mr-1"></i>Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ACORDEÓN
+   ============================================================ */
+const ACC_LS_KEY = 'acordeon_estado_v1';
+function leerEstadoAcordeon() { try { const g = localStorage.getItem(ACC_LS_KEY); if (g) return JSON.parse(g); } catch(e){} return {}; }
+function guardarEstadoAcordeon(e) { try { localStorage.setItem(ACC_LS_KEY, JSON.stringify(e)); } catch(e){} }
+function toggleAccordion(h) {
+  const id = h.getAttribute('data-target');
+  const body = document.getElementById(id);
+  if (!body) return;
+  const open = h.getAttribute('aria-expanded') === 'true';
+  const nuevo = !open;
+  h.setAttribute('aria-expanded', nuevo ? 'true' : 'false');
+  body.classList.toggle('is-open', nuevo);
+  const estado = leerEstadoAcordeon(); estado[id] = nuevo; guardarEstadoAcordeon(estado);
+}
+function accKeydown(e, h) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleAccordion(h); } }
+function inicializarAcordeon() {
+  const estado = leerEstadoAcordeon();
+  document.querySelectorAll('.accordion-header').forEach(h => {
+    const id = h.getAttribute('data-target');
+    const body = document.getElementById(id);
+    if (!body) return;
+    let abierto = h.getAttribute('aria-expanded') === 'true';
+    if (estado.hasOwnProperty(id)) abierto = estado[id];
+    h.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    body.classList.toggle('is-open', abierto);
+  });
+}
+function resetAcordeon() {
+  if (!confirm('¿Restaurar el estado por defecto de todas las secciones?')) return;
+  try { localStorage.removeItem(ACC_LS_KEY); } catch(e){}
+  document.querySelectorAll('.accordion-header').forEach(h => {
+    const id = h.getAttribute('data-target');
+    const body = document.getElementById(id);
+    if (!body) return;
+    const def = h.getAttribute('data-default') === 'open';
+    h.setAttribute('aria-expanded', def ? 'true' : 'false');
+    body.classList.toggle('is-open', def);
+  });
+}
+
+/* ============================================================
+   CATÁLOGO
+   ============================================================ */
+const CATALOGO_INICIAL = [
+  { codigo:'BA01000B', nombre:'BASE ABIERTA', descripcion:'Base abierta con 1 repisa, sin puertas', categoria:'bases', tipo:'Base abierta', altoBase:720, profBase:580, precio:520.00, caracteristicas:'1 repisa, sin puertas', opts:{incluirPuertas:false,incluirGavetas:false,incluirRepisas:true,cantRepisas:1} },
+  { codigo:'BA03001', nombre:'BASE 1 PUERTA 1 REPISA', descripcion:'Base de 1 puerta con 1 repisa interna', categoria:'bases', tipo:'Base 1 puerta', altoBase:720, profBase:580, precio:520.00, caracteristicas:'1 puerta + 1 repisa', opts:{incluirPuertas:true,cantPuertas:1,incluirRepisas:true,cantRepisas:1} },
+  { codigo:'BA060006', nombre:'BASE CON DOS PUERTAS 1 REPISA', descripcion:'Base de 2 puertas con 1 repisa interna', categoria:'bases', tipo:'Base 2 puertas', altoBase:720, profBase:580, precio:520.00, caracteristicas:'2 puertas + 1 repisa', opts:{incluirPuertas:true,cantPuertas:2,incluirRepisas:true,cantRepisas:1} },
+  { codigo:'PE06033', nombre:'AEREO H36 1 PUERTA 1 REPISA', descripcion:'Aéreo de 36 cm alto con 1 puerta y 1 repisa', categoria:'aereos', tipo:'Aéreo 36H', altoBase:360, profBase:330, precio:268.80, caracteristicas:'1 puerta + 1 repisa', opts:{incluirPuertas:true,cantPuertas:1,incluirRepisas:true,cantRepisas:1} },
+  { codigo:'PE09033', nombre:'AEREO H36 2 PUERTAS 1 REPISA', descripcion:'Aéreo de 36 cm alto con 2 puertas y 1 repisa', categoria:'aereos', tipo:'Aéreo 36H', altoBase:360, profBase:330, precio:268.80, caracteristicas:'2 puertas + 1 repisa', opts:{incluirPuertas:true,cantPuertas:2,incluirRepisas:true,cantRepisas:1} },
+  { codigo:'CL03001', nombre:'ARMARIO DESPENSA 1 PUERTA 2 ENTREPAÑOS', descripcion:'Columna despensa con 1 puerta y 2 entrepaños', categoria:'columnas', tipo:'Columna despensa', altoBase:1320, profBase:580, precio:3.30, caracteristicas:'1 puerta + 2 entrepaños', opts:{incluirPuertas:true,cantPuertas:1,incluirRepisas:true,cantRepisas:2} },
+  { codigo:'CL03031', nombre:'ARMARIO DESPENSA 2 PUERTAS 3 ENTREPAÑOS', descripcion:'Armario despensa de 2 puertas con 3 entrepaños', categoria:'armarios', tipo:'Armario despensa', altoBase:2040, profBase:350, precio:19.00, caracteristicas:'2 puertas + 3 entrepaños', opts:{incluirPuertas:true,cantPuertas:2,incluirRepisas:true,cantRepisas:3} },
+  { codigo:'CF06009', nombre:'ARMARIO HORNO 4 GAVETAS', descripcion:'Armario para horno con 4 gavetas', categoria:'armarios', tipo:'Armario horno', altoBase:1320, profBase:580, precio:760.00, caracteristicas:'4 gavetas', opts:{incluirPuertas:false,incluirGavetas:true,cantGavetas:4} }
+];
+const LS_KEY = 'catalogo_muebles_v1';
+function cargarCatalogo() { try { const g = localStorage.getItem(LS_KEY); if (g) return JSON.parse(g); } catch(e){} return [...CATALOGO_INICIAL]; }
+function guardarCatalogoLS() { try { localStorage.setItem(LS_KEY, JSON.stringify(BIBLIOTECA)); } catch(e){} }
+
+let BIBLIOTECA = cargarCatalogo();
+let muebles = [];
+let editandoPrecioPatasId = null, editandoPrecioCorrederaId = null, editandoCodigoActual = null;
+let editandoTornillo = null, editandoBisagraRecta = null, editandoElevacion = null, editandoPlatera = null, editandoCondimentero = null, editandoTiradorId = null;
+
+const fmt = n => Number(n).toLocaleString('es-ES', { maximumFractionDigits: 2 });
+const fmtMoney = n => '$' + Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const uid = () => Date.now() + Math.floor(Math.random()*1000);
+
+const TORNILLOS_DEF = [
+  { key: 't6x2', etiqueta: 'Tornillos 6x2 x100 und', precioDefault: 2.50, precioId: 'precioTornillo6x2', incluirId: 'incluirTornillo6x2', panelId: 'panelTornillo6x2' },
+  { key: 't6x1_4', etiqueta: 'Tornillos 6x1 1/4 x100 und', precioDefault: 1.26, precioId: 'precioTornillo6x1_4', incluirId: 'incluirTornillo6x1_4', panelId: 'panelTornillo6x1_4' },
+  { key: 't5_8x6', etiqueta: 'Tornillos 5/8 x6 x100 und', precioDefault: 1.68, precioId: 'precioTornillo5_8x6', incluirId: 'incluirTornillo5_8x6', panelId: 'panelTornillo5_8x6' }
+];
+const BISAGRA_RECTA_DEF = { key: 'bisagraRecta', etiqueta: 'Bisagra recta', precioDefault: 1.50 };
+const ELEVACION_DEF = [
+  { key: 'amortiguadorAutoelevable', etiqueta: 'Amortiguador autoelevable', precioDefault: 1.92, precioId: 'precioAmortiguadorAutoelevable', incluirId: 'incluirAmortiguadorAutoelevable', panelId: 'panelAmortiguadorAutoelevable' },
+  { key: 'elevacionPuertaDoble', etiqueta: 'Sistema de elevación puerta doble', precioDefault: 124.66, precioId: 'precioElevacionPuertaDoble', incluirId: 'incluirElevacionPuertaDoble', panelId: 'panelElevacionPuertaDoble' },
+  { key: 'elevacionPuertaSencilla', etiqueta: 'Sistema de elevación de puerta sencilla', precioDefault: 49.00, precioId: 'precioElevacionPuertaSencilla', incluirId: 'incluirElevacionPuertaSencilla', panelId: 'panelElevacionPuertaSencilla' }
+];
+const PLATERA_DEF = [
+  { key: 'platera60', etiqueta: 'Platera 60 cm', precioDefault: 29.94, precioId: 'precioPlatera60', incluirId: 'incluirPlatera60', panelId: 'panelPlatera60' },
+  { key: 'platera70', etiqueta: 'Platera 70 cm', precioDefault: 29.94, precioId: 'precioPlatera70', incluirId: 'incluirPlatera70', panelId: 'panelPlatera70' },
+  { key: 'platera80', etiqueta: 'Platera 80 cm', precioDefault: 29.94, precioId: 'precioPlatera80', incluirId: 'incluirPlatera80', panelId: 'panelPlatera80' },
+  { key: 'platera90', etiqueta: 'Platera 90 cm', precioDefault: 29.94, precioId: 'precioPlatera90', incluirId: 'incluirPlatera90', panelId: 'panelPlatera90' }
+];
+const CONDIMENTERO_DEF = [
+  { key: 'condimentero15', etiqueta: 'Condimentero 15 cm', precioDefault: 67.00, precioId: 'precioCondimentero15', incluirId: 'incluirCondimentero15', panelId: 'panelCondimentero15' },
+  { key: 'condimentero20', etiqueta: 'Condimentero 20 cm', precioDefault: 67.00, precioId: 'precioCondimentero20', incluirId: 'incluirCondimentero20', panelId: 'panelCondimentero20' },
+  { key: 'condimentero30', etiqueta: 'Condimentero 30 cm', precioDefault: 67.00, precioId: 'precioCondimentero30', incluirId: 'incluirCondimentero30', panelId: 'panelCondimentero30' },
+  { key: 'condimentero35', etiqueta: 'Condimentero 35 cm', precioDefault: 67.00, precioId: 'precioCondimentero35', incluirId: 'incluirCondimentero35', panelId: 'panelCondimentero35' },
+  { key: 'condimentero40', etiqueta: 'Condimentero 40 cm', precioDefault: 67.00, precioId: 'precioCondimentero40', incluirId: 'incluirCondimentero40', panelId: 'panelCondimentero40' }
+];
+const DESC = { TECHO_PISO: 36, FONDO_MUEBLE: 36, PUERTA: 3, REPISA_ANCHO: 36, REPISA_PROF: 18, REPISA_ESPESOR: 18,
+  EXTRA_GAVETA_ANCHO: 36, GAVETA_PROF_REDUCCION: 116, RODAPIE_ALTO: 150, RODAPIE_ANCHO_DESC: 36,
+  BLUM_FONDO_DESC: 98, BLUM_LATERAL_ALTO: 16, BLUM_LATERAL_LARGO: 500,
+  BLUM_FRENTE_ANCHO_DESC: 74.2, BLUM_FRENTE_ALTO: 150, GAVETA_ALTO_EXTRA: 11 };
+const CORREDERAS = { telescopica: { holgura: 25 }, oculta: { holgura: 10 }, ocultaBlum: { holgura: 74.2 } };
+
+const COMPONENTES_REVESTIMIENTO = ['Puerta', 'Frente de gaveta', 'Frente interno gaveta', 'Frente interno gaveta (Blum)', 'Panel', 'Finta', 'Rodapié'];
+function esRevestimiento(nombreComponente) {
+  return COMPONENTES_REVESTIMIENTO.some(rev => nombreComponente.startsWith(rev));
+}
+function tipoLamina(nombreComponente) {
+  return esRevestimiento(nombreComponente) ? 'revestimiento' : 'estructura';
+}
+
+function poblarDatalist() {
+  const dl = document.getElementById('listaCodigos'); dl.innerHTML = '';
+  BIBLIOTECA.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b.codigo;
+    opt.label = `${b.codigo} — ${b.descripcion || b.nombre} — ${fmtMoney(b.precio)}`;
+    dl.appendChild(opt);
+  });
+}
+function buscarPorCodigo(c) { if (!c) return null; return BIBLIOTECA.find(b => b.codigo.toUpperCase() === c.toUpperCase().trim()); }
+function validarCodigoEnVivo() {
+  const c = document.getElementById('codigoMueble').value.trim().toUpperCase();
+  const a = document.getElementById('alertaCodigo');
+  if (!c) { a.innerHTML = ''; return; }
+  const e = buscarPorCodigo(c);
+  if (e) a.innerHTML = `<span class="text-emerald-700">✅ ${e.descripcion || e.nombre} — ${fmtMoney(e.precio)}</span>`;
+  else a.innerHTML = `<span class="text-red-600">⚠ No registrado — <button type="button" onclick="abrirAgregarCodigo('${c}')" class="underline font-bold">Agregarlo</button></span>`;
+}
+function cargarMueblePorCodigo() {
+  const codigo = document.getElementById('codigoMueble').value.trim().toUpperCase();
+  const info = document.getElementById('infoCodigo');
+  if (!codigo) { info.innerHTML = '<span class="text-red-600">Escribe un código.</span>'; return; }
+  const m = buscarPorCodigo(codigo);
+  if (!m) { info.innerHTML = `<span class="text-red-600">❌ "${codigo}" no existe.</span>`; return; }
+  document.getElementById('nombreMueble').value = m.codigo;
+  document.getElementById('altoMueble').value = m.altoBase || 720;
+  document.getElementById('profMueble').value = m.profBase || 580;
+  document.getElementById('anchoMueble').value = 600;
+  const o = m.opts || {};
+  document.getElementById('incluirPuertas').checked = !!o.incluirPuertas;
+  document.getElementById('panelPuertas').classList.toggle('hidden', !o.incluirPuertas);
+  if (o.cantPuertas) document.getElementById('cantPuertas').value = o.cantPuertas;
+  document.getElementById('incluirGavetas').checked = !!o.incluirGavetas;
+  document.getElementById('panelGavetas').classList.toggle('hidden', !o.incluirGavetas);
+  if (o.cantGavetas) document.getElementById('cantGavetas').value = o.cantGavetas;
+  document.getElementById('incluirRepisas').checked = !!o.incluirRepisas;
+  document.getElementById('panelRepisas').classList.toggle('hidden', !o.incluirRepisas);
+  if (o.cantRepisas) document.getElementById('cantRepisas').value = o.cantRepisas;
+  document.getElementById('incluirPanel').checked = !!o.incluirPanel;
+  document.getElementById('panelPanel').classList.toggle('hidden', !o.incluirPanel);
+  document.getElementById('incluirFinta').checked = !!o.incluirFinta;
+  document.getElementById('panelFinta').classList.toggle('hidden', !o.incluirFinta);
+  document.getElementById('incluirRodapie').checked = !!o.incluirRodapie;
+  document.getElementById('panelRodapie').classList.toggle('hidden', !o.incluirRodapie);
+  info.innerHTML = `<div class="bg-white border border-amber-300 rounded-lg p-3">
+    <div class="flex justify-between items-start gap-2">
+      <div class="min-w-0 flex-1">
+        <p class="font-bold text-amber-900 text-sm">✅ ${m.codigo}</p>
+        <p class="text-slate-800 text-xs italic mt-1 border-l-2 border-amber-400 pl-2"><i class="fa-solid fa-align-left text-amber-500 mr-1"></i>${m.descripcion || 'Sin descripción'}</p>
+        <p class="text-amber-700 text-xs mt-2"><b>${m.nombre}</b></p>
+        <p class="text-slate-600 text-xs mt-1"><b>Categoría:</b> ${m.categoria} · <b>Tipo:</b> ${m.tipo}</p>
+        <p class="text-slate-600 text-xs"><b>Medidas:</b> ${m.altoBase} × ${m.profBase} mm</p>
+        <p class="text-indigo-700 text-sm font-bold mt-2">${fmtMoney(m.precio)}</p>
+      </div>
+      <div class="flex gap-1 flex-shrink-0">
+        <button type="button" onclick="abrirEditarCodigo('${m.codigo}')" class="edit-codigo-btn bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i></button>
+        <button type="button" onclick="eliminarCodigoCatalogo('${m.codigo}')" class="edit-codigo-btn bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
+  </div>`;
+}
+function mostrarCategoria(cat) {
+  const cont = document.getElementById('infoCodigo');
+  const lista = cat === 'todo' ? BIBLIOTECA : BIBLIOTECA.filter(b => b.categoria === cat);
+  let html = `<p class="font-bold text-slate-700 text-xs mb-2">${cat.toUpperCase()} — ${lista.length} muebles</p><div class="space-y-1 max-h-96 overflow-y-auto">`;
+  lista.forEach(b => {
+    html += `<div class="flex justify-between items-center gap-1 bg-slate-50 hover:bg-amber-50 border border-slate-200 rounded px-2 py-1">
+      <div class="min-w-0 flex-1 cursor-pointer" onclick="document.getElementById('codigoMueble').value='${b.codigo}'; cargarMueblePorCodigo();">
+        <p class="font-mono font-bold text-amber-800 text-[11px]">${b.codigo}</p>
+        <p class="text-slate-700 text-[10px] truncate italic">${b.descripcion || b.nombre}</p>
+      </div>
+      <span class="font-bold text-indigo-700 text-[11px] flex-shrink-0">${fmtMoney(b.precio)}</span>
+      <button type="button" onclick="event.stopPropagation(); abrirEditarCodigo('${b.codigo}')" class="edit-codigo-btn text-blue-500 hover:text-blue-700 p-1"><i class="fa-solid fa-pen text-[10px]"></i></button>
+      <button type="button" onclick="event.stopPropagation(); eliminarCodigoCatalogo('${b.codigo}')" class="edit-codigo-btn text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash text-[10px]"></i></button>
+    </div>`;
+  });
+  html += '</div>';
+  cont.innerHTML = html;
+}
+function abrirAgregarCodigo(c = '') {
+  editandoCodigoActual = null;
+  document.getElementById('modalTitulo').innerHTML = '<i class="fa-solid fa-plus mr-2"></i>Agregar nuevo código';
+  document.getElementById('modalHeader').className = 'bg-emerald-600 px-5 py-3 flex items-center justify-between';
+  ['ncCodigo','ncDescripcion','ncNombre','ncTipo','ncCaracteristicas'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ncCodigo').value = c || '';
+  document.getElementById('ncCategoria').value = 'bases';
+  document.getElementById('ncAlto').value = 720;
+  document.getElementById('ncProf').value = 580;
+  document.getElementById('ncPrecio').value = 0;
+  ['ncPuertas','ncGavetas','ncRepisas','ncPanel','ncFinta','ncRodapie'].forEach(id => document.getElementById(id).checked = false);
+  document.getElementById('ncCantPuertas').value = 1;
+  document.getElementById('ncCantGavetas').value = 2;
+  document.getElementById('ncCantRepisas').value = 1;
+  document.getElementById('ncMensaje').innerHTML = '';
+  document.getElementById('modalAgregar').classList.remove('hidden');
+  document.getElementById('modalAgregar').classList.add('flex');
+  setTimeout(() => document.getElementById('ncCodigo').focus(), 100);
+}
+function abrirEditarCodigo(c) {
+  const m = buscarPorCodigo(c); if (!m) { alert('Código no encontrado.'); return; }
+  editandoCodigoActual = c;
+  document.getElementById('modalTitulo').innerHTML = `<i class="fa-solid fa-pen mr-2"></i>Editar código: ${m.codigo}`;
+  document.getElementById('modalHeader').className = 'bg-blue-600 px-5 py-3 flex items-center justify-between';
+  document.getElementById('ncCodigo').value = m.codigo;
+  document.getElementById('ncDescripcion').value = m.descripcion || '';
+  document.getElementById('ncCategoria').value = m.categoria || 'bases';
+  document.getElementById('ncNombre').value = m.nombre || '';
+  document.getElementById('ncTipo').value = m.tipo || '';
+  document.getElementById('ncAlto').value = m.altoBase || 720;
+  document.getElementById('ncProf').value = m.profBase || 580;
+  document.getElementById('ncPrecio').value = m.precio || 0;
+  document.getElementById('ncCaracteristicas').value = m.caracteristicas || '';
+  const o = m.opts || {};
+  document.getElementById('ncPuertas').checked = !!o.incluirPuertas;
+  document.getElementById('ncCantPuertas').value = o.cantPuertas || 1;
+  document.getElementById('ncGavetas').checked = !!o.incluirGavetas;
+  document.getElementById('ncCantGavetas').value = o.cantGavetas || 2;
+  document.getElementById('ncRepisas').checked = !!o.incluirRepisas;
+  document.getElementById('ncCantRepisas').value = o.cantRepisas || 1;
+  document.getElementById('ncPanel').checked = !!o.incluirPanel;
+  document.getElementById('ncFinta').checked = !!o.incluirFinta;
+  document.getElementById('ncRodapie').checked = !!o.incluirRodapie;
+  document.getElementById('ncMensaje').innerHTML = '';
+  document.getElementById('modalAgregar').classList.remove('hidden');
+  document.getElementById('modalAgregar').classList.add('flex');
+  setTimeout(() => document.getElementById('ncDescripcion').focus(), 100);
+}
+function cerrarAgregarCodigo() {
+  document.getElementById('modalAgregar').classList.add('hidden');
+  document.getElementById('modalAgregar').classList.remove('flex');
+  editandoCodigoActual = null;
+}
+function guardarNuevoCodigo() {
+  const codigo = document.getElementById('ncCodigo').value.trim().toUpperCase();
+  const descripcion = document.getElementById('ncDescripcion').value.trim();
+  const categoria = document.getElementById('ncCategoria').value;
+  const nombre = document.getElementById('ncNombre').value.trim();
+  const tipo = document.getElementById('ncTipo').value.trim() || 'Personalizado';
+  const altoBase = parseInt(document.getElementById('ncAlto').value) || 720;
+  const profBase = parseInt(document.getElementById('ncProf').value) || 580;
+  const precio = parseFloat(document.getElementById('ncPrecio').value) || 0;
+  const caracteristicas = document.getElementById('ncCaracteristicas').value.trim();
+  const msg = document.getElementById('ncMensaje');
+  if (!codigo) { msg.innerHTML = '<span class="text-red-600">⚠ El código es obligatorio.</span>'; return; }
+  if (!descripcion) { msg.innerHTML = '<span class="text-red-600">⚠ La descripción breve es obligatoria.</span>'; return; }
+  if (!nombre) { msg.innerHTML = '<span class="text-red-600">⚠ El nombre es obligatorio.</span>'; return; }
+  if (editandoCodigoActual && editandoCodigoActual !== codigo && buscarPorCodigo(codigo)) { msg.innerHTML = `<span class="text-red-600">⚠ Ya existe otro código con "${codigo}".</span>`; return; }
+  if (!editandoCodigoActual && buscarPorCodigo(codigo) && !confirm(`El código "${codigo}" ya existe. ¿Sobrescribirlo?`)) return;
+  const opts = {
+    incluirPuertas: document.getElementById('ncPuertas').checked, cantPuertas: parseInt(document.getElementById('ncCantPuertas').value) || 1,
+    incluirGavetas: document.getElementById('ncGavetas').checked, cantGavetas: parseInt(document.getElementById('ncCantGavetas').value) || 2,
+    incluirRepisas: document.getElementById('ncRepisas').checked, cantRepisas: parseInt(document.getElementById('ncCantRepisas').value) || 1,
+    incluirPanel: document.getElementById('ncPanel').checked, incluirFinta: document.getElementById('ncFinta').checked, incluirRodapie: document.getElementById('ncRodapie').checked
+  };
+  const datos = { codigo, nombre, descripcion, categoria, tipo, altoBase, profBase, precio, caracteristicas, opts };
+  if (editandoCodigoActual) {
+    const idx = BIBLIOTECA.findIndex(b => b.codigo.toUpperCase() === editandoCodigoActual.toUpperCase());
+    if (idx >= 0) BIBLIOTECA[idx] = datos; else BIBLIOTECA.push(datos);
+  } else {
+    const idx = BIBLIOTECA.findIndex(b => b.codigo.toUpperCase() === codigo);
+    if (idx >= 0) BIBLIOTECA[idx] = datos; else BIBLIOTECA.push(datos);
+  }
+  guardarCatalogoLS(); poblarDatalist();
+  msg.innerHTML = `<span class="text-emerald-700">✅ Código "${codigo}" guardado.</span>`;
+  setTimeout(() => { cerrarAgregarCodigo(); document.getElementById('codigoMueble').value = codigo; cargarMueblePorCodigo(); }, 600);
+}
+function eliminarCodigoCatalogo(c) {
+  const m = buscarPorCodigo(c); if (!m) return;
+  if (!confirm(`¿Eliminar el código "${c}"?`)) return;
+  BIBLIOTECA = BIBLIOTECA.filter(b => b.codigo.toUpperCase() !== c.toUpperCase());
+  guardarCatalogoLS(); poblarDatalist();
+  document.getElementById('infoCodigo').innerHTML = `<span class="text-emerald-700">✅ Código "${c}" eliminado.</span>`;
+}
+
+/* ============================================================
+   CONFIG / DESPIECE / COSTOS
+   ============================================================ */
+function leerConfigTablero() {
+  const largo = parseFloat(document.getElementById('largoTablero').value) || 2440;
+  const ancho = parseFloat(document.getElementById('anchoTablero').value) || 1830;
+  const precioEstructura = parseFloat(document.getElementById('precioTableroEstructura').value) || 0;
+  const precioRevestimiento = parseFloat(document.getElementById('precioTableroRevestimiento').value) || 0;
+  const desperdicio = parseFloat(document.getElementById('desperdicioPct').value) || 0;
+  const precioCantoEstructura = parseFloat(document.getElementById('precioCantoEstructura').value) || 0;
+  const precioCantoRevestimiento = parseFloat(document.getElementById('precioCantoRevestimiento').value) || 0;
+  const precioParBisagra = parseFloat(document.getElementById('precioParBisagra').value) || 0;
+  const precioSetPatasGlobal = parseFloat(document.getElementById('precioSetPatasGlobal').value) || 0;
+  
+  const precioEnchapado = parseFloat(document.getElementById('precioEnchapado').value) || 0;
+  const precioCorte = parseFloat(document.getElementById('precioCorte').value) || 0;
+  const cantidadCortesPorLamina = parseInt(document.getElementById('cantidadCortesPorLamina').value) || 0;
+
+  const porcentajeManoObra = parseFloat(document.getElementById('porcentajeManoObra').value) || 0;
+  const porcentajeGastosAdmin = parseFloat(document.getElementById('porcentajeGastosAdmin').value) || 0;
+
+  const areaTableroM2 = (largo * ancho) / 1_000_000;
+  const precioM2Estructura = areaTableroM2 > 0 ? precioEstructura / areaTableroM2 : 0;
+  const precioM2Revestimiento = areaTableroM2 > 0 ? precioRevestimiento / areaTableroM2 : 0;
+  
+  return { largo, ancho, precioEstructura, precioRevestimiento, desperdicio, precioCantoEstructura, precioCantoRevestimiento, precioParBisagra, precioSetPatasGlobal, precioEnchapado, precioCorte, cantidadCortesPorLamina, porcentajeManoObra, porcentajeGastosAdmin, areaTableroM2, precioM2Estructura, precioM2Revestimiento };
+}
+function calcularParesBisagras(h) { if (h <= 800) return 1; if (h <= 1400) return 2; return 3; }
+function getPrecioCorredera(t, p) { if (t === 'telescopica') return p.telescopica; if (t === 'oculta') return p.oculta; if (t === 'ocultaBlum') return p.blum; return 0; }
+function getNombreCorredera(t) { if (t === 'telescopica') return 'Telescópica estándar'; if (t === 'oculta') return 'Oculta genérica'; if (t === 'ocultaBlum') return 'Oculta Blum / Push'; return t; }
+
+function calcularDespiece(alto, ancho, prof, espesor, opts, colores, veta) {
+  const baseMat = `Tablero ${espesor} mm`;
+  const P = (componente, cantidad, material, ancho, alto, observaciones, cantosDefault, esHerraje = false) => ({
+    id: uid() + Math.floor(Math.random()*10000), componente, cantidad, material, ancho, alto, observaciones, veta, esHerraje,
+    cantos: cantosDefault || { sup:false, inf:false, izq:false, der:false }
+  });
+  
+  let reduccionAltura = 0;
+  if (opts.tiradores?.incluir && opts.tiradores.tipoPrincipal === 'perfil' && opts.tiradores.variedad === 'gola' && opts.tiradores.categoriaGola === 'L') {
+    reduccionAltura = opts.tiradores.reduccionAltura || 30;
+  }
+
+  const piezas = [
+    P('Lateral', 2, `${baseMat} (${colores.lateral})`, prof, alto, `Lateral`, { sup:true, inf:true, izq:false, der:true }),
+    P('Techo / Piso', 2, `${baseMat} (${colores.pisoTecho})`, ancho - DESC.TECHO_PISO, prof, `Techo/Piso`, { sup:true, inf:true, izq:false, der:false }),
+    P('Fondo', 1, `${baseMat} (${colores.fondo})`, ancho - DESC.FONDO_MUEBLE, alto - DESC.FONDO_MUEBLE, `Fondo`, { sup:false, inf:false, izq:false, der:false })
+  ];
+  if (opts.incluirRepisas && opts.cantRepisas > 0) {
+    piezas.push(P('Repisa', opts.cantRepisas, `Tablero ${DESC.REPISA_ESPESOR} mm (${colores.pisoTecho})`,
+      ancho - DESC.REPISA_ANCHO, prof - DESC.REPISA_PROF, `Repisa`, { sup:true, inf:false, izq:false, der:false }));
+  }
+  let numPuertas = 0, altoPuertaCalc = 0;
+  if (opts.incluirPuertas && opts.cantPuertas > 0) {
+    numPuertas = opts.cantPuertas;
+    const anchoPuerta = ancho - DESC.PUERTA;
+    let altoPuerta;
+    if (numPuertas === 1) altoPuerta = alto - DESC.PUERTA; else altoPuerta = (alto / numPuertas) - DESC.PUERTA;
+    altoPuertaCalc = altoPuerta - reduccionAltura;
+    piezas.push(P(numPuertas === 1 ? 'Puerta' : `Puerta (${numPuertas} uds.)`, numPuertas,
+      `${baseMat} (${colores.puerta})`, anchoPuerta, altoPuertaCalc, `Puerta${reduccionAltura ? ' (Perfil L)' : ''}`, { sup:true, inf:true, izq:true, der:true }));
+  } else if (!opts.incluirGavetas) {
+    numPuertas = 1; altoPuertaCalc = alto - DESC.PUERTA - reduccionAltura;
+    piezas.push(P('Puerta', 1, `${baseMat} (${colores.puerta})`, ancho - DESC.PUERTA, altoPuertaCalc, `Puerta${reduccionAltura ? ' (Perfil L)' : ''}`, { sup:true, inf:true, izq:true, der:true }));
+  }
+  if (numPuertas > 0) {
+    const ppp = calcularParesBisagras(altoPuertaCalc);
+    piezas.push(P(`Bisagras de cazoleta (${ppp} par${ppp>1?'es':''} por puerta)`, ppp*numPuertas, 'Herraje metálico (Pares)', 0, 0, '', { sup:false, inf:false, izq:false, der:false }, true));
+  }
+  if (opts.incluirGavetas && opts.cantGavetas > 0) {
+    const n = opts.cantGavetas;
+    const holguraFrente = 3;
+    let altoFrente = (alto - (holguraFrente * (n + 1))) / n;
+    if (reduccionAltura > 0) altoFrente -= reduccionAltura;
+    const anchoFrente = ancho - (holguraFrente * 2);
+    piezas.push(P('Frente de gaveta', n, `${baseMat} (${colores.puerta})`, anchoFrente, altoFrente, `Frente visible${reduccionAltura ? ' (Perfil L)' : ''}`, { sup:true, inf:true, izq:true, der:true }));
+    
+    // CORRECCIÓN EN DESCUENTO DE GAVETAS CON CORREDERAS OCULTAS
+    let anchoCajon = 0;
+    if (opts.tipoCorredera === 'ocultaBlum') {
+      const afi = ancho - DESC.BLUM_FRENTE_ANCHO_DESC;
+      const fg = prof - DESC.BLUM_FONDO_DESC;
+      const alb = DESC.BLUM_LATERAL_ALTO + DESC.GAVETA_ALTO_EXTRA;
+      const afib = DESC.BLUM_FRENTE_ALTO + DESC.GAVETA_ALTO_EXTRA;
+      piezas.push(P('Lateral de gaveta (Blum)', n*2, `${baseMat} (${colores.lateral})`, DESC.BLUM_LATERAL_LARGO, alb, `Blum`, { sup:true, inf:false, izq:false, der:true }));
+      piezas.push(P('Frente interno gaveta (Blum)', n*2, `${baseMat} (${colores.lateral})`, afi, afib, `Blum`, { sup:true, inf:true, izq:false, der:false }));
+      piezas.push(P('Fondo de gaveta (Blum)', n, `Tablero 15 mm (${colores.fondo})`, afi, fg, `Blum`, { sup:false, inf:false, izq:false, der:false }));
+    } else {
+      const conf = CORREDERAS[opts.tipoCorredera] || CORREDERAS.telescopica;
+      const holgura = conf.holgura;
+      
+      // Si es oculta genérica, aplicamos el descuento exacto de 84mm (8.4cm)
+      if (opts.tipoCorredera === 'oculta') {
+        anchoCajon = ancho - 84;
+      } else {
+        anchoCajon = ancho - (espesor * 2) - holgura - DESC.EXTRA_GAVETA_ANCHO;
+      }
+
+      const profCajon = opts.profGaveta;
+      const altoLateral = opts.altoGaveta + DESC.GAVETA_ALTO_EXTRA;
+      piezas.push(P('Lateral de gaveta', n*2, `${baseMat} (${colores.lateral})`, profCajon, altoLateral, `Lateral`, { sup:true, inf:false, izq:false, der:true }));
+      piezas.push(P('Frente interno gaveta', n*2, `${baseMat} (${colores.lateral})`, anchoCajon, altoLateral, `Frente`, { sup:true, inf:true, izq:false, der:false }));
+      const profFondo = prof - DESC.GAVETA_PROF_REDUCCION;
+      piezas.push(P('Fondo de gaveta', n, `Tablero 15 mm (${colores.fondo})`, anchoCajon, profFondo, `Fondo`, { sup:false, inf:false, izq:false, der:false }));
+    }
+    const nombreCorredera = getNombreCorredera(opts.tipoCorredera);
+    piezas.push(P(`Par de correderas (${nombreCorredera})`, n, 'Herraje metálico (Pares)', 0, 0, `${nombreCorredera}`, { sup:false, inf:false, izq:false, der:false }, true));
+  }
+  if (opts.incluirPanel && opts.cantPanel > 0) {
+    const desc = opts.descripcionPanel?.trim();
+    let altoPanelFinal = opts.altoPanel;
+    if(reduccionAltura > 0) altoPanelFinal -= reduccionAltura;
+    piezas.push(P(desc ? `Panel (${desc})` : 'Panel', opts.cantPanel, `Tablero ${opts.espesorPanel} mm (${colores.pisoTecho})`, opts.anchoPanel, altoPanelFinal, `Panel${reduccionAltura ? ' (Perfil L)' : ''}`, { sup:true, inf:true, izq:true, der:true }));
+  }
+  if (opts.incluirFinta && opts.cantFinta > 0) {
+    const desc = opts.descripcionFinta?.trim();
+    piezas.push(P(desc ? `Finta (${desc})` : 'Finta', opts.cantFinta, `Tablero ${opts.espesorFinta} mm (${colores.pisoTecho})`, opts.anchoFinta, opts.altoFinta, `Finta`, { sup:true, inf:true, izq:true, der:true }));
+  }
+  if (opts.incluirRodapie && opts.cantRodapie > 0) {
+    const desc = opts.descripcionRodapie?.trim();
+    const anchoRodapie = ancho - DESC.RODAPIE_ANCHO_DESC;
+    piezas.push(P(desc ? `Rodapié (${desc})` : 'Rodapié', opts.cantRodapie, `Tablero ${opts.espesorRodapie} mm (${colores.pisoTecho})`, anchoRodapie, DESC.RODAPIE_ALTO, `Rodapié`, { sup:true, inf:false, izq:false, der:false }));
+  }
+  if (opts.incluirPatas) piezas.push(P('Patas plásticas regulables (set 4 uds.)', 1, 'Herraje plástico', 0, 0, 'Set 4 patas', { sup:false, inf:false, izq:false, der:false }, true));
+  
+  if (opts.tiradores?.incluir) {
+    const tipoTxt = opts.tiradores.tipoPrincipal === 'sobreponer' ? 'Sobreponer' : `Perfil ${opts.tiradores.categoriaGola}`;
+    const color = opts.tiradores.color || 'Aluminio';
+    piezas.push(P(`Tirador ${tipoTxt} (${color})`, opts.tiradores.cantidad || 1, 'Herraje metálico (Tirador)', 0, 0, `Tirador`, { sup:false, inf:false, izq:false, der:false }, true));
+  }
+
+  TORNILLOS_DEF.forEach(t => { if (opts.tornillos?.[t.key]?.incluir) piezas.push(P(`${t.etiqueta} (bolsa)`, 1, 'Herraje metálico (Tornillos)', 0, 0, `Bolsa de 100 unidades`, { sup:false, inf:false, izq:false, der:false }, true)); });
+  if (opts.bisagraRecta?.incluir && opts.bisagraRecta.cantidad > 0) piezas.push(P(`${BISAGRA_RECTA_DEF.etiqueta} (unidad)`, opts.bisagraRecta.cantidad, 'Herraje metálico (Unidades)', 0, 0, `Bisagra recta adicional`, { sup:false, inf:false, izq:false, der:false }, true));
+  if (opts.elevacion) ELEVACION_DEF.forEach(e => { if (opts.elevacion[e.key]?.incluir) piezas.push(P(`${e.etiqueta} (unidad)`, 1, 'Herraje metálico (Sistema elevación)', 0, 0, `${e.etiqueta}`, { sup:false, inf:false, izq:false, der:false }, true)); });
+  if (opts.platera) PLATERA_DEF.forEach(p => { if (opts.platera[p.key]?.incluir) piezas.push(P(`${p.etiqueta} (kit escurridor)`, 1, 'Herraje metálico (Platera)', 0, 0, `${p.etiqueta}`, { sup:false, inf:false, izq:false, der:false }, true)); });
+  if (opts.condimentero) CONDIMENTERO_DEF.forEach(cd => { if (opts.condimentero[cd.key]?.incluir) piezas.push(P(`${cd.etiqueta} (kit condimentero)`, 1, 'Herraje metálico (Condimentero)', 0, 0, `${cd.etiqueta}`, { sup:false, inf:false, izq:false, der:false }, true)); });
+  return piezas;
+}
+function calcularCantosPieza(p) {
+  if (p.esHerraje) return 0;
+  let ml = 0;
+  if (p.cantos?.sup) ml += p.ancho / 1000;
+  if (p.cantos?.inf) ml += p.ancho / 1000;
+  if (p.cantos?.izq) ml += p.alto / 1000;
+  if (p.cantos?.der) ml += p.alto / 1000;
+  return ml;
+}
+function validar(alto, ancho, prof, espesor) {
+  if ([alto, ancho, prof].some(v => isNaN(v) || v <= 0)) { alert('Las dimensiones deben ser números mayores a cero.'); return false; }
+  if (ancho - (espesor * 2) <= 0) { alert('El ancho es menor o igual al espacio de los dos laterales.'); return false; }
+  return true;
+}
+
+/* ============================================================
+   EVENTOS
+   ============================================================ */
+['incluirPuertas','incluirGavetas','incluirRepisas','incluirPanel','incluirFinta','incluirRodapie','incluirPatas','incluirBisagraRecta', 'incluirTirador'].forEach(id => {
+  const el = document.getElementById(id); if (!el) return;
+  el.addEventListener('change', e => {
+    const panel = document.getElementById('panel' + id.replace('incluir',''));
+    if (panel) panel.classList.toggle('hidden', !e.target.checked);
+    if (id === 'incluirPatas' && e.target.checked) {
+      const g = parseFloat(document.getElementById('precioSetPatasGlobal').value) || 0;
+      document.getElementById('precioSetPatas').value = g.toFixed(2);
+    }
+  });
+});
+
+document.getElementById('tipoTiradorPrincipal').addEventListener('change', e => {
+  const esPerfil = e.target.value === 'perfil';
+  const wrapVariedad = document.getElementById('tipoTiradorVariedad').closest('div');
+  wrapVariedad.style.display = esPerfil ? 'block' : 'none';
+  if(!esPerfil) {
+    document.getElementById('wrapTiradorPerfilGola').classList.add('hidden');
+  } else {
+    if(document.getElementById('tipoTiradorVariedad').value === 'gola') {
+      document.getElementById('wrapTiradorPerfilGola').classList.remove('hidden');
+    }
+  }
+});
+
+document.getElementById('tipoTiradorVariedad').addEventListener('change', e => {
+  if(e.target.value === 'gola') {
+    document.getElementById('wrapTiradorPerfilGola').classList.remove('hidden');
+  } else {
+    document.getElementById('wrapTiradorPerfilGola').classList.add('hidden');
+  }
+});
+
+document.getElementById('tipoGola').addEventListener('change', e => {
+  document.getElementById('wrapReduccionAltura').classList.toggle('hidden', e.target.value !== 'L');
+});
+
+TORNILLOS_DEF.forEach(t => { document.getElementById(t.incluirId).addEventListener('change', e => { document.getElementById(t.panelId).classList.toggle('hidden', !e.target.checked); }); });
+ELEVACION_DEF.forEach(e => { document.getElementById(e.incluirId).addEventListener('change', ev => { document.getElementById(e.panelId).classList.toggle('hidden', !ev.target.checked); }); });
+PLATERA_DEF.forEach(p => { document.getElementById(p.incluirId).addEventListener('change', ev => { document.getElementById(p.panelId).classList.toggle('hidden', !ev.target.checked); }); });
+CONDIMENTERO_DEF.forEach(cd => { document.getElementById(cd.incluirId).addEventListener('change', ev => { document.getElementById(cd.panelId).classList.toggle('hidden', !ev.target.checked); }); });
+document.getElementById('tipoCorredera').addEventListener('change', e => {
+  const t = e.target.value;
+  document.getElementById('precioCorrederaTelescopicaWrap').classList.toggle('hidden', t !== 'telescopica');
+  document.getElementById('precioCorrederaOcultaWrap').classList.toggle('hidden', t !== 'oculta');
+  document.getElementById('precioCorrederaBlumWrap').classList.toggle('hidden', t !== 'ocultaBlum');
+});
+document.getElementById('codigoMueble').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); cargarMueblePorCodigo(); } });
+
+/* ============================================================
+   SUBMIT
+   ============================================================ */
+document.getElementById('muebleForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const nombre = document.getElementById('nombreMueble').value.trim() || `Mueble ${muebles.length + 1}`;
+  const alto = parseFloat(document.getElementById('altoMueble').value);
+  const ancho = parseFloat(document.getElementById('anchoMueble').value);
+  const prof = parseFloat(document.getElementById('profMueble').value);
+  const espesor = parseFloat(document.getElementById('espesorTablero').value);
+  const veta = document.getElementById('vetaMueble').value;
+  const codigoActual = document.getElementById('codigoMueble').value.trim().toUpperCase();
+  const catItem = buscarPorCodigo(codigoActual);
+  const descripcionMueble = catItem ? (catItem.descripcion || '') : '';
+  const colores = {
+    lateral: document.getElementById('colorLateral').value.trim() || 'Blanco',
+    pisoTecho: document.getElementById('colorPisoTecho').value.trim() || 'Blanco',
+    fondo: document.getElementById('colorFondo').value.trim() || 'Blanco',
+    puerta: document.getElementById('colorPuerta').value.trim() || 'Roble'
+  };
+  const incluirPatas = document.getElementById('incluirPatas').checked;
+  const precioSetPatas = incluirPatas ? (parseFloat(document.getElementById('precioSetPatas').value) || 0) : (parseFloat(document.getElementById('precioSetPatasGlobal').value) || 0);
+  const preciosCorredera = {
+    telescopica: parseFloat(document.getElementById('precioCorrederaTelescopica').value) || 0,
+    oculta: parseFloat(document.getElementById('precioCorrederaOculta').value) || 0,
+    blum: parseFloat(document.getElementById('precioCorrederaBlum').value) || 0
+  };
+  const tornillos = {}; TORNILLOS_DEF.forEach(t => { tornillos[t.key] = { incluir: document.getElementById(t.incluirId).checked, precio: parseFloat(document.getElementById(t.precioId).value) || 0, etiqueta: t.etiqueta }; });
+  const bisagraRecta = { incluir: document.getElementById('incluirBisagraRecta').checked, cantidad: parseInt(document.getElementById('cantBisagraRecta').value) || 1, precio: parseFloat(document.getElementById('precioBisagraRecta').value) || 0, etiqueta: BISAGRA_RECTA_DEF.etiqueta };
+  const elevacion = {}; ELEVACION_DEF.forEach(e => { elevacion[e.key] = { incluir: document.getElementById(e.incluirId).checked, precio: parseFloat(document.getElementById(e.precioId).value) || 0, etiqueta: e.etiqueta }; });
+  const platera = {}; PLATERA_DEF.forEach(p => { platera[p.key] = { incluir: document.getElementById(p.incluirId).checked, precio: parseFloat(document.getElementById(p.precioId).value) || 0, etiqueta: p.etiqueta }; });
+  const condimentero = {}; CONDIMENTERO_DEF.forEach(cd => { condimentero[cd.key] = { incluir: document.getElementById(cd.incluirId).checked, precio: parseFloat(document.getElementById(cd.precioId).value) || 0, etiqueta: cd.etiqueta }; });
+  
+  const tiradores = {
+    incluir: document.getElementById('incluirTirador').checked,
+    tipoPrincipal: document.getElementById('tipoTiradorPrincipal').value,
+    variedad: document.getElementById('tipoTiradorVariedad').value,
+    categoriaGola: document.getElementById('tipoGola').value,
+    reduccionAltura: parseFloat(document.getElementById('reduccionAlturaPerfilL').value) || 0,
+    cantidad: parseInt(document.getElementById('cantTirador').value) || 1,
+    precio: parseFloat(document.getElementById('precioTirador').value) || 0,
+    color: document.getElementById('colorTirador').value.trim(),
+    altura: parseFloat(document.getElementById('alturaTirador').value) || 0
+  };
+
+  const opts = {
+    incluirPuertas: document.getElementById('incluirPuertas').checked, cantPuertas: parseInt(document.getElementById('cantPuertas').value) || 1,
+    incluirGavetas: document.getElementById('incluirGavetas').checked, cantGavetas: parseInt(document.getElementById('cantGavetas').value) || 1,
+    profGaveta: parseFloat(document.getElementById('profGaveta').value) || 500, altoGaveta: parseFloat(document.getElementById('altoGaveta').value) || 150,
+    tipoCorredera: document.getElementById('tipoCorredera').value, preciosCorredera,
+    incluirRepisas: document.getElementById('incluirRepisas').checked, cantRepisas: parseInt(document.getElementById('cantRepisas').value) || 1,
+    incluirPanel: document.getElementById('incluirPanel').checked, anchoPanel: parseFloat(document.getElementById('anchoPanel').value) || 0,
+    altoPanel: parseFloat(document.getElementById('altoPanel').value) || 0, cantPanel: parseInt(document.getElementById('cantPanel').value) || 1,
+    espesorPanel: parseFloat(document.getElementById('espesorPanel').value) || 18, descripcionPanel: document.getElementById('descripcionPanel').value,
+    incluirFinta: document.getElementById('incluirFinta').checked, anchoFinta: parseFloat(document.getElementById('anchoFinta').value) || 0,
+    altoFinta: parseFloat(document.getElementById('altoFinta').value) || 0, cantFinta: parseInt(document.getElementById('cantFinta').value) || 1,
+    espesorFinta: parseFloat(document.getElementById('espesorFinta').value) || 18, descripcionFinta: document.getElementById('descripcionFinta').value,
+    incluirRodapie: document.getElementById('incluirRodapie').checked, cantRodapie: parseInt(document.getElementById('cantRodapie').value) || 1,
+    espesorRodapie: parseFloat(document.getElementById('espesorRodapie').value) || 18, descripcionRodapie: document.getElementById('descripcionRodapie').value,
+    incluirPatas, precioSetPatas, tornillos, bisagraRecta, elevacion, platera, condimentero, tiradores
+  };
+  if (!validar(alto, ancho, prof, espesor)) return;
+
+  const cantMueblesInput = document.getElementById('cantMuebles');
+  const cantMuebles = Math.max(1, parseInt(cantMueblesInput.value) || 1);
+
+  const componentesBase = calcularDespiece(alto, ancho, prof, espesor, opts, colores, veta);
+
+  for (let i = 0; i < cantMuebles; i++) {
+    muebles.push({
+      id: uid(), nombre, alto, ancho, prof, espesor, veta, descripcion: descripcionMueble,
+      cantidad: cantMuebles,
+      incluirPuertas: opts.incluirPuertas, incluirGavetas: opts.incluirGavetas, incluirRepisas: opts.incluirRepisas,
+      incluirPanel: opts.incluirPanel, incluirFinta: opts.incluirFinta, incluirRodapie: opts.incluirRodapie,
+      incluirPatas: opts.incluirPatas, precioSetPatas: opts.precioSetPatas,
+      tipoCorredera: opts.tipoCorredera, precioCorredera: getPrecioCorredera(opts.tipoCorredera, opts.preciosCorredera),
+      tornillos, bisagraRecta, elevacion, platera, condimentero, tiradores,
+      componentes: JSON.parse(JSON.stringify(componentesBase))
+    });
+  }
+
+  e.target.reset();
+  document.getElementById('cantMuebles').value = 1;
+  document.getElementById('incluirPuertas').checked = true;
+  document.getElementById('panelPuertas').classList.remove('hidden');
+  ['panelGavetas','panelRepisas','panelPanel','panelFinta','panelRodapie','panelPatas','panelBisagraRecta', 'panelTirador'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+  document.getElementById('incluirPatas').checked = false;
+  document.getElementById('incluirTirador').checked = false;
+  document.getElementById('precioCorrederaTelescopicaWrap').classList.remove('hidden');
+  document.getElementById('precioCorrederaOcultaWrap').classList.add('hidden');
+  document.getElementById('precioCorrederaBlumWrap').classList.add('hidden');
+  TORNILLOS_DEF.forEach(t => { document.getElementById(t.incluirId).checked = false; document.getElementById(t.panelId).classList.add('hidden'); });
+  ELEVACION_DEF.forEach(ev => { document.getElementById(ev.incluirId).checked = false; document.getElementById(ev.panelId).classList.add('hidden'); });
+  PLATERA_DEF.forEach(p => { document.getElementById(p.incluirId).checked = false; document.getElementById(p.panelId).classList.add('hidden'); });
+  CONDIMENTERO_DEF.forEach(cd => { document.getElementById(cd.incluirId).checked = false; document.getElementById(cd.panelId).classList.add('hidden'); });
+  document.getElementById('incluirBisagraRecta').checked = false;
+  document.getElementById('cantBisagraRecta').value = 1;
+  renderizarMuebles();
+});
+
+/* ============================================================
+   TOGGLE CANTOS
+   ============================================================ */
+function toggleCanto(muebleId, piezaId, borde) {
+  const m = muebles.find(x => x.id === muebleId); if (!m) return;
+  const p = m.componentes.find(c => c.id === piezaId); if (!p || p.esHerraje) return;
+  if (!p.cantos) p.cantos = { sup:false, inf:false, izq:false, der:false };
+  p.cantos[borde] = !p.cantos[borde];
+  renderizarMuebles();
+}
+
+/* ============================================================
+   EDICIÓN EN LÍNEA
+   ============================================================ */
+function iniciarEdicionPrecioPatas(id) { editandoPrecioPatasId = id; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-patas-${id}`); if (i) { i.focus(); i.select(); } }, 50); }
+function guardarPrecioPatas(id) { const i = document.getElementById(`edit-precio-patas-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioSetPatas = v; editandoPrecioPatasId = null; renderizarMuebles(); }
+function cancelarEdicionPrecioPatas() { editandoPrecioPatasId = null; renderizarMuebles(); }
+function manejarKeyPrecioPatas(e, id) { if (e.key === 'Enter') { e.preventDefault(); guardarPrecioPatas(id); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPrecioPatas(); } }
+function iniciarEdicionPrecioCorredera(id) { editandoPrecioCorrederaId = id; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-corredera-${id}`); if (i) { i.focus(); i.select(); } }, 50); }
+function guardarPrecioCorredera(id) { const i = document.getElementById(`edit-precio-corredera-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioCorredera = v; editandoPrecioCorrederaId = null; renderizarMuebles(); }
+function cancelarEdicionPrecioCorredera() { editandoPrecioCorrederaId = null; renderizarMuebles(); }
+function manejarKeyPrecioCorredera(e, id) { if (e.key === 'Enter') { e.preventDefault(); guardarPrecioCorredera(id); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPrecioCorredera(); } }
+
+function iniciarEdicionTornillo(muebleId, tipo) { editandoTornillo = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-tornillo-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
+function guardarTornillo(muebleId, tipo) { const i = document.getElementById(`edit-precio-tornillo-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tornillos && m.tornillos[tipo]) m.tornillos[tipo].precio = v; editandoTornillo = null; renderizarMuebles(); }
+function cancelarEdicionTornillo() { editandoTornillo = null; renderizarMuebles(); }
+function manejarKeyTornillo(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarTornillo(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionTornillo(); } }
+
+function iniciarEdicionBisagraRecta(muebleId) { editandoBisagraRecta = { muebleId }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-bisagrarecta-${muebleId}`); if (i) { i.focus(); i.select(); } }, 50); }
+function guardarBisagraRecta(muebleId) { const i = document.getElementById(`edit-precio-bisagrarecta-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.bisagraRecta) m.bisagraRecta.precio = v; editandoBisagraRecta = null; renderizarMuebles(); }
+function cancelarEdicionBisagraRecta() { editandoBisagraRecta = null; renderizarMuebles(); }
+function manejarKeyBisagraRecta(e, muebleId) { if (e.key === 'Enter') { e.preventDefault(); guardarBisagraRecta(muebleId); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionBisagraRecta(); } }
+
+function iniciarEdicionElevacion(muebleId, tipo) { editandoElevacion = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-elevacion-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
+function guardarElevacion(muebleId, tipo) { const i = document.getElementById(`edit-precio-elevacion-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.elevacion && m.elevacion[tipo]) m.elevacion[tipo].precio = v; editandoElevacion = null; renderizarMuebles(); }
+function cancelarEdicionElevacion() { editandoElevacion = null; renderizarMuebles(); }
+function manejarKeyElevacion(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarElevacion(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionElevacion(); } }
+
+function iniciarEdicionPlatera(muebleId, tipo) { editandoPlatera = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-platera-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
+function guardarPlatera(muebleId, tipo) { const i = document.getElementById(`edit-precio-platera-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.platera && m.platera[tipo]) m.platera[tipo].precio = v; editandoPlatera = null; renderizarMuebles(); }
+function cancelarEdicionPlatera() { editandoPlatera = null; renderizarMuebles(); }
+function manejarKeyPlatera(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarPlatera(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPlatera(); } }
+
+function iniciarEdicionCondimentero(muebleId, tipo) { editandoCondimentero = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-condimentero-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
+function guardarCondimentero(muebleId, tipo) { const i = document.getElementById(`edit-precio-condimentero-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.condimentero && m.condimentero[tipo]) m.condimentero[tipo].precio = v; editandoCondimentero = null; renderizarMuebles(); }
+function cancelarEdicionCondimentero() { editandoCondimentero = null; renderizarMuebles(); }
+function manejarKeyCondimentero(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarCondimentero(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionCondimentero(); } }
+
+function iniciarEdicionTirador(muebleId) { editandoTiradorId = muebleId; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-tirador-${muebleId}`); if (i) { i.focus(); i.select(); } }, 50); }
+function guardarTirador(muebleId) { const i = document.getElementById(`edit-precio-tirador-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tiradores) m.tiradores.precio = v; editandoTiradorId = null; renderizarMuebles(); }
+function cancelarEdicionTirador() { editandoTiradorId = null; renderizarMuebles(); }
+function manejarKeyTirador(e, muebleId) { if (e.key === 'Enter') { e.preventDefault(); guardarTirador(muebleId); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionTirador(); } }
+
+/* ============================================================
+   RENDER MUEBLES
+   ============================================================ */
+function renderizarMuebles() {
+  const cont = document.getElementById('listaMuebles');
+  const contador = document.getElementById('contadorMuebles');
+  if (muebles.length === 0) {
+    cont.innerHTML = `<p class="text-slate-500 text-center py-8"><i class="fa-solid fa-box-open text-3xl block mb-2 text-slate-300"></i>No hay muebles agregados todavía.</p>`;
+    contador.textContent = '';
+    document.getElementById('resumenPanel').classList.add('hidden');
+    document.getElementById('costoPanel').classList.add('hidden');
+    document.getElementById('cantosPanel').classList.add('hidden');
+    document.getElementById('cortesPanel').classList.add('hidden');
+    return;
+  }
+  contador.textContent = `(${muebles.length} mueble${muebles.length > 1 ? 's' : ''})`;
+  let html = '';
+  muebles.forEach(m => {
+    let filas = '';
+    m.componentes.forEach(c => {
+      const cantTotal = c.cantidad * (m.cantidad || 1);
+      const areaM2 = c.esHerraje ? 0 : (c.ancho * c.alto * cantTotal) / 1_000_000;
+      const mlUnidad = calcularCantosPieza(c);
+      const mlTotal = mlUnidad * cantTotal;
+      const cantos = c.cantos || {};
+      let badgeCantosHtml = '';
+      if (c.esHerraje) {
+        badgeCantosHtml = `<span class="text-xs text-amber-600 font-semibold"><i class="fa-solid fa-screwdriver-wrench mr-1"></i>Herraje</span>`;
+      } else {
+        const bc = (b, e) => cantos[b]
+          ? `<button onclick="toggleCanto(${m.id}, ${c.id}, '${b}')" class="canto-badge bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded transition">${e}</button>`
+          : `<button onclick="toggleCanto(${m.id}, ${c.id}, '${b}')" class="canto-badge bg-slate-200 hover:bg-slate-300 text-slate-600 text-[10px] px-1.5 py-0.5 rounded transition">${e}</button>`;
+        badgeCantosHtml = `<div class="flex items-center gap-0.5 justify-center flex-wrap">${bc('sup','Sup')}${bc('inf','Inf')}${bc('izq','Izq')}${bc('der','Der')}</div>`;
+      }
+      filas += `<tr class="hover:bg-slate-50 border-b border-slate-100 ${c.esHerraje ? 'bg-amber-50/50' : ''}">
+        <td class="py-2 px-3 font-medium text-slate-700 text-xs">${c.componente}</td>
+        <td class="py-2 px-3 text-center text-xs font-bold ${c.esHerraje ? 'text-amber-700' : ''}">${cantTotal}</td>
+        <td class="py-2 px-3 text-slate-600 text-[11px]">${c.material}</td>
+        <td class="py-2 px-3 text-right font-mono text-xs">${c.esHerraje ? '—' : fmt(c.ancho)}</td>
+        <td class="py-2 px-3 text-right font-mono text-xs">${c.esHerraje ? '—' : fmt(c.alto)}</td>
+        <td class="py-2 px-3 text-right font-mono text-[11px] text-slate-500">${c.esHerraje ? '—' : areaM2.toFixed(3)}</td>
+        <td class="py-2 px-2 text-center">${badgeCantosHtml}</td>
+        <td class="py-2 px-3 text-right font-mono text-[11px] ${c.esHerraje ? 'text-slate-400' : (mlTotal > 0 ? 'text-sky-700 font-semibold' : 'text-slate-400')}">${c.esHerraje ? '—' : mlTotal.toFixed(2)}</td>
+      </tr>`;
+    });
+    const badges = [];
+    if (m.incluirPuertas) badges.push('<span class="bg-cyan-600 text-white text-xs px-2 py-0.5 rounded-full">Con puertas + bisagras</span>');
+    if (m.incluirGavetas) {
+      if (editandoPrecioCorrederaId === m.id) {
+        badges.push(`<span class="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1">Con gavetas: $<input type="number" id="edit-precio-corredera-${m.id}" value="${m.precioCorredera.toFixed(2)}" min="0" step="0.01" onkeydown="manejarKeyPrecioCorredera(event, ${m.id})" onblur="guardarPrecioCorredera(${m.id})" class="w-16 px-1 py-0 text-[11px] text-slate-800 rounded border border-emerald-300"><button onclick="event.stopPropagation(); cancelarEdicionPrecioCorredera()" class="text-emerald-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`);
+      } else {
+        badges.push(`<span class="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">Con gavetas (${fmtMoney(m.precioCorredera)}/par)<button onclick="iniciarEdicionPrecioCorredera(${m.id})" class="edit-precio-btn text-emerald-200 hover:text-white"><i class="fa-solid fa-pen text-[10px]"></i></button></span>`);
+      }
+    }
+    if (m.incluirRepisas) badges.push('<span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">Con repisas</span>');
+    if (m.incluirPatas) {
+      if (editandoPrecioPatasId === m.id) {
+        badges.push(`<span class="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1">Con patas: $<input type="number" id="edit-precio-patas-${m.id}" value="${m.precioSetPatas.toFixed(2)}" min="0" step="0.01" onkeydown="manejarKeyPrecioPatas(event, ${m.id})" onblur="guardarPrecioPatas(${m.id})" class="w-16 px-1 py-0 text-[11px] text-slate-800 rounded border border-purple-300"><button onclick="event.stopPropagation(); cancelarEdicionPrecioPatas()" class="text-purple-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`);
+      } else {
+        badges.push(`<span class="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">Con patas (${fmtMoney(m.precioSetPatas)}/set)<button onclick="iniciarEdicionPrecioPatas(${m.id})" class="edit-precio-btn text-purple-200 hover:text-white"><i class="fa-solid fa-pen text-[10px]"></i></button></span>`);
+      }
+    }
+    if (m.tiradores && m.tiradores.incluir) {
+      const t = m.tiradores;
+      const tipoTxt = t.tipoPrincipal === 'sobreponer' ? 'Sobreponer' : `Gola ${t.categoriaGola}`;
+      if (editandoTiradorId === m.id) {
+        badges.push(`<span class="bg-teal-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1">Tirador (${tipoTxt}): $<input type="number" id="edit-precio-tirador-${m.id}" value="${t.precio.toFixed(2)}" min="0" step="0.01" onkeydown="manejarKeyTirador(event, ${m.id})" onblur="guardarTirador(${m.id})" class="w-16 px-1 py-0 text-[11px] text-slate-800 rounded border border-teal-300"><button onclick="event.stopPropagation(); cancelarEdicionTirador()" class="text-teal-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`);
+      } else {
+        badges.push(`<span class="bg-teal-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">Tirador ${tipoTxt} (${fmtMoney(t.precio)}/u)<button onclick="iniciarEdicionTirador(${m.id})" class="edit-precio-btn text-teal-200 hover:text-white"><i class="fa-solid fa-pen text-[10px]"></i></button></span>`);
+      }
+    }
+    if (m.tornillos) TORNILLOS_DEF.forEach(t => {
+      const info = m.tornillos[t.key]; if (!info || !info.incluir) return;
+      const etiquetaCorta = t.etiqueta.replace('Tornillos ', '').replace(' x100 und', '');
+      const esEdit = editandoTornillo && editandoTornillo.muebleId === m.id && editandoTornillo.tipo === t.key;
+      if (esEdit) badges.push(`<span class="bg-orange-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1">${etiquetaCorta}: $<input type="number" id="edit-precio-tornillo-${m.id}-${t.key}" value="${info.precio.toFixed(2)}" min="0" step="0.01" onkeydown="manejarKeyTornillo(event, ${m.id}, '${t.key}')" onblur="guardarTornillo(${m.id}, '${t.key}')" class="w-16 px-1 py-0 text-[11px] text-slate-800 rounded border border-orange-300"><button onclick="event.stopPropagation(); cancelarEdicionTornillo()" class="text-orange-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`);
+      else badges.push(`<span class="bg-orange-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">${etiquetaCorta} (${fmtMoney(info.precio)})<button onclick="iniciarEdicionTornillo(${m.id}, '${t.key}')" class="edit-precio-btn text-orange-200 hover:text-white"><i class="fa-solid fa-pen text-[10px]"></i></button></span>`);
+    });
+    if (m.bisagraRecta && m.bisagraRecta.incluir) {
+      const br = m.bisagraRecta;
+      if (editandoBisagraRecta && editandoBisagraRecta.muebleId === m.id) {
+        badges.push(`<span class="bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1">Bisagra recta (${br.cantidad}u): $<input type="number" id="edit-precio-bisagrarecta-${m.id}" value="${br.precio.toFixed(2)}" min="0" step="0.01" onkeydown="manejarKeyBisagraRecta(event, ${m.id})" onblur="guardarBisagraRecta(${m.id})" class="w-16 px-1 py-0 text-[11px] text-slate-800 rounded border border-rose-300"><button onclick="event.stopPropagation(); cancelarEdicionBisagraRecta()" class="text-rose-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`);
+      } else {
+        badges.push(`<span class="bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">Bisagra recta ×${br.cantidad} (${fmtMoney(br.precio)}/u)<button onclick="iniciarEdicionBisagraRecta(${m.id})" class="edit-precio-btn text-rose-200 hover:text-white"><i class="fa-solid fa-pen text-[10px]"></i></button></span>`);
+      }
+    }
+    if (m.elevacion) ELEVACION_DEF.forEach(e => {
+      const info = m.elevacion[e.key]; if (!info || !info.incluir) return;
+      const etiquetaCorta = e.etiqueta.replace('Sistema de elevación ', 'Elev. ').replace('Amortiguador autoelevable', 'Amortiguador');
+      const esEdit = editandoElevacion && editandoElevacion.muebleId === m.id && editandoElevacion.tipo === e.key;
+      if (esEdit) badges.push(`<span class="bg-fuchsia-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1">${etiquetaCorta}: $<input type="number" id="edit-precio-elevacion-${m.id}-${e.key}" value="${info.precio.toFixed(2)}" min="0" step="0.01" onkeydown="manejarKeyElevacion(event, ${m.id}, '${e.key}')" onblur="guardarElevacion(${m.id}, '${e.key}')" class="w-16 px-1 py-0 text-[11px] text-slate-800 rounded border border-fuchsia-300"><button onclick="event.stopPropagation(); cancelarEdicionElevacion()" class="text-fuchsia-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`);
+      else badges.push(`<span class="bg-fuchsia-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">${etiquetaCorta} (${fmtMoney(info.precio)})<button onclick="iniciarEdicionElevacion(${m.id}, '${e.key}')" class="edit-precio-btn text-fuchsia-200 hover:text-white"><i class="fa-solid fa-pen text-[10px]"></i></button></span>`);
+    });
+    if (m.platera) PLATERA_DEF.forEach(p => {
+      const info = m.platera[p.key]; if (!info || !info.incluir) return;
+      const esEdit = editandoPlatera && editandoPlatera.muebleId === m.id && editandoPlatera.tipo === p.key;
+      if (esEdit) badges.push(`<span class="bg-cyan-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1">${p.etiqueta}: $<input type="number" id="edit-precio-platera-${m.id}-${p.key}" value="${info.precio.toFixed(2)}" min="0" step="0.01" onkeydown="manejarKeyPlatera(event, ${m.id}, '${p.key}')" onblur="guardarPlatera(${m.id}, '${p.key}')" class="w-16 px-1 py-0 text-[11px] text-slate-800 rounded border border-cyan-300"><button onclick="event.stopPropagation(); cancelarEdicionPlatera()" class="text-cyan-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`);
+      else badges.push(`<span class="bg-cyan-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">${p.etiqueta} (${fmtMoney(info.precio)})<button onclick="iniciarEdicionPlatera(${m.id}, '${p.key}')" class="edit-precio-btn text-cyan-200 hover:text-white"><i class="fa-solid fa-pen text-[10px]"></i></button></span>`);
+    });
+    if (m.condimentero) CONDIMENTERO_DEF.forEach(cd => {
+      const info = m.condimentero[cd.key]; if (!info || !info.incluir) return;
+      const esEdit = editandoCondimentero && editandoCondimentero.muebleId === m.id && editandoCondimentero.tipo === cd.key;
+      if (esEdit) badges.push(`<span class="bg-lime-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1">${cd.etiqueta}: $<input type="number" id="edit-precio-condimentero-${m.id}-${cd.key}" value="${info.precio.toFixed(2)}" min="0" step="0.01" onkeydown="manejarKeyCondimentero(event, ${m.id}, '${cd.key}')" onblur="guardarCondimentero(${m.id}, '${cd.key}')" class="w-16 px-1 py-0 text-[11px] text-slate-800 rounded border border-lime-300"><button onclick="event.stopPropagation(); cancelarEdicionCondimentero()" class="text-lime-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button></span>`);
+      else badges.push(`<span class="bg-lime-600 text-white text-xs px-2 py-0.5 rounded-full inline-flex items-center gap-1.5">${cd.etiqueta} (${fmtMoney(info.precio)})<button onclick="iniciarEdicionCondimentero(${m.id}, '${cd.key}')" class="edit-precio-btn text-lime-200 hover:text-white"><i class="fa-solid fa-pen text-[10px]"></i></button></span>`);
+    });
+    const descHTML = m.descripcion ? `<p class="text-[11px] text-amber-200 italic mt-0.5"><i class="fa-solid fa-align-left mr-1"></i>${m.descripcion}</p>` : '';
+    html += `<div class="card-mueble border border-slate-200 rounded-xl overflow-hidden bg-white">
+      <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 py-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-3 flex-wrap">
+            <i class="fa-solid fa-box-open text-amber-400"></i>
+            <h3 class="font-bold text-white">${m.nombre}</h3>
+            <span class="bg-slate-600 text-white text-xs px-2 py-0.5 rounded-full">${m.alto} × ${m.ancho} × ${m.prof} mm</span>
+            <span class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full">Espesor ${m.espesor} mm</span>
+            ${m.cantidad && m.cantidad > 1 ? `<span class="bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">${m.cantidad} uds.</span>` : ''}
+            ${badges.join(' ')}
+          </div>
+          <button onclick="eliminarMueble(${m.id})" class="text-slate-300 hover:text-red-400 transition p-1 no-print"><i class="fa-solid fa-trash-alt"></i></button>
+        </div>
+        ${descHTML}
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-slate-100 text-slate-600 text-[10px] uppercase">
+            <tr>
+              <th class="py-2 px-3">Pieza / Herraje</th>
+              <th class="py-2 px-3 text-center">Cant.</th>
+              <th class="py-2 px-3">Material / Tipo</th>
+              <th class="py-2 px-3 text-right">Largo (mm)</th>
+              <th class="py-2 px-3 text-right">Ancho (mm)</th>
+              <th class="py-2 px-3 text-right">Área (m²)</th>
+              <th class="py-2 px-3 text-center">Cantos / Detalle</th>
+              <th class="py-2 px-3 text-right">ML canto</th>
+            </tr>
+          </thead>
+          <tbody>${filas}</tbody>
+        </table>
+      </div>
+    </div>`;
+  });
+  cont.innerHTML = html;
+  renderizarResumen();
+  renderizarCantos();
+  renderizarCostos();
+  renderizarCortes();
+}
+
+function renderizarResumen() {
+  const panel = document.getElementById('resumenPanel');
+  const cuerpo = document.getElementById('cuerpoResumen');
+  const totalPiezas = document.getElementById('totalPiezasResumen');
+  if (muebles.length === 0) { panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+  const grupos = new Map();
+  muebles.forEach(m => {
+    m.componentes.forEach(c => {
+      const aR = c.esHerraje ? 0 : Math.round(c.ancho * 100) / 100;
+      const hR = c.esHerraje ? 0 : Math.round(c.alto * 100) / 100;
+      const key = `${c.componente}|${aR}|${hR}|${c.material}`;
+      if (!grupos.has(key)) grupos.set(key, { componente:c.componente, ancho:aR, alto:hR, material:c.material, cantidad:0, muebles:new Set(), esHerraje:c.esHerraje });
+      const g = grupos.get(key); g.cantidad += c.cantidad * (m.cantidad || 1); g.muebles.add(m.nombre);
+    });
+  });
+  const filas = [...grupos.values()].sort((a,b) => a.componente.localeCompare(b.componente) || a.ancho - b.ancho);
+  let html = '', total = 0;
+  filas.forEach(f => {
+    total += f.cantidad;
+    const lista = [...f.muebles].join(', ');
+    html += `<tr class="hover:bg-slate-50 ${f.esHerraje ? 'bg-amber-50/40' : ''}">
+      <td class="py-2 px-3 font-medium text-slate-700">${f.componente}</td>
+      <td class="py-2 px-3 text-center font-bold text-amber-600">${f.cantidad}</td>
+      <td class="py-2 px-3 text-right font-mono">${f.esHerraje ? '—' : fmt(f.ancho)}</td>
+      <td class="py-2 px-3 text-right font-mono">${f.esHerraje ? '—' : fmt(f.alto)}</td>
+      <td class="py-2 px-3 text-xs text-slate-600">${f.material}</td>
+      <td class="py-2 px-3 text-xs text-slate-500 max-w-[220px] truncate" title="${lista}">${lista}</td>
+    </tr>`;
+  });
+  cuerpo.innerHTML = html;
+  totalPiezas.textContent = total;
+}
+
+function renderizarCantos() {
+  const panel = document.getElementById('cantosPanel');
+  const cuerpo = document.getElementById('cuerpoCantos');
+  if (!panel || !cuerpo) return;
+  if (muebles.length === 0) { panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+  const cfg = leerConfigTablero();
+  let html = '', totalML = 0, totalCosto = 0;
+  
+  muebles.forEach(m => {
+    m.componentes.forEach(c => {
+      if (c.esHerraje) return;
+      const cantTotal = c.cantidad * (m.cantidad || 1);
+      const mlUnidad = calcularCantosPieza(c);
+      const mlTotal = mlUnidad * cantTotal;
+      
+      const esRev = tipoLamina(c.componente) === 'revestimiento';
+      const tipoTexto = esRev ? 'Rev (1mm)' : 'Est (0.45mm)';
+      const precioM = esRev ? cfg.precioCantoRevestimiento : cfg.precioCantoEstructura;
+      
+      const costo = mlTotal * precioM;
+      const cantos = c.cantos || {};
+      const listaCantos = [];
+      if (cantos.sup) listaCantos.push('Sup');
+      if (cantos.inf) listaCantos.push('Inf');
+      if (cantos.izq) listaCantos.push('Izq');
+      if (cantos.der) listaCantos.push('Der');
+      if (mlTotal <= 0) return;
+      
+      totalML += mlTotal; totalCosto += costo;
+      
+      const badges = listaCantos.map(x => `<span class="canto-badge bg-emerald-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded mr-0.5">${x}</span>`).join('');
+      
+      let tipoBadge = '';
+      if(esRev) tipoBadge = `<span class="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">${tipoTexto}</span>`;
+      else tipoBadge = `<span class="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded text-[10px]">${tipoTexto}</span>`;
+
+      html += `<tr class="hover:bg-sky-50">
+        <td class="py-2 px-3 text-xs text-slate-600">${m.nombre}</td>
+        <td class="py-2 px-3 font-medium text-slate-700 text-xs">${c.componente}</td>
+        <td class="py-2 px-3 text-center text-xs">${cantTotal}</td>
+        <td class="py-2 px-3 text-center">${badges}</td>
+        <td class="py-2 px-3 text-center">${tipoBadge}</td>
+        <td class="py-2 px-3 text-right font-mono text-xs">${mlUnidad.toFixed(3)}</td>
+        <td class="py-2 px-3 text-right font-mono text-xs font-semibold text-sky-700">${mlTotal.toFixed(3)}</td>
+        <td class="py-2 px-3 text-right font-mono text-xs text-emerald-700">${fmtMoney(costo)}</td>
+      </tr>`;
+    });
+  });
+  
+  if (html === '') html = `<tr><td colspan="8" class="py-4 text-center text-slate-400 text-xs">No hay cantos seleccionados.</td></tr>`;
+  cuerpo.innerHTML = html;
+  
+  document.getElementById('cantosTotalML').textContent = totalML.toFixed(3);
+  document.getElementById('cantosTotalCosto').textContent = fmtMoney(totalCosto);
+}
+
+function renderizarCostos() {
+  const panel = document.getElementById('costoPanel');
+  const cuerpo = document.getElementById('cuerpoCostos');
+  if (!panel || !cuerpo) return;
+  if (muebles.length === 0) { panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+  const cfg = leerConfigTablero();
+  let html = '';
+  let totalPiezas = 0, areaNetaTotal = 0, areaDescTotal = 0;
+  let cCantosEst = 0, cCantosRev = 0, cBisagras = 0, cCorrederas = 0, cTiradores = 0, cPatas = 0, cTornillos = 0, cBisagraRecta = 0, cElevacion = 0, cPlatera = 0, cCondimentero = 0;
+  let cEnchapado = 0, cCortes = 0, cManoObra = 0, cGastosAdmin = 0;
+  let areaNetaEstructura = 0, areaNetaRevestimiento = 0;
+  let areaDescEstructura = 0, areaDescRevestimiento = 0;
+
+  muebles.forEach(m => {
+    const cantMueble = m.cantidad || 1;
+    let areaNetaMueble = 0, piezasMueble = 0, mlCantosEst = 0, mlCantosRev = 0;
+    let areaEstructuraMueble = 0, areaRevestimientoMueble = 0;
+    let costoBisagrasMueble = 0, costoCorrederasMueble = 0, costoPatasMueble = 0, costoTornillosMueble = 0, costoBisagraRectaMueble = 0, costoElevacionMueble = 0, costoPlateraMueble = 0, costoCondimenteroMueble = 0, costoTiradoresMueble = 0;
+
+    m.componentes.forEach(c => {
+      const cantTotal = c.cantidad * cantMueble;
+      if (c.esHerraje) {
+        const n = c.componente.toLowerCase();
+        if (n.includes('bisagras de cazoleta')) costoBisagrasMueble += cantTotal * cfg.precioParBisagra;
+        if (n.includes('correderas')) costoCorrederasMueble += cantTotal * (m.precioCorredera || 0);
+        if (n.includes('patas')) costoPatasMueble += cantTotal * (m.precioSetPatas || cfg.precioSetPatasGlobal);
+        if (n.includes('tornillos') && m.tornillos) TORNILLOS_DEF.forEach(t => { if (n.includes(t.etiqueta.toLowerCase().split(' x100')[0])) { const info = m.tornillos[t.key]; if (info?.incluir) costoTornillosMueble += cantTotal * info.precio; } });
+        if (n.includes('bisagra recta') && m.bisagraRecta?.incluir) costoBisagraRectaMueble += cantTotal * m.bisagraRecta.precio;
+        if (m.elevacion) ELEVACION_DEF.forEach(e => { if (n.includes(e.etiqueta.toLowerCase())) { const info = m.elevacion[e.key]; if (info?.incluir) costoElevacionMueble += cantTotal * info.precio; } });
+        if (m.platera) PLATERA_DEF.forEach(p => { if (n.includes(p.etiqueta.toLowerCase())) { const info = m.platera[p.key]; if (info?.incluir) costoPlateraMueble += cantTotal * info.precio; } });
+        if (m.condimentero) CONDIMENTERO_DEF.forEach(cd => { if (n.includes(cd.etiqueta.toLowerCase())) { const info = m.condimentero[cd.key]; if (info?.incluir) costoCondimenteroMueble += cantTotal * info.precio; } });
+        if (n.includes('tirador') && m.tiradores?.incluir) costoTiradoresMueble += cantTotal * m.tiradores.precio;
+      } else {
+        const area = (c.ancho * c.alto * cantTotal) / 1_000_000;
+        areaNetaMueble += area;
+        if (tipoLamina(c.componente) === 'revestimiento') areaRevestimientoMueble += area;
+        else areaEstructuraMueble += area;
+        piezasMueble += cantTotal;
+        
+        const mlPieza = calcularCantosPieza(c) * cantTotal;
+        if (tipoLamina(c.componente) === 'revestimiento') mlCantosRev += mlPieza;
+        else mlCantosEst += mlPieza;
+      }
+    });
+    
+    const areaDescMueble = areaNetaMueble * (1 + cfg.desperdicio / 100);
+    const areaDescEstMueble = areaEstructuraMueble * (1 + cfg.desperdicio / 100);
+    const areaDescRevMueble = areaRevestimientoMueble * (1 + cfg.desperdicio / 100);
+    
+    const costoCantoEstMueble = mlCantosEst * cfg.precioCantoEstructura;
+    const costoCantoRevMueble = mlCantosRev * cfg.precioCantoRevestimiento;
+    const mlCantosTotalesMueble = mlCantosEst + mlCantosRev;
+    const costoEnchapadoMueble = mlCantosTotalesMueble * cfg.precioEnchapado;
+    
+    const tablerosEstMueble = Math.ceil(areaDescEstMueble / cfg.areaTableroM2);
+    const tablerosRevMueble = Math.ceil(areaDescRevMueble / cfg.areaTableroM2);
+    const tablerosTotalesMueble = tablerosEstMueble + tablerosRevMueble;
+    const costoCortesMueble = tablerosTotalesMueble * cfg.cantidadCortesPorLamina * cfg.precioCorte;
+
+    const subtotalMaterialesMueble = 
+      (areaDescEstMueble * cfg.precioM2Estructura) + 
+      (areaDescRevMueble * cfg.precioM2Revestimiento) + 
+      costoCantoEstMueble + 
+      costoCantoRevMueble + 
+      costoEnchapadoMueble + 
+      costoCortesMueble + 
+      costoBisagrasMueble + 
+      costoCorrederasMueble + 
+      costoPatasMueble + 
+      costoTornillosMueble + 
+      costoBisagraRectaMueble + 
+      costoElevacionMueble + 
+      costoPlateraMueble + 
+      costoCondimenteroMueble + 
+      costoTiradoresMueble;
+
+    const costoManoObraMueble = subtotalMaterialesMueble * (cfg.porcentajeManoObra / 100);
+    const costoGastosAdminMueble = (subtotalMaterialesMueble + costoManoObraMueble) * (cfg.porcentajeGastosAdmin / 100);
+    const costoTotalMueble = subtotalMaterialesMueble + costoManoObraMueble + costoGastosAdminMueble;
+
+    totalPiezas += piezasMueble; areaNetaTotal += areaNetaMueble; areaDescTotal += areaDescMueble;
+    areaNetaEstructura += areaEstructuraMueble; areaNetaRevestimiento += areaRevestimientoMueble;
+    areaDescEstructura += areaDescEstMueble; areaDescRevestimiento += areaDescRevMueble;
+    
+    cCantosEst += costoCantoEstMueble; cCantosRev += costoCantoRevMueble;
+    cBisagras += costoBisagrasMueble; cCorrederas += costoCorrederasMueble; cTiradores += costoTiradoresMueble;
+    cPatas += costoPatasMueble; cTornillos += costoTornillosMueble; cBisagraRecta += costoBisagraRectaMueble;
+    cElevacion += costoElevacionMueble; cPlatera += costoPlateraMueble; cCondimentero += costoCondimenteroMueble;
+    cEnchapado += costoEnchapadoMueble; cCortes += costoCortesMueble;
+    cManoObra += costoManoObraMueble; cGastosAdmin += costoGastosAdminMueble;
+
+    const badgeCant = cantMueble > 1 ? `<span class="bg-emerald-600 text-white text-[10px] px-1.5 rounded-full ml-1">${cantMueble} uds</span>` : '';
+
+    html += `<tr class="hover:bg-emerald-50">
+      <td class="py-2 px-3 font-medium text-slate-700 text-xs">${m.nombre}${badgeCant}</td>
+      <td class="py-2 px-3 text-center text-xs">${piezasMueble}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs">${areaNetaMueble.toFixed(3)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${areaDescMueble.toFixed(3)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(areaDescEstMueble * cfg.precioM2Estructura)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-emerald-700">${fmtMoney(areaDescRevMueble * cfg.precioM2Revestimiento)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(costoCantoEstMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-emerald-700">${fmtMoney(costoCantoRevMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-indigo-700">${fmtMoney(costoEnchapadoMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-rose-700">${fmtMoney(costoCortesMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(costoBisagrasMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-teal-700">${fmtMoney(costoCorrederasMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-teal-700">${fmtMoney(costoTiradoresMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-purple-700">${fmtMoney(costoPatasMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-orange-700">${fmtMoney(costoTornillosMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-rose-700">${fmtMoney(costoBisagraRectaMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-fuchsia-700">${fmtMoney(costoElevacionMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-cyan-700">${fmtMoney(costoPlateraMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-lime-700">${fmtMoney(costoCondimenteroMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-slate-700">${fmtMoney(costoManoObraMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-slate-700">${fmtMoney(costoGastosAdminMueble)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs font-semibold text-emerald-700">${fmtMoney(costoTotalMueble)}</td>
+    </tr>`;
+  });
+
+  const tablerosEstructura = Math.ceil(areaDescEstructura / cfg.areaTableroM2);
+  const tablerosRevestimiento = Math.ceil(areaDescRevestimiento / cfg.areaTableroM2);
+  const costoRealEstructura = tablerosEstructura * cfg.precioEstructura;
+  const costoRealRevestimiento = tablerosRevestimiento * cfg.precioRevestimiento;
+  const costoMateriales = costoRealEstructura + costoRealRevestimiento;
+
+  cuerpo.innerHTML = html;
+  const costoGeneral = costoMateriales + cCantosEst + cCantosRev + cEnchapado + cCortes + cBisagras + cCorrederas + cPatas + cTornillos + cBisagraRecta + cElevacion + cPlatera + cCondimentero + cTiradores + cManoObra + cGastosAdmin;
+  
+  document.getElementById('costoAreaNeta').textContent = areaNetaTotal.toFixed(3) + ' m²';
+  document.getElementById('costoAreaTotal').textContent = areaDescTotal.toFixed(3) + ' m²';
+  document.getElementById('costoTablerosEstructura').textContent = tablerosEstructura;
+  document.getElementById('costoTablerosRevestimiento').textContent = tablerosRevestimiento;
+  document.getElementById('costoTotal').textContent = fmtMoney(costoGeneral);
+  document.getElementById('costoTotalPiezas').textContent = totalPiezas;
+  document.getElementById('costoTotalAreaNeta').textContent = areaNetaTotal.toFixed(3);
+  document.getElementById('costoTotalAreaDesc').textContent = areaDescTotal.toFixed(3);
+  document.getElementById('costoTotalEstructura').textContent = fmtMoney(costoRealEstructura);
+  document.getElementById('costoTotalRevestimiento').textContent = fmtMoney(costoRealRevestimiento);
+  
+  document.getElementById('costoTotalCantoEst').textContent = fmtMoney(cCantosEst);
+  document.getElementById('costoTotalCantoRev').textContent = fmtMoney(cCantosRev);
+  document.getElementById('costoTotalEnchapado').textContent = fmtMoney(cEnchapado);
+  document.getElementById('costoTotalCortes').textContent = fmtMoney(cCortes);
+  
+  document.getElementById('costoTotalBisagras').textContent = fmtMoney(cBisagras);
+  document.getElementById('costoTotalCorrederas').textContent = fmtMoney(cCorrederas);
+  document.getElementById('costoTotalTiradores').textContent = fmtMoney(cTiradores);
+  document.getElementById('costoTotalPatas').textContent = fmtMoney(cPatas);
+  document.getElementById('costoTotalTornillos').textContent = fmtMoney(cTornillos);
+  document.getElementById('costoTotalBisagraRecta').textContent = fmtMoney(cBisagraRecta);
+  document.getElementById('costoTotalElevacion').textContent = fmtMoney(cElevacion);
+  document.getElementById('costoTotalPlatera').textContent = fmtMoney(cPlatera);
+  document.getElementById('costoTotalCondimentero').textContent = fmtMoney(cCondimentero);
+  document.getElementById('costoTotalManoObra').textContent = fmtMoney(cManoObra);
+  document.getElementById('costoTotalGastosAdmin').textContent = fmtMoney(cGastosAdmin);
+  document.getElementById('costoTotalGeneral').textContent = fmtMoney(costoGeneral);
+}
+
+/* ============================================================
+   DIAGRAMA DE OPTIMIZACIÓN DE CORTES (BIN PACKING)
+   ============================================================ */
+function renderizarCortes() {
+  const panel = document.getElementById('cortesPanel');
+  if (muebles.length === 0) { panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+
+  const cfg = leerConfigTablero();
+  const { largo: L, ancho: A } = cfg;
+
+  let todasEstructura = [];
+  let todasRevestimiento = [];
+
+  muebles.forEach(m => {
+    m.componentes.forEach(c => {
+      if (c.esHerraje || c.ancho <= 0 || c.alto <= 0) return;
+      const cantTotal = c.cantidad * (m.cantidad || 1);
+      for (let i = 0; i < cantTotal; i++) {
+        const pieza = { ancho: c.ancho, alto: c.alto, nombre: c.componente };
+        if (tipoLamina(c.componente) === 'revestimiento') todasRevestimiento.push(pieza);
+        else todasEstructura.push(pieza);
+      }
+    });
+  });
+
+  const contEst = document.getElementById('cortesEstructuraContenedor');
+  const contRev = document.getElementById('cortesRevestimientoContenedor');
+  const noMsg = document.getElementById('noCortesMsg');
+
+  contEst.innerHTML = '';
+  contRev.innerHTML = '';
+  
+  if (todasEstructura.length === 0 && todasRevestimiento.length === 0) {
+    noMsg.classList.remove('hidden');
+    return;
+  }
+  noMsg.classList.add('hidden');
+
+  function empaquetar(piezas, L, A) {
+    piezas.sort((a, b) => (b.ancho * b.alto) - (a.ancho * a.alto));
+    
+    let tableros = [];
+    let actual = { libres: [{x:0, y:0, w:L, h:A}], colocadas: [] };
+
+    piezas.forEach(p => {
+      let colocada = false;
+      let intentos = [{w:p.ancho, h:p.alto, rotada:false}];
+      if (p.ancho !== p.alto) intentos.push({w:p.alto, h:p.ancho, rotada:true});
+
+      for (let intento of intentos) {
+        if (intento.w > L || intento.h > A) continue;
+        for (let i = 0; i < actual.libres.length; i++) {
+          let espacio = actual.libres[i];
+          if (intento.w <= espacio.w && intento.h <= espacio.h) {
+            actual.colocadas.push({ x: espacio.x, y: espacio.y, w: intento.w, h: intento.h, rotada: intento.rotada, nombre: p.nombre });
+            let nuevoLibre1 = { x: espacio.x, y: espacio.y + intento.h, w: espacio.w, h: espacio.h - intento.h };
+            let nuevoLibre2 = { x: espacio.x + intento.w, y: espacio.y, w: espacio.w - intento.w, h: intento.h };
+            actual.libres.splice(i, 1);
+            if (nuevoLibre1.w > 0 && nuevoLibre1.h > 0) actual.libres.push(nuevoLibre1);
+            if (nuevoLibre2.w > 0 && nuevoLibre2.h > 0) actual.libres.push(nuevoLibre2);
+            actual.libres.sort((a,b) => (a.w * a.h) - (b.w * b.h));
+            colocada = true;
+            break;
+          }
+        }
+        if (colocada) break;
+      }
+
+      if (!colocada) {
+        tableros.push(actual);
+        actual = { libres: [{x:0, y:0, w:L, h:A}], colocadas: [] };
+        for (let intento of intentos) {
+          if (intento.w <= L && intento.h <= A) {
+             actual.colocadas.push({ x: 0, y: 0, w: intento.w, h: intento.h, rotada: intento.rotada, nombre: p.nombre });
+             let nuevoLibre1 = { x: 0, y: intento.h, w: L, h: A - intento.h };
+             let nuevoLibre2 = { x: intento.w, y: 0, w: L - intento.w, h: intento.h };
+             if (nuevoLibre1.w > 0 && nuevoLibre1.h > 0) actual.libres.push(nuevoLibre1);
+             if (nuevoLibre2.w > 0 && nuevoLibre2.h > 0) actual.libres.push(nuevoLibre2);
+             actual.libres.shift();
+             colocada = true;
+             break;
+          }
+        }
+      }
+    });
+    
+    if (actual.colocadas.length > 0) tableros.push(actual);
+    return tableros;
+  }
+
+  const colores = ['bg-emerald-200', 'bg-sky-200', 'bg-amber-200', 'bg-fuchsia-200', 'bg-rose-200', 'bg-indigo-200', 'bg-teal-200', 'bg-lime-200'];
+
+  function dibujarTableros(tableros, titulo, colorBorde) {
+    if (tableros.length === 0) return '';
+    const maxVisualWidth = 800;
+    const factor = Math.min(maxVisualWidth / L, 1);
+
+    let html = `<div class="mb-6">
+      <h3 class="text-lg font-bold ${colorBorde} mb-3 border-b pb-1"><i class="fa-solid fa-layer-group mr-1"></i>${titulo} (${tableros.length} tablero${tableros.length > 1 ? 's' : ''})</h3>
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">`;
+    
+    tableros.forEach((t, index) => {
+      const tabW = L * factor;
+      const tabH = A * factor;
+      let piezasHtml = '';
+      t.colocadas.forEach(p => {
+        const pW = p.w * factor;
+        const pH = p.h * factor;
+        const pX = p.x * factor;
+        const pY = p.y * factor;
+        const color = colores[Math.floor(Math.random() * colores.length)];
+        const textSize = Math.min(pW, pH) > 40 ? 'text-[10px]' : 'text-[8px]';
+        piezasHtml += `<div class="pieza-corte ${color} ${textSize} text-slate-800 font-semibold flex-col leading-none" style="left:${pX}px; top:${pY}px; width:${pW}px; height:${pH}px;" title="${p.nombre} (${Math.round(p.w)}x${Math.round(p.h)})">
+          <span class="block truncate w-full px-0.5">${p.nombre}</span>
+          <span class="block text-[8px] opacity-75">${Math.round(p.w)}x${Math.round(p.h)}</span>
+        </div>`;
+      });
+      html += `<div>
+        <div class="text-xs font-semibold text-slate-500 mb-1 flex justify-between">
+          <span>Tablero ${index + 1}</span>
+          <span>${L} x ${A} mm</span>
+        </div>
+        <div class="tablero-corte" style="width:${tabW}px; height:${tabH}px;">
+          ${piezasHtml}
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+    return html;
+  }
+
+  if (todasEstructura.length > 0) {
+    const tablerosEst = empaquetar(todasEstructura, L, A);
+    contEst.innerHTML = dibujarTableros(tablerosEst, 'Despiece: Estructura (Laterales, Pisos, Techos, Fondos)', 'text-amber-700 border-amber-300');
+  } else {
+    contEst.innerHTML = '';
+  }
+
+  if (todasRevestimiento.length > 0) {
+    const tablerosRev = empaquetar(todasRevestimiento, L, A);
+    contRev.innerHTML = dibujarTableros(tablerosRev, 'Despiece: Revestimiento (Puertas, Frentes, Paneles)', 'text-emerald-700 border-emerald-300');
+  } else {
+    contRev.innerHTML = '';
+  }
+}
+
+function eliminarMueble(id) {
+  if (!confirm('¿Eliminar este mueble?')) return;
+  muebles = muebles.filter(m => m.id !== id);
+  if (editandoPrecioPatasId === id) editandoPrecioPatasId = null;
+  if (editandoPrecioCorrederaId === id) editandoPrecioCorrederaId = null;
+  if (editandoTornillo?.muebleId === id) editandoTornillo = null;
+  if (editandoBisagraRecta?.muebleId === id) editandoBisagraRecta = null;
+  if (editandoElevacion?.muebleId === id) editandoElevacion = null;
+  if (editandoPlatera?.muebleId === id) editandoPlatera = null;
+  if (editandoCondimentero?.muebleId === id) editandoCondimentero = null;
+  if (editandoTiradorId === id) editandoTiradorId = null;
+  renderizarMuebles();
+}
+function limpiarTodo() {
+  if (muebles.length === 0) return;
+  if (!confirm('¿Eliminar TODOS los muebles?')) return;
+  muebles = []; editandoPrecioPatasId = null; editandoPrecioCorrederaId = null; editandoTornillo = null; editandoBisagraRecta = null; editandoElevacion = null; editandoPlatera = null; editandoCondimentero = null; editandoTiradorId = null;
+  renderizarMuebles();
+}
+
+/* ============================================================
+   CSV
+   ============================================================ */
+function descargarCSV(n, c) { const b = new Blob(['\uFEFF' + c], {type:'text/csv;charset=utf-8;'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = n; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); }
+function exportarCatalogo() {
+  if (BIBLIOTECA.length === 0) { alert('Catálogo vacío.'); return; }
+  const cab = ['Codigo','Descripcion','Nombre','Categoria','Tipo','Alto','Prof','Precio','Caracteristicas'];
+  const filas = BIBLIOTECA.map(m => [m.codigo, m.descripcion || '', m.nombre, m.categoria, m.tipo, m.altoBase, m.profBase, m.precio, m.caracteristicas || '']);
+  const csv = [cab, ...filas].map(r => r.map(v => { const s = String(v); return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }).join(';')).join('\n');
+  descargarCSV('catalogo_muebles.csv', csv);
+}
+function exportarCSVResumen() {
+  if (muebles.length === 0) { alert('No hay muebles.'); return; }
+  const cab = ['Componente/Herraje','Cantidad total','Ancho (mm)','Alto (mm)','Material/Tipo','Muebles'];
+  const filas = []; const grupos = new Map();
+  muebles.forEach(m => {
+    m.componentes.forEach(c => {
+      const aR = c.esHerraje ? 0 : Math.round(c.ancho*100)/100;
+      const hR = c.esHerraje ? 0 : Math.round(c.alto*100)/100;
+      const key = `${c.componente}|${aR}|${hR}|${c.material}`;
+      if (!grupos.has(key)) grupos.set(key, { componente:c.componente, ancho:aR, alto:hR, material:c.material, cantidad:0, muebles:new Set(), esHerraje:c.esHerraje });
+      const g = grupos.get(key); g.cantidad += c.cantidad * (m.cantidad || 1); g.muebles.add(m.nombre);
+    });
+  });
+  [...grupos.values()].sort((a,b) => a.componente.localeCompare(b.componente))
+    .forEach(g => filas.push([g.componente, g.cantidad, g.esHerraje ? '—' : g.ancho, g.esHerraje ? '—' : g.alto, g.material, [...g.muebles].join(' | ')]));
+  const csv = [cab, ...filas].map(r => r.map(v => { const s = String(v); return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }).join(';')).join('\n');
+  descargarCSV('resumen_corte_herrajes.csv', csv);
+}
+function exportarCSVCompleto() {
+  if (muebles.length === 0) { alert('No hay muebles.'); return; }
+  const cab = ['Mueble','Descripción','Pieza/Herraje','Cantidad','Material/Tipo','Veta','Largo (mm)','Ancho (mm)','Área (m²)','Cantos','ML canto','Observaciones'];
+  const filas = [];
+  muebles.forEach(m => {
+    m.componentes.forEach(c => {
+      const cantTotal = c.cantidad * (m.cantidad || 1);
+      const areaM2 = c.esHerraje ? 0 : (c.ancho * c.alto * cantTotal) / 1_000_000;
+      const cantos = c.cantos || {};
+      const lc = [];
+      if (cantos.sup) lc.push('Sup'); if (cantos.inf) lc.push('Inf'); if (cantos.izq) lc.push('Izq'); if (cantos.der) lc.push('Der');
+      const mlTotal = c.esHerraje ? 0 : calcularCantosPieza(c) * cantTotal;
+      filas.push([m.nombre, m.descripcion || '', c.componente, cantTotal, c.material, c.esHerraje ? '—' : (c.veta || m.veta),
+        c.esHerraje ? '—' : c.ancho, c.esHerraje ? '—' : c.alto, c.esHerraje ? '—' : areaM2.toFixed(4),
+        c.esHerraje ? 'Herraje' : (lc.join('+') || 'Sin canto'),
+        c.esHerraje ? '—' : mlTotal.toFixed(3), c.observaciones]);
+    });
+  });
+  const csv = [cab, ...filas].map(r => r.map(v => { const s = String(v); return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }).join(';')).join('\n');
+  descargarCSV('despiece_completo.csv', csv);
+}
+function exportarCSVCostos() {
+  if (muebles.length === 0) { alert('No hay muebles.'); return; }
+  const cfg = leerConfigTablero();
+  const filas = [
+    ['Largo tablero (mm)', cfg.largo], ['Ancho tablero (mm)', cfg.ancho],
+    ['Área tablero (m²)', cfg.areaTableroM2.toFixed(4)],
+    ['Precio lámina ESTRUCTURA ($)', cfg.precioEstructura],
+    ['Precio lámina REVESTIMIENTO ($)', cfg.precioRevestimiento],
+    ['Desperdicio (%)', cfg.desperdicio],
+    ['Canto Estructura 0.45mm ($/ML)', cfg.precioCantoEstructura],
+    ['Canto Revestimiento 1mm ($/ML)', cfg.precioCantoRevestimiento],
+    ['Enchapado ($/ML)', cfg.precioEnchapado],
+    ['Precio por corte ($)', cfg.precioCorte],
+    ['Cortes por lámina (cant.)', cfg.cantidadCortesPorLamina],
+    ['Mano de Obra (%)', cfg.porcentajeManoObra],
+    ['Gastos Administrativos (%)', cfg.porcentajeGastosAdmin],
+    ['Precio par bisagras ($)', cfg.precioParBisagra], ['Precio set patas global ($)', cfg.precioSetPatasGlobal],
+    ['Tornillos 6x2 - precio por defecto ($)', 2.50], ['Tornillos 6x1 1/4 - precio por defecto ($)', 1.26],
+    ['Tornillos 5/8 x6 - precio por defecto ($)', 1.68], ['Bisagra recta - precio por defecto ($)', 1.50],
+    ['Amortiguador autoelevable - precio por defecto ($)', 1.92],
+    ['Sistema elevación puerta doble - precio por defecto ($)', 124.66],
+    ['Sistema elevación puerta sencilla - precio por defecto ($)', 49.00],
+    ['Platera 60 cm - precio por defecto ($)', 29.94], ['Platera 70 cm - precio por defecto ($)', 29.94],
+    ['Platera 80 cm - precio por defecto ($)', 29.94], ['Platera 90 cm - precio por defecto ($)', 29.94],
+    ['Condimentero 15 cm - precio por defecto ($)', 67.00], ['Condimentero 20 cm - precio por defecto ($)', 67.00],
+    ['Condimentero 30 cm - precio por defecto ($)', 67.00], ['Condimentero 35 cm - precio por defecto ($)', 67.00],
+    ['Condimentero 40 cm - precio por defecto ($)', 67.00]
+  ];
+  const csv = [['Concepto','Valor'], ...filas].map(r => r.map(v => { const s = String(v); return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }).join(';')).join('\n');
+  descargarCSV('analisis_costos_herrajes.csv', csv);
+}
+function exportarCSVCantos() { exportarCSVCompleto(); }
+
+/* ============================================================
+   INIT
+   ============================================================ */
+poblarDatalist();
+renderizarMuebles();
+inicializarAcordeon();
+</script>
+</body>
+</html>
