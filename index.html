@@ -106,8 +106,14 @@
   main{ padding:0 0 84px; }
   .panel{
     margin-top:-46px; position:relative; z-index:5;
-    display:grid; grid-template-columns:1.35fr 1fr; gap:26px;
+    display:grid; grid-template-columns:1.3fr 1fr; gap:26px;
+    align-items:stretch;
   }
+  .tarjeta-principal{ grid-row:span 2; }
+  .tarjeta-compacta{ padding:28px; }
+  .tarjeta-compacta h2{ font-size:1.28rem; }
+  .tarjeta-compacta .icono{ width:52px; height:52px; font-size:1.3rem; margin-bottom:16px; }
+  @media (max-width:900px){ .tarjeta-principal{ grid-row:auto; } }
   .tarjeta{
     background:var(--blanco);
     border-radius:var(--radio);
@@ -221,6 +227,7 @@
     <nav>
       <a href="#inicio">Inicio</a>
       <a href="calculadora.html">Calculadora</a>
+      <a href="presupuesto.html">Presupuesto</a>
       <a href="#proyectos">Proyectos</a>
     </nav>
   </div>
@@ -242,7 +249,7 @@
   <div class="contenedor">
     <div class="panel">
 
-      <a class="tarjeta" href="calculadora.html" style="text-decoration:none;">
+      <a class="tarjeta tarjeta-principal" href="calculadora.html" style="text-decoration:none;">
         <div class="icono"><i class="fa-solid fa-ruler-combined"></i></div>
         <h2>Calculadora de Despiece</h2>
         <p>Herramienta del taller: mide el mueble en milímetros y obtiene el despiece completo, láminas necesarias, metros de canto, herrajes y costo final.</p>
@@ -253,6 +260,19 @@
           <span class="chip">Costos y herrajes</span>
         </div>
         <span class="accion"><i class="fa-solid fa-arrow-right"></i> Abrir calculadora</span>
+      </a>
+
+      <a class="tarjeta tarjeta-compacta" href="presupuesto.html" style="text-decoration:none;">
+        <div class="icono"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+        <h2>Presupuesto para Clientes</h2>
+        <p>Genera el documento del cliente con materiales, herrajes, traslado, mano de obra, diseño y administración.</p>
+        <div class="chips">
+          <span class="chip">Materiales</span>
+          <span class="chip">Herrajes</span>
+          <span class="chip">Servicios</span>
+          <span class="chip">IVA</span>
+        </div>
+        <span class="accion"><i class="fa-solid fa-arrow-right"></i> Abrir presupuesto</span>
       </a>
 
       <div class="tarjeta-vacia" id="proyectos">
