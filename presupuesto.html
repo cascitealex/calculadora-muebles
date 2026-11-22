@@ -6,110 +6,61 @@
 <title>Presupuesto para clientes | Taller de Muebles de Alex</title>
 <style>
   :root{
-    --madera:#8a5a2b;
-    --madera-oscura:#5c3a1a;
-    --madera-clara:#c98a4b;
-    --beige:#f7f1e6;
-    --beige-2:#efe3d2;
-    --texto:#3b2e24;
-    --texto-suave:#6b5b4d;
-    --blanco:#fffdf9;
-    --linea:#e2d5c2;
-    --verde:#2f6b45;
+    --madera:#8a5a2b; --madera-oscura:#5c3a1a; --madera-clara:#c98a4b;
+    --beige:#f7f1e6; --beige-2:#efe3d2; --texto:#3b2e24; --texto-suave:#6b5b4d;
+    --blanco:#fffdf9; --linea:#e2d5c2;
   }
   *{ box-sizing:border-box; }
-  body{
-    margin:0;
-    font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
-    background:var(--beige);
-    color:var(--texto);
-    line-height:1.5;
-  }
+  body{ margin:0; font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    background:var(--beige); color:var(--texto); line-height:1.5; }
   h1,h2,h3,h4{ margin:0 0 .4em; line-height:1.2; }
-  .barra{
-    position:sticky; top:0; z-index:10;
-    background:var(--madera-oscura); color:#fff;
-    padding:14px 20px;
-    display:flex; flex-wrap:wrap; gap:12px;
-    align-items:center; justify-content:space-between;
-  }
+  .barra{ position:sticky; top:0; z-index:10; background:var(--madera-oscura); color:#fff;
+    padding:14px 20px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; }
   .barra h1{ font-size:1.05rem; margin:0; font-weight:600; }
   .barra .acciones{ display:flex; gap:10px; flex-wrap:wrap; }
-  .btn{
-    border:0; cursor:pointer; border-radius:9px;
-    padding:10px 18px; font-size:.92rem; font-weight:700;
-    transition:filter .15s, transform .15s;
-  }
+  .btn{ border:0; cursor:pointer; border-radius:9px; padding:10px 18px; font-size:.92rem; font-weight:700;
+    transition:filter .15s, transform .15s; }
   .btn:hover{ filter:brightness(1.1); transform:translateY(-1px); }
   .btn-principal{ background:var(--madera-clara); color:#3b2410; }
   .btn-borde{ background:transparent; color:#f3e6d4; border:1px solid rgba(255,255,255,.45); }
-
   .contenedor{ max-width:1180px; margin:0 auto; padding:22px 16px 60px; }
   .rejilla{ display:grid; grid-template-columns:minmax(0,380px) minmax(0,1fr); gap:22px; align-items:start; }
   @media (max-width:960px){ .rejilla{ grid-template-columns:1fr; } }
-
-  .panel{
-    background:var(--blanco);
-    border:1px solid var(--linea);
-    border-radius:14px;
-    padding:18px;
-    box-shadow:0 8px 22px rgba(92,58,26,.08);
-  }
+  .panel{ background:var(--blanco); border:1px solid var(--linea); border-radius:14px; padding:18px;
+    box-shadow:0 8px 22px rgba(92,58,26,.08); }
   .panel + .panel{ margin-top:16px; }
   .panel h2{ font-size:1rem; color:var(--madera-oscura); text-transform:uppercase; letter-spacing:.6px; }
   .campos{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .campos.uno{ grid-template-columns:1fr; }
   .campos.tres{ grid-template-columns:1fr 1fr 1fr; }
   .campo label{ display:block; font-size:.74rem; font-weight:700; color:var(--texto-suave); margin-bottom:4px; }
-  .campo input, .campo select{
-    width:100%; padding:9px 10px; font-size:.9rem;
-    border:1px solid var(--linea); border-radius:8px;
-    background:var(--beige); color:var(--texto); outline:none;
-  }
+  .campo input, .campo select{ width:100%; padding:9px 10px; font-size:.9rem; border:1px solid var(--linea);
+    border-radius:8px; background:var(--beige); color:var(--texto); outline:none; }
   .campo input:focus, .campo select:focus{ border-color:var(--madera-clara); box-shadow:0 0 0 3px rgba(201,138,75,.2); }
   .campo.ancho{ grid-column:1 / -1; }
-  .check{ display:flex; align-items:center; gap:8px; font-size:.85rem; margin-top:6px; }
-  .check input{ width:16px; height:16px; }
-
-  /* ---------- Documento del presupuesto ---------- */
-  .doc{
-    background:var(--blanco);
-    border:1px solid var(--linea);
-    border-radius:14px;
-    padding:30px 34px;
-    box-shadow:0 10px 28px rgba(92,58,26,.1);
-    color:#2c231c;
-  }
-  .doc-cabecera{
-    display:flex; justify-content:space-between; gap:20px;
-    border-bottom:3px solid var(--madera); padding-bottom:14px; margin-bottom:18px;
-    flex-wrap:wrap;
-  }
+  .oculto{ display:none !important; }
+  .modo{ background:rgba(201,138,75,.12); border:1px dashed rgba(138,90,43,.4); border-radius:10px;
+    padding:10px; margin-bottom:12px; }
+  .doc{ background:var(--blanco); border:1px solid var(--linea); border-radius:14px; padding:30px 34px;
+    box-shadow:0 10px 28px rgba(92,58,26,.1); color:#2c231c; }
+  .doc-cabecera{ display:flex; justify-content:space-between; gap:20px; border-bottom:3px solid var(--madera);
+    padding-bottom:14px; margin-bottom:18px; flex-wrap:wrap; }
   .doc-marca h2{ font-size:1.4rem; color:var(--madera-oscura); margin:0 0 2px; }
   .doc-marca p{ margin:0; font-size:.8rem; color:var(--texto-suave); }
   .doc-num{ text-align:right; font-size:.8rem; color:var(--texto-suave); }
   .doc-num strong{ display:block; font-size:1rem; color:var(--madera-oscura); }
-
   .doc-datos{ display:grid; grid-template-columns:1fr 1fr; gap:8px 24px; font-size:.82rem; margin-bottom:20px; }
   .doc-datos span{ color:var(--texto-suave); }
-  .doc h3{
-    font-size:.82rem; text-transform:uppercase; letter-spacing:1px;
-    color:var(--madera-oscura); margin:22px 0 8px;
-    border-bottom:1px solid var(--linea); padding-bottom:5px;
-  }
+  .doc h3{ font-size:.82rem; text-transform:uppercase; letter-spacing:1px; color:var(--madera-oscura);
+    margin:22px 0 8px; border-bottom:1px solid var(--linea); padding-bottom:5px; }
   table{ width:100%; border-collapse:collapse; font-size:.82rem; }
-  th{
-    text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.6px;
-    color:var(--texto-suave); border-bottom:1px solid var(--linea); padding:6px 4px;
-  }
+  th{ text-align:left; font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color:var(--texto-suave);
+    border-bottom:1px solid var(--linea); padding:6px 4px; }
   td{ padding:6px 4px; border-bottom:1px dotted var(--linea); vertical-align:top; }
   td.num, th.num{ text-align:right; white-space:nowrap; }
   tr.sub td{ font-weight:700; border-top:1px solid var(--linea); border-bottom:0; padding-top:9px; }
-  .total-final{
-    margin-top:18px; border:2px solid var(--madera); border-radius:10px;
-    padding:14px 18px; display:flex; justify-content:space-between; align-items:center;
-    background:var(--beige-2);
-  }
+  .total-final{ margin-top:18px; border:2px solid var(--madera); border-radius:10px; padding:14px 18px;
+    display:flex; justify-content:space-between; align-items:center; background:var(--beige-2); }
   .total-final span{ font-size:.8rem; text-transform:uppercase; letter-spacing:1px; color:var(--madera-oscura); font-weight:700; }
   .total-final b{ font-size:1.6rem; color:var(--madera-oscura); }
   .notas{ margin-top:16px; font-size:.76rem; color:var(--texto-suave); }
@@ -118,7 +69,6 @@
   .firma div{ flex:1; border-top:1px solid #999; padding-top:5px; }
   .despiece{ font-size:.74rem; }
   .despiece td, .despiece th{ padding:4px 3px; }
-
   @media print{
     @page{ size:A4; margin:12mm; }
     body{ background:#fff; }
@@ -134,7 +84,6 @@
 </style>
 </head>
 <body>
-
 <div class="barra no-print">
   <h1>Presupuesto para clientes &middot; Taller de Muebles de Alex</h1>
   <div class="acciones">
@@ -146,106 +95,123 @@
 <div class="contenedor">
 <div class="rejilla">
 
-  <!-- ================= FORMULARIO ================= -->
   <form id="formulario" class="panel-form" oninput="actualizar()" onsubmit="return false">
 
     <div class="panel">
       <h2>1. Cliente</h2>
       <div class="campos uno">
         <div class="campo"><label for="cliNombre">Nombre del cliente</label>
-          <input id="cliNombre" type="text" placeholder="Ej. María Pérez" value="Cliente de ejemplo"></div>
-      </div>
-      <div class="campos">
-        <div class="campo"><label for="cliTelefono">Teléfono</label>
-          <input id="cliTelefono" type="text" placeholder="0414-0000000"></div>
-        <div class="campo"><label for="cliFecha">Fecha</label>
-          <input id="cliFecha" type="date"></div>
+          <input id="cliNombre" type="text" value="Cliente de ejemplo"></div>
       </div>
       <div class="campos" style="margin-top:10px">
-        <div class="campo"><label for="cliValidez">Validez (días)</label>
-          <input id="cliValidez" type="number" min="1" step="1" value="15"></div>
-        <div class="campo"><label for="numPresupuesto">N° presupuesto</label>
-          <input id="numPresupuesto" type="text" value="P-001"></div>
+        <div class="campo"><label for="cliTelefono">Teléfono</label><input id="cliTelefono" type="text" placeholder="0414-0000000"></div>
+        <div class="campo"><label for="cliFecha">Fecha</label><input id="cliFecha" type="date"></div>
+      </div>
+      <div class="campos" style="margin-top:10px">
+        <div class="campo"><label for="cliValidez">Validez (días)</label><input id="cliValidez" type="number" min="1" value="15"></div>
+        <div class="campo"><label for="numPresupuesto">N° presupuesto</label><input id="numPresupuesto" type="text" value="P-001"></div>
       </div>
     </div>
 
     <div class="panel">
       <h2>2. Mueble</h2>
       <div class="campos uno">
-        <div class="campo"><label for="nombreMueble">Descripción del mueble</label>
-          <input id="nombreMueble" type="text" value="Mueble bajo de cocina"></div>
+        <div class="campo"><label for="nombreMueble">Descripción / código</label>
+          <input id="nombreMueble" type="text" value="Mueble BA01000B"></div>
       </div>
       <div class="campos tres" style="margin-top:10px">
-        <div class="campo"><label for="alto">Alto (mm)</label><input id="alto" type="number" min="1" step="1" value="720"></div>
-        <div class="campo"><label for="ancho">Ancho (mm)</label><input id="ancho" type="number" min="1" step="1" value="600"></div>
-        <div class="campo"><label for="prof">Prof. (mm)</label><input id="prof" type="number" min="1" step="1" value="580"></div>
+        <div class="campo"><label for="alto">Alto (mm)</label><input id="alto" type="number" min="1" value="720"></div>
+        <div class="campo"><label for="ancho">Ancho (mm)</label><input id="ancho" type="number" min="1" value="600"></div>
+        <div class="campo"><label for="prof">Prof. (mm)</label><input id="prof" type="number" min="1" value="580"></div>
       </div>
       <div class="campos tres" style="margin-top:10px">
         <div class="campo"><label for="espesor">Espesor</label>
           <select id="espesor"><option value="18" selected>18 mm</option><option value="12">12 mm</option><option value="8">8 mm</option></select></div>
-        <div class="campo"><label for="cantidad">Cantidad de muebles</label><input id="cantidad" type="number" min="1" step="1" value="1"></div>
-        <div class="campo"><label for="estantes">Repisas</label><input id="estantes" type="number" min="0" step="1" value="3"></div>
+        <div class="campo"><label for="cantidad">Cantidad</label><input id="cantidad" type="number" min="1" value="1"></div>
+        <div class="campo"><label for="estantes">Repisas</label><input id="estantes" type="number" min="0" value="1"></div>
       </div>
       <div class="campos tres" style="margin-top:10px">
-        <div class="campo"><label for="puertas">Puertas</label><input id="puertas" type="number" min="0" max="4" step="1" value="2"></div>
-        <div class="campo"><label for="gavetas">Gavetas</label><input id="gavetas" type="number" min="0" max="6" step="1" value="0"></div>
+        <div class="campo"><label for="puertas">Puertas</label><input id="puertas" type="number" min="0" max="4" value="1"></div>
+        <div class="campo"><label for="gavetas">Gavetas</label><input id="gavetas" type="number" min="0" max="6" value="0"></div>
         <div class="campo"><label for="tipoCorredera">Corredera</label>
-          <select id="tipoCorredera">
-            <option value="telescopica" selected>Telescópica</option>
-            <option value="oculta">Oculta</option>
+          <select id="tipoCorredera"><option value="telescopica" selected>Telescópica</option><option value="oculta">Oculta</option></select></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>3. Costos de materiales</h2>
+      <div class="modo">
+        <div class="campo"><label for="origen">¿De dónde salen los montos?</label>
+          <select id="origen">
+            <option value="analisis" selected>Copiados del Análisis de costo</option>
+            <option value="medidas">Calculados desde las medidas</option>
           </select></div>
       </div>
+
+      <div id="bloqueAnalisis">
+        <div class="campos">
+          <div class="campo"><label for="mEstructura">Estructura ($)</label><input id="mEstructura" type="number" min="0" step="0.01" value="56.46"></div>
+          <div class="campo"><label for="mRevestimiento">Revestimiento ($)</label><input id="mRevestimiento" type="number" min="0" step="0.01" value="16.54"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="mCantoEst">Canto estructura ($)</label><input id="mCantoEst" type="number" min="0" step="0.01" value="3.29"></div>
+          <div class="campo"><label for="mCantoRev">Canto revestimiento ($)</label><input id="mCantoRev" type="number" min="0" step="0.01" value="2.63"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="mEnchapado">Enchapado ($)</label><input id="mEnchapado" type="number" min="0" step="0.01" value="21.73"></div>
+          <div class="campo"><label for="mCortes">Cortes ($)</label><input id="mCortes" type="number" min="0" step="0.01" value="9.10"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="mBisagras">Bisagras ($)</label><input id="mBisagras" type="number" min="0" step="0.01" value="2.50"></div>
+          <div class="campo"><label for="mOtrosHerrajes">Otros herrajes ($)</label><input id="mOtrosHerrajes" type="number" min="0" step="0.01" value="0"></div>
+        </div>
+      </div>
+
+      <div id="bloqueMedidas" class="oculto">
+        <div class="campos">
+          <div class="campo"><label for="precioLaminaEst">Lámina estructura ($)</label><input id="precioLaminaEst" type="number" min="0" step="0.01" value="100"></div>
+          <div class="campo"><label for="precioLaminaRev">Lámina revestimiento ($)</label><input id="precioLaminaRev" type="number" min="0" step="0.01" value="150"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="largoLamina">Largo lámina (mm)</label><input id="largoLamina" type="number" min="1" value="2440"></div>
+          <div class="campo"><label for="anchoLamina">Ancho lámina (mm)</label><input id="anchoLamina" type="number" min="1" value="1830"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="desperdicio">Desperdicio (%)</label><input id="desperdicio" type="number" min="0" max="80" value="15"></div>
+          <div class="campo"><label for="precioEnchapado">Enchapado ($/ml)</label><input id="precioEnchapado" type="number" min="0" step="0.01" value="2.36"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="precioCantoEst">Canto estructura ($/ml)</label><input id="precioCantoEst" type="number" min="0" step="0.01" value="0.50"></div>
+          <div class="campo"><label for="precioCantoRev">Canto revestimiento ($/ml)</label><input id="precioCantoRev" type="number" min="0" step="0.01" value="1.00"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="precioCorte">Precio por corte ($)</label><input id="precioCorte" type="number" min="0" step="0.01" value="0.91"></div>
+          <div class="campo"><label for="cortesPorLamina">Cortes por lámina</label><input id="cortesPorLamina" type="number" min="1" value="5"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="precioBisagra">Par de bisagras ($)</label><input id="precioBisagra" type="number" min="0" step="0.01" value="2.50"></div>
+          <div class="campo"><label for="precioCorredera">Par de correderas ($)</label><input id="precioCorredera" type="number" min="0" step="0.01" value="2.00"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="incluirTiradores">Tiradores</label>
+            <select id="incluirTiradores"><option value="1" selected>Sí</option><option value="0">No</option></select></div>
+          <div class="campo"><label for="precioTirador">Precio por tirador ($)</label><input id="precioTirador" type="number" min="0" step="0.01" value="5.00"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="incluirPatas">Patas regulables</label>
+            <select id="incluirPatas"><option value="1" selected>Sí</option><option value="0">No</option></select></div>
+          <div class="campo"><label for="precioPatas">Set de 4 patas ($)</label><input id="precioPatas" type="number" min="0" step="0.01" value="3.00"></div>
+        </div>
+        <div class="campos" style="margin-top:10px">
+          <div class="campo"><label for="incluirTornillos">Bolsa de tornillos</label>
+            <select id="incluirTornillos"><option value="1" selected>Sí</option><option value="0">No</option></select></div>
+          <div class="campo"><label for="precioTornillos">Bolsa de tornillos ($)</label><input id="precioTornillos" type="number" min="0" step="0.01" value="6.00"></div>
+        </div>
+      </div>
     </div>
 
     <div class="panel">
-      <h2>3. Materiales</h2>
-      <div class="campos">
-        <div class="campo"><label for="precioLaminaEst">Lámina estructura ($)</label><input id="precioLaminaEst" type="number" min="0" step="0.01" value="100"></div>
-        <div class="campo"><label for="precioLaminaRev">Lámina revestimiento ($)</label><input id="precioLaminaRev" type="number" min="0" step="0.01" value="150"></div>
-      </div>
-      <div class="campos" style="margin-top:10px">
-        <div class="campo"><label for="largoLamina">Largo lámina (mm)</label><input id="largoLamina" type="number" min="1" value="2440"></div>
-        <div class="campo"><label for="anchoLamina">Ancho lámina (mm)</label><input id="anchoLamina" type="number" min="1" value="1830"></div>
-      </div>
-      <div class="campos" style="margin-top:10px">
-        <div class="campo"><label for="desperdicio">Desperdicio (%)</label><input id="desperdicio" type="number" min="0" max="80" step="1" value="15"></div>
-        <div class="campo"><label for="precioEnchapado">Enchapado ($/ml)</label><input id="precioEnchapado" type="number" min="0" step="0.01" value="2.36"></div>
-      </div>
-      <div class="campos" style="margin-top:10px">
-        <div class="campo"><label for="precioCantoEst">Canto estructura ($/ml)</label><input id="precioCantoEst" type="number" min="0" step="0.01" value="0.50"></div>
-        <div class="campo"><label for="precioCantoRev">Canto revestimiento ($/ml)</label><input id="precioCantoRev" type="number" min="0" step="0.01" value="1.00"></div>
-      </div>
-      <div class="campos" style="margin-top:10px">
-        <div class="campo"><label for="precioCorte">Precio por corte ($)</label><input id="precioCorte" type="number" min="0" step="0.01" value="0.91"></div>
-        <div class="campo"><label for="cortesPorLamina">Cortes por lámina</label><input id="cortesPorLamina" type="number" min="1" value="5"></div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>4. Herrajes</h2>
-      <div class="campos">
-        <div class="campo"><label for="precioBisagra">Par de bisagras ($)</label><input id="precioBisagra" type="number" min="0" step="0.01" value="2.50"></div>
-        <div class="campo"><label for="precioCorredera">Par de correderas ($)</label><input id="precioCorredera" type="number" min="0" step="0.01" value="2.00"></div>
-      </div>
-      <div class="campos" style="margin-top:10px">
-        <div class="campo"><label for="incluirTiradores">Tiradores</label>
-          <select id="incluirTiradores"><option value="1" selected>Sí</option><option value="0">No</option></select></div>
-        <div class="campo"><label for="precioTirador">Precio por tirador ($)</label><input id="precioTirador" type="number" min="0" step="0.01" value="5.00"></div>
-      </div>
-      <div class="campos" style="margin-top:10px">
-        <div class="campo"><label for="incluirPatas">Patas regulables</label>
-          <select id="incluirPatas"><option value="1" selected>Sí</option><option value="0">No</option></select></div>
-        <div class="campo"><label for="precioPatas">Set de 4 patas ($)</label><input id="precioPatas" type="number" min="0" step="0.01" value="3.00"></div>
-      </div>
-      <div class="campos" style="margin-top:10px">
-        <div class="campo"><label for="incluirTornillos">Bolsa de tornillos</label>
-          <select id="incluirTornillos"><option value="1" selected>Sí</option><option value="0">No</option></select></div>
-        <div class="campo"><label for="precioTornillos">Bolsa de tornillos ($)</label><input id="precioTornillos" type="number" min="0" step="0.01" value="6.00"></div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>5. Servicios</h2>
+      <h2>4. Servicios</h2>
       <div class="campos">
         <div class="campo"><label for="traslado">Traslado e instalación ($)</label><input id="traslado" type="number" min="0" step="0.01" value="25"></div>
         <div class="campo"><label for="pctManoObra">Mano de obra (%)</label><input id="pctManoObra" type="number" min="0" step="0.1" value="25"></div>
@@ -267,18 +233,16 @@
 
   </form>
 
-  <!-- ================= PRESUPUESTO ================= -->
   <div id="presupuesto" class="doc"></div>
 
 </div>
 </div>
-
 <script>
 // ===== INICIO CALCULO =====
-var COMPONENTES_REVESTIMIENTO = ['Puerta', 'Frente de gaveta', 'Frente interno gaveta', 'Panel', 'Finta', 'Rodapié'];
+var REVESTIMIENTO = ['Puerta', 'Frente de gaveta', 'Frente interno gaveta', 'Panel', 'Finta', 'Rodapié'];
 
 function esRevestimiento(nombre) {
-  return COMPONENTES_REVESTIMIENTO.some(function (r) { return nombre.indexOf(r) === 0; });
+  return REVESTIMIENTO.some(function (r) { return nombre.indexOf(r) === 0; });
 }
 
 function paresBisagras(altoPuerta) {
@@ -297,44 +261,38 @@ function metrosCanto(pieza) {
   return (mm / 1000) * pieza.cantidad;
 }
 
-function piezasDelMueble(d) {
+function armarDespiece(d) {
   var piezas = [];
   function P(nombre, ancho, alto, cantidad, cantos) {
     piezas.push({ nombre: nombre, ancho: ancho, alto: alto, cantidad: cantidad,
       cantos: cantos || { sup: false, inf: false, izq: false, der: false } });
   }
 
-  P('Lateral', d.prof, d.alto, 2, { sup: true, inf: true, izq: false, der: true });
-  P('Techo / Piso', d.ancho - 36, d.prof, 2, { sup: true, inf: true, izq: false, der: false });
+  P('Lateral', d.prof, d.alto, 2, { sup: true, inf: true, der: true });
+  P('Techo / Piso', d.ancho - 36, d.prof, 2, { sup: true, inf: true });
   P('Fondo', d.ancho - 36, d.alto - 36, 1);
 
-  if (d.repisas > 0) {
-    P('Repisa', d.ancho - 36, d.prof - 18, d.repisas, { sup: true });
-  }
+  if (d.repisas > 0) P('Repisa', d.ancho - 36, d.prof - 18, d.repisas, { sup: true });
 
   var pares = 0;
   if (d.puertas > 0) {
     var anchoPuerta = d.ancho - 3;
     var altoPuerta = d.puertas === 1 ? d.alto - 3 : (d.alto / d.puertas) - 3;
-    P(d.puertas === 1 ? 'Puerta' : 'Puerta (' + d.puertas + ' uds.)',
-      anchoPuerta, altoPuerta, d.puertas,
-      { sup: true, inf: true, izq: true, der: true });
+    P(d.puertas === 1 ? 'Puerta' : 'Puerta (' + d.puertas + ' uds.)', anchoPuerta, altoPuerta,
+      d.puertas, { sup: true, inf: true, izq: true, der: true });
     pares = paresBisagras(altoPuerta) * d.puertas;
   }
 
-  var anchoCajon = 0;
   if (d.gavetas > 0) {
     var n = d.gavetas;
-    var altoFrente = (d.alto - (3 * (n + 1))) / n;
-    P('Frente de gaveta', d.ancho - 6, altoFrente, n,
+    P('Frente de gaveta', d.ancho - 6, (d.alto - (3 * (n + 1))) / n, n,
       { sup: true, inf: true, izq: true, der: true });
-
     var holgura = d.tipoCorredera === 'oculta' ? 10 : 25;
-    anchoCajon = d.tipoCorredera === 'oculta'
+    var anchoCajon = d.tipoCorredera === 'oculta'
       ? d.ancho - 84
       : d.ancho - (d.espesor * 2) - holgura - 36;
-    P('Lateral de gaveta', 500, 150 + 11, n * 2, { sup: true, der: true });
-    P('Frente interno gaveta', anchoCajon, 150 + 11, n * 2, { sup: true, inf: true });
+    P('Lateral de gaveta', 500, 161, n * 2, { sup: true, der: true });
+    P('Frente interno gaveta', anchoCajon, 161, n * 2, { sup: true, inf: true });
     P('Fondo de gaveta', anchoCajon, d.prof - 116, n);
   }
 
@@ -342,101 +300,106 @@ function piezasDelMueble(d) {
 }
 
 function calcularPresupuesto(d) {
-  var mueble = piezasDelMueble(d);
-  var piezas = mueble.piezas;
+  var mueble = armarDespiece(d);
+  var areaEst = 0, areaRev = 0, mlEst = 0, mlRev = 0, detalle = [];
 
-  var areaEst = 0, areaRev = 0, mlEst = 0, mlRev = 0;
-  var detalle = [];
-
-  piezas.forEach(function (p) {
-    var areaUnidad = (p.ancho * p.alto) / 1000000;
-    var area = areaUnidad * p.cantidad;
+  mueble.piezas.forEach(function (p) {
+    var area = (p.ancho * p.alto * p.cantidad) / 1000000;
     var ml = metrosCanto(p);
-    var rev = esRevestimiento(p.nombre);
-    detalle.push({
-      nombre: p.nombre,
-      ancho: p.ancho,
-      alto: p.alto,
-      cantidad: p.cantidad,
-      area: area,
-      ml: ml,
-      rev: rev
-    });
-    if (rev) { areaRev += area; mlRev += ml; } else { areaEst += area; mlEst += ml; }
+    detalle.push({ nombre: p.nombre, ancho: p.ancho, alto: p.alto, cantidad: p.cantidad, area: area, ml: ml });
+    if (esRevestimiento(p.nombre)) { areaRev += area; mlRev += ml; }
+    else { areaEst += area; mlEst += ml; }
   });
 
-  var factor = 1 + (d.desperdicio / 100);
-  var areaEstDesc = areaEst * factor;
-  var areaRevDesc = areaRev * factor;
-  var areaLamina = (d.largoLamina * d.anchoLamina) / 1000000;
+  var lineasMateriales = [];
+  var lineasHerrajes = [];
+  var materiales = 0, herrajes = 0;
+  var tablerosEst = 0, tablerosRev = 0;
 
-  var tablerosEst = areaLamina > 0 ? Math.ceil(areaEstDesc / areaLamina) : 0;
-  var tablerosRev = areaLamina > 0 ? Math.ceil(areaRevDesc / areaLamina) : 0;
+  if (d.origen === 'analisis') {
+    function linea(nombre, detalleTxt, monto) {
+      lineasMateriales.push({ concepto: nombre, detalle: detalleTxt, monto: monto });
+      materiales += monto;
+    }
+    linea('Tablero estructura', 'según análisis de costo', d.mEstructura);
+    linea('Tablero revestimiento', 'según análisis de costo', d.mRevestimiento);
+    linea('Canto estructura 0,45 mm', 'según análisis de costo', d.mCantoEst);
+    linea('Canto revestimiento 1 mm', 'según análisis de costo', d.mCantoRev);
+    linea('Enchapado', 'según análisis de costo', d.mEnchapado);
+    linea('Cortes de tablero', 'según análisis de costo', d.mCortes);
 
-  var costoEst = tablerosEst * d.precioLaminaEst;
-  var costoRev = tablerosRev * d.precioLaminaRev;
-  var costoCantoEst = mlEst * d.precioCantoEst;
-  var costoCantoRev = mlRev * d.precioCantoRev;
-  var costoEnchapado = (mlEst + mlRev) * d.precioEnchapado;
-  var costoCortes = (tablerosEst + tablerosRev) * d.cortesPorLamina * d.precioCorte;
+    lineasHerrajes.push({ concepto: 'Bisagras de cazoleta', detalle: 'según análisis de costo', monto: d.mBisagras });
+    if (d.mOtrosHerrajes > 0) {
+      lineasHerrajes.push({ concepto: 'Otros herrajes', detalle: 'correderas, tiradores, patas', monto: d.mOtrosHerrajes });
+    }
+    herrajes = d.mBisagras + d.mOtrosHerrajes;
+  } else {
+    var factor = 1 + (d.desperdicio / 100);
+    var areaLamina = (d.largoLamina * d.anchoLamina) / 1000000;
+    tablerosEst = areaLamina > 0 ? Math.ceil((areaEst * factor) / areaLamina) : 0;
+    tablerosRev = areaLamina > 0 ? Math.ceil((areaRev * factor) / areaLamina) : 0;
 
-  var materiales = costoEst + costoRev + costoCantoEst + costoCantoRev + costoEnchapado + costoCortes;
+    var costoEst = tablerosEst * d.precioLaminaEst;
+    var costoRev = tablerosRev * d.precioLaminaRev;
+    var cantoEst = mlEst * d.precioCantoEst;
+    var cantoRev = mlRev * d.precioCantoRev;
+    var enchapado = (mlEst + mlRev) * d.precioEnchapado;
+    var cortes = (tablerosEst + tablerosRev) * d.cortesPorLamina * d.precioCorte;
 
-  var numTiradores = d.incluirTiradores ? (d.puertas + d.gavetas) * d.cantidad : 0;
-  var costoTiradores = numTiradores * d.precioTirador;
-  var costoBisagras = mueble.pares * d.cantidad * d.precioBisagra;
-  var costoCorrederas = d.gavetas * d.cantidad * d.precioCorredera;
-  var costoPatas = d.incluirPatas ? d.cantidad * d.precioPatas : 0;
-  var costoTornillos = d.incluirTornillos ? d.cantidad * d.precioTornillos : 0;
-  var herrajes = costoTiradores + costoBisagras + costoCorrederas + costoPatas + costoTornillos;
+    lineasMateriales.push({ concepto: 'Tablero estructura ' + d.espesor + ' mm',
+      detalle: tablerosEst + ' lámina(s) — ' + (areaEst * factor).toFixed(2) + ' m² con desperdicio', monto: costoEst });
+    lineasMateriales.push({ concepto: 'Tablero revestimiento ' + d.espesor + ' mm',
+      detalle: tablerosRev + ' lámina(s) — ' + (areaRev * factor).toFixed(2) + ' m² con desperdicio', monto: costoRev });
+    lineasMateriales.push({ concepto: 'Canto estructura 0,45 mm', detalle: mlEst.toFixed(2) + ' ml', monto: cantoEst });
+    lineasMateriales.push({ concepto: 'Canto revestimiento 1 mm', detalle: mlRev.toFixed(2) + ' ml', monto: cantoRev });
+    lineasMateriales.push({ concepto: 'Enchapado', detalle: (mlEst + mlRev).toFixed(2) + ' ml', monto: enchapado });
+    lineasMateriales.push({ concepto: 'Cortes de tablero',
+      detalle: (tablerosEst + tablerosRev) + ' lámina(s) × ' + d.cortesPorLamina + ' cortes', monto: cortes });
 
-  var base = (materiales + herrajes) * d.cantidad;
-  var traslado = d.traslado;
+    materiales = costoEst + costoRev + cantoEst + cantoRev + enchapado + cortes;
+
+    var costoBisagras = mueble.pares * d.precioBisagra;
+    if (costoBisagras > 0) lineasHerrajes.push({ concepto: 'Bisagras de cazoleta',
+      detalle: mueble.pares + ' par(es) del mueble', monto: costoBisagras });
+    if (d.gavetas > 0) lineasHerrajes.push({ concepto: 'Correderas para gavetas',
+      detalle: d.gavetas + ' par(es)', monto: d.gavetas * d.precioCorredera });
+    if (d.incluirTiradores) lineasHerrajes.push({ concepto: 'Tiradores',
+      detalle: (d.puertas + d.gavetas) + ' unidad(es)', monto: (d.puertas + d.gavetas) * d.precioTirador });
+    if (d.incluirPatas) lineasHerrajes.push({ concepto: 'Patas regulables', detalle: 'set de 4', monto: d.precioPatas });
+    if (d.incluirTornillos) lineasHerrajes.push({ concepto: 'Tornillos y fijaciones', detalle: 'bolsa', monto: d.precioTornillos });
+
+    herrajes = lineasHerrajes.reduce(function (s, l) { return s + l.monto; }, 0);
+  }
+
+  materiales = materiales * d.cantidad;
+  herrajes = herrajes * d.cantidad;
+  lineasMateriales.forEach(function (l) { l.monto = l.monto * d.cantidad; });
+  lineasHerrajes.forEach(function (l) { l.monto = l.monto * d.cantidad; });
+
+  var base = materiales + herrajes;
   var manoObra = base * d.pctManoObra / 100;
   var diseno = base * d.pctDiseno / 100;
-  var admin = (base + manoObra + diseno + traslado) * d.pctAdmin / 100;
-
-  var subtotal = base + traslado + manoObra + diseno + admin;
+  var admin = (base + manoObra + diseno + d.traslado) * d.pctAdmin / 100;
+  var subtotal = base + d.traslado + manoObra + diseno + admin;
   var iva = d.conIva ? subtotal * d.pctIva / 100 : 0;
-  var total = subtotal + iva;
 
   return {
     detalle: detalle,
-    piezas: piezas.length,
-    areaEst: areaEst, areaRev: areaRev, areaEstDesc: areaEstDesc, areaRevDesc: areaRevDesc,
-    mlEst: mlEst, mlRev: mlRev,
-    tablerosEst: tablerosEst, tablerosRev: tablerosRev,
-    costoEst: costoEst * d.cantidad,
-    costoRev: costoRev * d.cantidad,
-    costoCantoEst: costoCantoEst * d.cantidad,
-    costoCantoRev: costoCantoRev * d.cantidad,
-    costoEnchapado: costoEnchapado * d.cantidad,
-    costoCortes: costoCortes * d.cantidad,
-    materiales: materiales * d.cantidad,
-    costoBisagras: costoBisagras,
-    costoCorrederas: costoCorrederas,
-    costoTiradores: costoTiradores,
-    costoPatas: costoPatas,
-    costoTornillos: costoTornillos,
-    numTiradores: numTiradores,
-    herrajes: herrajes,
-    base: base,
-    traslado: traslado,
-    manoObra: manoObra,
-    diseno: diseno,
-    admin: admin,
-    subtotal: subtotal,
-    iva: iva,
-    total: total
+    lineasMateriales: lineasMateriales,
+    lineasHerrajes: lineasHerrajes,
+    materiales: materiales, herrajes: herrajes, base: base,
+    manoObra: manoObra, diseno: diseno, traslado: d.traslado, admin: admin,
+    subtotal: subtotal, iva: iva, total: subtotal + iva,
+    areaEst: areaEst, areaRev: areaRev, mlEst: mlEst, mlRev: mlRev,
+    tablerosEst: tablerosEst, tablerosRev: tablerosRev
   };
 }
 // ===== FIN CALCULO =====
 
 function money(n) {
   var v = (isNaN(n) ? 0 : n).toFixed(2);
-  var partes = v.split('.');
-  var entero = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return '$ ' + entero + ',' + partes[1];
+  var p = v.split('.');
+  return '$ ' + p[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + p[1];
 }
 
 function num(id) {
@@ -446,6 +409,11 @@ function num(id) {
   return isNaN(v) ? 0 : v;
 }
 
+function valor(id) {
+  var el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
 function hoyISO() {
   var h = new Date();
   return h.getFullYear() + '-' + String(h.getMonth() + 1).padStart(2, '0') + '-' + String(h.getDate()).padStart(2, '0');
@@ -453,131 +421,108 @@ function hoyISO() {
 
 function leerDatos() {
   return {
+    origen: valor('origen'),
     alto: num('alto'), ancho: num('ancho'), prof: num('prof'),
     espesor: num('espesor'), cantidad: Math.max(1, num('cantidad')),
     repisas: num('estantes'), puertas: num('puertas'), gavetas: num('gavetas'),
-    tipoCorredera: document.getElementById('tipoCorredera').value,
+    tipoCorredera: valor('tipoCorredera'),
+    mEstructura: num('mEstructura'), mRevestimiento: num('mRevestimiento'),
+    mCantoEst: num('mCantoEst'), mCantoRev: num('mCantoRev'),
+    mEnchapado: num('mEnchapado'), mCortes: num('mCortes'),
+    mBisagras: num('mBisagras'), mOtrosHerrajes: num('mOtrosHerrajes'),
     precioLaminaEst: num('precioLaminaEst'), precioLaminaRev: num('precioLaminaRev'),
     largoLamina: num('largoLamina'), anchoLamina: num('anchoLamina'),
-    desperdicio: num('desperdicio'),
+    desperdicio: num('desperdicio'), precioEnchapado: num('precioEnchapado'),
     precioCantoEst: num('precioCantoEst'), precioCantoRev: num('precioCantoRev'),
-    precioEnchapado: num('precioEnchapado'),
     precioCorte: num('precioCorte'), cortesPorLamina: num('cortesPorLamina'),
     precioBisagra: num('precioBisagra'), precioCorredera: num('precioCorredera'),
-    incluirTiradores: document.getElementById('incluirTiradores').value === '1',
+    incluirTiradores: valor('incluirTiradores') === '1',
     precioTirador: num('precioTirador'),
-    incluirPatas: document.getElementById('incluirPatas').value === '1',
+    incluirPatas: valor('incluirPatas') === '1',
     precioPatas: num('precioPatas'),
-    incluirTornillos: document.getElementById('incluirTornillos').value === '1',
+    incluirTornillos: valor('incluirTornillos') === '1',
     precioTornillos: num('precioTornillos'),
-    traslado: num('traslado'),
-    pctManoObra: num('pctManoObra'),
-    pctDiseno: num('pctDiseno'),
-    pctAdmin: num('pctAdmin'),
-    conIva: document.getElementById('conIva').value === '1',
-    pctIva: num('pctIva')
+    traslado: num('traslado'), pctManoObra: num('pctManoObra'),
+    pctDiseno: num('pctDiseno'), pctAdmin: num('pctAdmin'),
+    conIva: valor('conIva') === '1', pctIva: num('pctIva')
   };
 }
 
-function fila(concepto, detalle, monto, clase) {
-  return '<tr' + (clase ? ' class="' + clase + '"' : '') + '>' +
-    '<td>' + concepto + (detalle ? '<br><span style="font-size:.72rem;color:#6b5b4d">' + detalle + '</span>' : '') + '</td>' +
-    '<td class="num">' + money(monto) + '</td></tr>';
+function fila(concepto, detalle, monto) {
+  return '<tr><td>' + concepto + (detalle ? '<br><span style="font-size:.72rem;color:#6b5b4d">' + detalle + '</span>' : '') +
+    '</td><td class="num">' + money(monto) + '</td></tr>';
 }
 
 function render() {
   var d = leerDatos();
-  var r = calcularPresupuesto(d);
-  var cont = document.getElementById('presupuesto');
 
+  document.getElementById('bloqueAnalisis').className = d.origen === 'analisis' ? '' : 'oculto';
+  document.getElementById('bloqueMedidas').className = d.origen === 'medidas' ? '' : 'oculto';
+
+  var cont = document.getElementById('presupuesto');
   if (d.alto <= 0 || d.ancho <= 0 || d.prof <= 0) {
     cont.innerHTML = '<p style="color:#8a2b2b">Revisa las medidas: alto, ancho y profundidad deben ser mayores a cero.</p>';
     return;
   }
 
-  var cliente = document.getElementById('cliNombre').value || '—';
-  var telefono = document.getElementById('cliTelefono').value || '—';
-  var fecha = document.getElementById('cliFecha').value || hoyISO();
-  var validez = document.getElementById('cliValidez').value || '15';
-  var numero = document.getElementById('numPresupuesto').value || 'P-001';
-  var muebleTxt = document.getElementById('nombreMueble').value || 'Mueble a medida';
-  var obs = document.getElementById('observaciones').value || '';
+  var r = calcularPresupuesto(d);
+  var cliente = valor('cliNombre') || '—';
+  var telefono = valor('cliTelefono') || '—';
+  var fecha = valor('cliFecha') || hoyISO();
+  var validez = valor('cliValidez') || '15';
+  var numero = valor('numPresupuesto') || 'P-001';
+  var muebleTxt = valor('nombreMueble') || 'Mueble a medida';
+  var obs = valor('observaciones');
 
-  var filasMat = '';
-  if (r.tablerosEst > 0) {
-    filasMat += fila('Tablero estructura ' + d.espesor + ' mm',
-      r.tablerosEst * d.cantidad + ' lámina(s) de ' + (d.largoLamina / 1000) + '×' + (d.anchoLamina / 1000) + ' m — ' + r.areaEstDesc.toFixed(2) + ' m² con desperdicio',
-      r.costoEst);
-  }
-  if (r.tablerosRev > 0) {
-    filasMat += fila('Tablero revestimiento ' + d.espesor + ' mm',
-      r.tablerosRev * d.cantidad + ' lámina(s) — ' + r.areaRevDesc.toFixed(2) + ' m² con desperdicio',
-      r.costoRev);
-  }
-  filasMat += fila('Canto estructura 0,45 mm', r.mlEst.toFixed(2) + ' ml', r.costoCantoEst);
-  filasMat += fila('Canto revestimiento 1 mm', r.mlRev.toFixed(2) + ' ml', r.costoCantoRev);
-  filasMat += fila('Enchapado', (r.mlEst + r.mlRev).toFixed(2) + ' ml', r.costoEnchapado);
-  filasMat += fila('Cortes de tablero', (r.tablerosEst + r.tablerosRev) * d.cantidad + ' lámina(s) × ' + d.cortesPorLamina + ' cortes', r.costoCortes);
+  var filasMat = r.lineasMateriales.map(function (l) { return fila(l.concepto, l.detalle, l.monto); }).join('');
+  var filasHer = r.lineasHerrajes.length
+    ? r.lineasHerrajes.map(function (l) { return fila(l.concepto, l.detalle, l.monto); }).join('')
+    : '<tr><td colspan="2">Este mueble no lleva herrajes.</td></tr>';
 
-  var filasHer = '';
-  if (r.costoBisagras > 0) filasHer += fila('Bisagras de cazoleta', 'pares según altura de puerta', r.costoBisagras);
-  if (r.costoCorrederas > 0) filasHer += fila('Correderas para gavetas', d.gavetas * d.cantidad + ' par(es) ' + (d.tipoCorredera === 'oculta' ? 'ocultas' : 'telescópicas'), r.costoCorrederas);
-  if (r.costoTiradores > 0) filasHer += fila('Tiradores', r.numTiradores + ' unidad(es)', r.costoTiradores);
-  if (r.costoPatas > 0) filasHer += fila('Patas regulables', d.cantidad + ' set(s)', r.costoPatas);
-  if (r.costoTornillos > 0) filasHer += fila('Tornillos y fijaciones', d.cantidad + ' bolsa(s)', r.costoTornillos);
+  var filasServ =
+    fila('Mano de obra de carpintería', d.pctManoObra + '% sobre materiales y herrajes', r.manoObra) +
+    fila('Diseño y planos', d.pctDiseno + '% sobre materiales y herrajes', r.diseno) +
+    fila('Traslado e instalación', 'monto fijo', r.traslado) +
+    fila('Administración', d.pctAdmin + '% sobre el subtotal', r.admin);
 
-  var filasServ = '';
-  filasServ += fila('Mano de obra de carpintería', d.pctManoObra + '% sobre materiales y herrajes', r.manoObra);
-  filasServ += fila('Diseño y planos', d.pctDiseno + '% sobre materiales y herrajes', r.diseno);
-  filasServ += fila('Traslado e instalación', 'monto fijo', r.traslado);
-  filasServ += fila('Administración', d.pctAdmin + '% sobre el subtotal', r.admin);
-
-  var filasDespiece = '';
-  r.detalle.forEach(function (p) {
-    filasDespiece += '<tr><td>' + p.nombre + '</td>' +
-      '<td class="num">' + Math.round(p.ancho) + ' × ' + Math.round(p.alto) + '</td>' +
-      '<td class="num">' + p.cantidad + '</td>' +
-      '<td class="num">' + p.area.toFixed(3) + '</td>' +
-      '<td class="num">' + p.ml.toFixed(2) + '</td></tr>';
-  });
+  var filasDespiece = r.detalle.map(function (p) {
+    return '<tr><td>' + p.nombre + '</td><td class="num">' + Math.round(p.ancho) + ' × ' + Math.round(p.alto) +
+      '</td><td class="num">' + p.cantidad + '</td><td class="num">' + p.area.toFixed(3) +
+      '</td><td class="num">' + p.ml.toFixed(2) + '</td></tr>';
+  }).join('');
 
   var ivaTxt = r.iva > 0 ? fila('IVA ' + d.pctIva + '%', '', r.iva) : '';
 
   cont.innerHTML =
     '<div class="doc-cabecera">' +
-      '<div class="doc-marca"><h2>Taller de Muebles de Alex</h2>' +
-        '<p>Carpintería a medida · Diseño y fabricación</p></div>' +
+      '<div class="doc-marca"><h2>Taller de Muebles de Alex</h2><p>Carpintería a medida · Diseño y fabricación</p></div>' +
       '<div class="doc-num"><span>Presupuesto</span><strong>' + numero + '</strong>' +
         '<span>Fecha: ' + fecha + '</span><br><span>Validez: ' + validez + ' días</span></div>' +
     '</div>' +
-
     '<div class="doc-datos">' +
       '<div><span>Cliente:</span> ' + cliente + '</div>' +
       '<div><span>Teléfono:</span> ' + telefono + '</div>' +
       '<div><span>Mueble:</span> ' + muebleTxt + '</div>' +
-      '<div><span>Medidas:</span> ' + Math.round(d.alto) + ' alto × ' + Math.round(d.ancho) + ' ancho × ' + Math.round(d.prof) + ' prof (mm)</div>' +
+      '<div><span>Medidas:</span> ' + Math.round(d.alto) + ' alto × ' + Math.round(d.ancho) + ' ancho × ' +
+        Math.round(d.prof) + ' prof (mm)</div>' +
       '<div><span>Cantidad:</span> ' + d.cantidad + ' unidad(es)</div>' +
-      '<div><span>Acabado:</span> tablero ' + d.espesor + ' mm</div>' +
+      '<div><span>Tablero:</span> ' + d.espesor + ' mm</div>' +
     '</div>' +
-
     '<h3>Materiales</h3>' +
     '<table><thead><tr><th>Concepto</th><th class="num">Monto</th></tr></thead><tbody>' +
       filasMat +
       '<tr class="sub"><td>Subtotal materiales</td><td class="num">' + money(r.materiales) + '</td></tr>' +
     '</tbody></table>' +
-
     '<h3>Herrajes</h3>' +
     '<table><thead><tr><th>Concepto</th><th class="num">Monto</th></tr></thead><tbody>' +
-      (filasHer || '<tr><td colspan="2">Este mueble no lleva herrajes.</td></tr>') +
+      filasHer +
       '<tr class="sub"><td>Subtotal herrajes</td><td class="num">' + money(r.herrajes) + '</td></tr>' +
     '</tbody></table>' +
-
     '<h3>Servicios</h3>' +
     '<table><thead><tr><th>Concepto</th><th class="num">Monto</th></tr></thead><tbody>' +
       filasServ +
       '<tr class="sub"><td>Subtotal servicios</td><td class="num">' + money(r.manoObra + r.diseno + r.traslado + r.admin) + '</td></tr>' +
     '</tbody></table>' +
-
     '<h3>Resumen</h3>' +
     '<table><tbody>' +
       fila('Materiales', '', r.materiales) +
@@ -588,20 +533,16 @@ function render() {
       fila('Administración', '', r.admin) +
       ivaTxt +
     '</tbody></table>' +
-
     '<div class="total-final"><span>Total a pagar</span><b>' + money(r.total) + '</b></div>' +
-
     '<h3>Despiece de referencia</h3>' +
-    '<table class="despiece"><thead><tr><th>Pieza</th><th class="num">Medidas (mm)</th><th class="num">Cant.</th><th class="num">m²</th><th class="num">Canto (ml)</th></tr></thead><tbody>' +
-      filasDespiece +
-    '</tbody></table>' +
-
+    '<table class="despiece"><thead><tr><th>Pieza</th><th class="num">Medidas (mm)</th><th class="num">Cant.</th>' +
+      '<th class="num">m²</th><th class="num">Canto (ml)</th></tr></thead><tbody>' + filasDespiece + '</tbody></table>' +
     (obs ? '<div class="notas"><strong>Observaciones:</strong> ' + obs + '</div>' : '') +
     '<div class="notas"><ul>' +
-      '<li>Precios expresados en dólares. El pago en bolívares se calcula a la tasa del día.</li>' +
-      '<li>El presupuesto incluye materiales, herrajes, traslado y mano de obra detallados arriba.</li>' +
+      '<li>Precios en dólares. El pago en bolívares se calcula a la tasa del día.</li>' +
+      '<li>Incluye materiales, herrajes, traslado y mano de obra detallados arriba.</li>' +
       '<li>No incluye cambios de diseño posteriores a la aprobación.</li>' +
-      '</ul></div>' +
+    '</ul></div>' +
     '<div class="firma"><div>Firma del cliente</div><div>Taller de Muebles de Alex</div></div>';
 }
 
@@ -615,9 +556,7 @@ function limpiar() {
 
 if (typeof document !== 'undefined' && document.getElementById('formulario')) {
   document.addEventListener('DOMContentLoaded', function () {
-    if (!document.getElementById('cliFecha').value) {
-      document.getElementById('cliFecha').value = hoyISO();
-    }
+    if (!document.getElementById('cliFecha').value) document.getElementById('cliFecha').value = hoyISO();
     render();
   });
 }
