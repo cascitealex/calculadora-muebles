@@ -155,7 +155,7 @@
             </select></div>
           <div><label class="block text-sm font-medium text-slate-700 mb-1">Veta</label>
             <select id="vetaMueble" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
-              <option value="Vertical" selected>Vertical</option><option value="Horizontal">Horizontal</option>
+              <option value="Vertical" selected>Vertical</option><option value="Horizontal">Horizontal</option><option value="">Sin veta</option>
             </select></div>
         </div>
 
@@ -202,6 +202,17 @@
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Set 4 Patas global ($)</label>
               <input type="number" id="precioSetPatasGlobal" value="3.00" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Kerf de sierra (mm)</label>
+              <input type="number" id="kerfSierra" value="4" min="0" step="0.5" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Refilado por borde (mm)</label>
+              <input type="number" id="refiladoBorde" value="10" min="0" step="1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
           </div>
 
@@ -583,8 +594,8 @@
           <input type="number" id="cantMuebles" value="1" min="1" max="100" class="w-full px-3 py-2 border border-amber-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-lg font-bold">
         </div>
 
-        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg transition shadow-sm">
-          <i class="fa-solid fa-plus mr-2"></i>Calcular y agregar mueble
+        <button type="submit" id="btnSubmitMueble" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg transition shadow-sm">
+          <i class="fa-solid fa-plus mr-2"></i><span id="btnSubmitTexto">Calcular y agregar mueble</span>
         </button>
         <button type="button" onclick="limpiarTodo()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg transition text-sm">
           <i class="fa-solid fa-trash-alt mr-2"></i>Limpiar todo
@@ -813,6 +824,7 @@
   </div>
 </div>
 
+<script src="motor-calculo.js"></script>
 <script>
 /* ============================================================
    ACORDEÓN
@@ -873,14 +885,28 @@ const LS_KEY = 'catalogo_muebles_v1';
 function cargarCatalogo() { try { const g = localStorage.getItem(LS_KEY); if (g) return JSON.parse(g); } catch(e){} return [...CATALOGO_INICIAL]; }
 function guardarCatalogoLS() { try { localStorage.setItem(LS_KEY, JSON.stringify(BIBLIOTECA)); } catch(e){} }
 
+// P1.3: proyecto en curso (muebles del despiece) persistido entre recargas.
+const PROYECTO_LS_KEY = 'proyecto_muebles_v1';
+function cargarProyecto() {
+  try {
+    const g = localStorage.getItem(PROYECTO_LS_KEY);
+    if (!g) return [];
+    const arr = JSON.parse(g);
+    return Array.isArray(arr) ? arr : [];
+  } catch(e) { return []; }
+}
+function guardarProyecto() { try { localStorage.setItem(PROYECTO_LS_KEY, JSON.stringify(muebles)); } catch(e){} }
+
 let BIBLIOTECA = cargarCatalogo();
-let muebles = [];
+let muebles = cargarProyecto();
 let editandoPrecioPatasId = null, editandoPrecioCorrederaId = null, editandoCodigoActual = null;
+let editandoMuebleId = null;
 let editandoTornillo = null, editandoBisagraRecta = null, editandoElevacion = null, editandoPlatera = null, editandoCondimentero = null, editandoTiradorId = null;
 
 const fmt = n => Number(n).toLocaleString('es-ES', { maximumFractionDigits: 2 });
 const fmtMoney = n => '$' + Number(n).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const uid = () => Date.now() + Math.floor(Math.random()*1000);
+let __uidSeq = 0;
+const uid = () => (Date.now() * 1000) + (__uidSeq++ % 1000);
 
 const TORNILLOS_DEF = [
   { key: 't6x2', etiqueta: 'Tornillos 6x2 x100 und', precioDefault: 2.50, precioId: 'precioTornillo6x2', incluirId: 'incluirTornillo6x2', panelId: 'panelTornillo6x2' },
@@ -906,6 +932,15 @@ const CONDIMENTERO_DEF = [
   { key: 'condimentero35', etiqueta: 'Condimentero 35 cm', precioDefault: 67.00, precioId: 'precioCondimentero35', incluirId: 'incluirCondimentero35', panelId: 'panelCondimentero35' },
   { key: 'condimentero40', etiqueta: 'Condimentero 40 cm', precioDefault: 67.00, precioId: 'precioCondimentero40', incluirId: 'incluirCondimentero40', panelId: 'panelCondimentero40' }
 ];
+
+// Catalogos que consume el motor de calculo compartido.
+const CATALOGOS_MOTOR = {
+  tornillos: TORNILLOS_DEF,
+  bisagraRecta: BISAGRA_RECTA_DEF,
+  elevacion: ELEVACION_DEF,
+  platera: PLATERA_DEF,
+  condimentero: CONDIMENTERO_DEF
+};
 const DESC = { TECHO_PISO: 36, FONDO_MUEBLE: 36, PUERTA: 3, REPISA_ANCHO: 36, REPISA_PROF: 18, REPISA_ESPESOR: 18,
   EXTRA_GAVETA_ANCHO: 36, GAVETA_PROF_REDUCCION: 116, RODAPIE_ALTO: 150, RODAPIE_ANCHO_DESC: 36,
   BLUM_FONDO_DESC: 98, BLUM_LATERAL_ALTO: 16, BLUM_LATERAL_LARGO: 500,
@@ -914,12 +949,11 @@ const CORREDERAS = { telescopica: { holgura: 25 }, oculta: { holgura: 10 }, ocul
 
 const COMPONENTES_REVESTIMIENTO = ['Puerta', 'Frente de gaveta', 'Frente interno gaveta', 'Frente interno gaveta (Blum)', 'Panel', 'Finta', 'Rodapié'];
 function esRevestimiento(nombreComponente) {
-  return COMPONENTES_REVESTIMIENTO.some(rev => nombreComponente.startsWith(rev));
+  return MotorCalculo.esRevestimiento(nombreComponente);
 }
 function tipoLamina(nombreComponente) {
-  return esRevestimiento(nombreComponente) ? 'revestimiento' : 'estructura';
+  return MotorCalculo.tipoLamina(nombreComponente);
 }
-
 function poblarDatalist() {
   const dl = document.getElementById('listaCodigos'); dl.innerHTML = '';
   BIBLIOTECA.forEach(b => {
@@ -1126,111 +1160,8 @@ function getPrecioCorredera(t, p) { if (t === 'telescopica') return p.telescopic
 function getNombreCorredera(t) { if (t === 'telescopica') return 'Telescópica estándar'; if (t === 'oculta') return 'Oculta genérica'; if (t === 'ocultaBlum') return 'Oculta Blum / Push'; return t; }
 
 function calcularDespiece(alto, ancho, prof, espesor, opts, colores, veta) {
-  const baseMat = `Tablero ${espesor} mm`;
-  const P = (componente, cantidad, material, ancho, alto, observaciones, cantosDefault, esHerraje = false) => ({
-    id: uid() + Math.floor(Math.random()*10000), componente, cantidad, material, ancho, alto, observaciones, veta, esHerraje,
-    cantos: cantosDefault || { sup:false, inf:false, izq:false, der:false }
-  });
-  
-  let reduccionAltura = 0;
-  if (opts.tiradores?.incluir && opts.tiradores.tipoPrincipal === 'perfil' && opts.tiradores.variedad === 'gola' && opts.tiradores.categoriaGola === 'L') {
-    reduccionAltura = opts.tiradores.reduccionAltura || 30;
-  }
-
-  const piezas = [
-    P('Lateral', 2, `${baseMat} (${colores.lateral})`, prof, alto, `Lateral`, { sup:true, inf:true, izq:false, der:true }),
-    P('Techo / Piso', 2, `${baseMat} (${colores.pisoTecho})`, ancho - DESC.TECHO_PISO, prof, `Techo/Piso`, { sup:true, inf:true, izq:false, der:false }),
-    P('Fondo', 1, `${baseMat} (${colores.fondo})`, ancho - DESC.FONDO_MUEBLE, alto - DESC.FONDO_MUEBLE, `Fondo`, { sup:false, inf:false, izq:false, der:false })
-  ];
-  if (opts.incluirRepisas && opts.cantRepisas > 0) {
-    piezas.push(P('Repisa', opts.cantRepisas, `Tablero ${DESC.REPISA_ESPESOR} mm (${colores.pisoTecho})`,
-      ancho - DESC.REPISA_ANCHO, prof - DESC.REPISA_PROF, `Repisa`, { sup:true, inf:false, izq:false, der:false }));
-  }
-  let numPuertas = 0, altoPuertaCalc = 0;
-  if (opts.incluirPuertas && opts.cantPuertas > 0) {
-    numPuertas = opts.cantPuertas;
-    const anchoPuerta = ancho - DESC.PUERTA;
-    let altoPuerta;
-    if (numPuertas === 1) altoPuerta = alto - DESC.PUERTA; else altoPuerta = (alto / numPuertas) - DESC.PUERTA;
-    altoPuertaCalc = altoPuerta - reduccionAltura;
-    piezas.push(P(numPuertas === 1 ? 'Puerta' : `Puerta (${numPuertas} uds.)`, numPuertas,
-      `${baseMat} (${colores.puerta})`, anchoPuerta, altoPuertaCalc, `Puerta${reduccionAltura ? ' (Perfil L)' : ''}`, { sup:true, inf:true, izq:true, der:true }));
-  } else if (!opts.incluirGavetas) {
-    numPuertas = 1; altoPuertaCalc = alto - DESC.PUERTA - reduccionAltura;
-    piezas.push(P('Puerta', 1, `${baseMat} (${colores.puerta})`, ancho - DESC.PUERTA, altoPuertaCalc, `Puerta${reduccionAltura ? ' (Perfil L)' : ''}`, { sup:true, inf:true, izq:true, der:true }));
-  }
-  if (numPuertas > 0) {
-    const ppp = calcularParesBisagras(altoPuertaCalc);
-    piezas.push(P(`Bisagras de cazoleta (${ppp} par${ppp>1?'es':''} por puerta)`, ppp*numPuertas, 'Herraje metálico (Pares)', 0, 0, '', { sup:false, inf:false, izq:false, der:false }, true));
-  }
-  if (opts.incluirGavetas && opts.cantGavetas > 0) {
-    const n = opts.cantGavetas;
-    const holguraFrente = 3;
-    let altoFrente = (alto - (holguraFrente * (n + 1))) / n;
-    if (reduccionAltura > 0) altoFrente -= reduccionAltura;
-    const anchoFrente = ancho - (holguraFrente * 2);
-    piezas.push(P('Frente de gaveta', n, `${baseMat} (${colores.puerta})`, anchoFrente, altoFrente, `Frente visible${reduccionAltura ? ' (Perfil L)' : ''}`, { sup:true, inf:true, izq:true, der:true }));
-    
-    // CORRECCIÓN EN DESCUENTO DE GAVETAS CON CORREDERAS OCULTAS
-    let anchoCajon = 0;
-    if (opts.tipoCorredera === 'ocultaBlum') {
-      const afi = ancho - DESC.BLUM_FRENTE_ANCHO_DESC;
-      const fg = prof - DESC.BLUM_FONDO_DESC;
-      const alb = DESC.BLUM_LATERAL_ALTO + DESC.GAVETA_ALTO_EXTRA;
-      const afib = DESC.BLUM_FRENTE_ALTO + DESC.GAVETA_ALTO_EXTRA;
-      piezas.push(P('Lateral de gaveta (Blum)', n*2, `${baseMat} (${colores.lateral})`, DESC.BLUM_LATERAL_LARGO, alb, `Blum`, { sup:true, inf:false, izq:false, der:true }));
-      piezas.push(P('Frente interno gaveta (Blum)', n*2, `${baseMat} (${colores.lateral})`, afi, afib, `Blum`, { sup:true, inf:true, izq:false, der:false }));
-      piezas.push(P('Fondo de gaveta (Blum)', n, `Tablero 15 mm (${colores.fondo})`, afi, fg, `Blum`, { sup:false, inf:false, izq:false, der:false }));
-    } else {
-      const conf = CORREDERAS[opts.tipoCorredera] || CORREDERAS.telescopica;
-      const holgura = conf.holgura;
-      
-      // Si es oculta genérica, aplicamos el descuento exacto de 84mm (8.4cm)
-      if (opts.tipoCorredera === 'oculta') {
-        anchoCajon = ancho - 84;
-      } else {
-        anchoCajon = ancho - (espesor * 2) - holgura - DESC.EXTRA_GAVETA_ANCHO;
-      }
-
-      const profCajon = opts.profGaveta;
-      const altoLateral = opts.altoGaveta + DESC.GAVETA_ALTO_EXTRA;
-      piezas.push(P('Lateral de gaveta', n*2, `${baseMat} (${colores.lateral})`, profCajon, altoLateral, `Lateral`, { sup:true, inf:false, izq:false, der:true }));
-      piezas.push(P('Frente interno gaveta', n*2, `${baseMat} (${colores.lateral})`, anchoCajon, altoLateral, `Frente`, { sup:true, inf:true, izq:false, der:false }));
-      const profFondo = prof - DESC.GAVETA_PROF_REDUCCION;
-      piezas.push(P('Fondo de gaveta', n, `Tablero 15 mm (${colores.fondo})`, anchoCajon, profFondo, `Fondo`, { sup:false, inf:false, izq:false, der:false }));
-    }
-    const nombreCorredera = getNombreCorredera(opts.tipoCorredera);
-    piezas.push(P(`Par de correderas (${nombreCorredera})`, n, 'Herraje metálico (Pares)', 0, 0, `${nombreCorredera}`, { sup:false, inf:false, izq:false, der:false }, true));
-  }
-  if (opts.incluirPanel && opts.cantPanel > 0) {
-    const desc = opts.descripcionPanel?.trim();
-    let altoPanelFinal = opts.altoPanel;
-    if(reduccionAltura > 0) altoPanelFinal -= reduccionAltura;
-    piezas.push(P(desc ? `Panel (${desc})` : 'Panel', opts.cantPanel, `Tablero ${opts.espesorPanel} mm (${colores.pisoTecho})`, opts.anchoPanel, altoPanelFinal, `Panel${reduccionAltura ? ' (Perfil L)' : ''}`, { sup:true, inf:true, izq:true, der:true }));
-  }
-  if (opts.incluirFinta && opts.cantFinta > 0) {
-    const desc = opts.descripcionFinta?.trim();
-    piezas.push(P(desc ? `Finta (${desc})` : 'Finta', opts.cantFinta, `Tablero ${opts.espesorFinta} mm (${colores.pisoTecho})`, opts.anchoFinta, opts.altoFinta, `Finta`, { sup:true, inf:true, izq:true, der:true }));
-  }
-  if (opts.incluirRodapie && opts.cantRodapie > 0) {
-    const desc = opts.descripcionRodapie?.trim();
-    const anchoRodapie = ancho - DESC.RODAPIE_ANCHO_DESC;
-    piezas.push(P(desc ? `Rodapié (${desc})` : 'Rodapié', opts.cantRodapie, `Tablero ${opts.espesorRodapie} mm (${colores.pisoTecho})`, anchoRodapie, DESC.RODAPIE_ALTO, `Rodapié`, { sup:true, inf:false, izq:false, der:false }));
-  }
-  if (opts.incluirPatas) piezas.push(P('Patas plásticas regulables (set 4 uds.)', 1, 'Herraje plástico', 0, 0, 'Set 4 patas', { sup:false, inf:false, izq:false, der:false }, true));
-  
-  if (opts.tiradores?.incluir) {
-    const tipoTxt = opts.tiradores.tipoPrincipal === 'sobreponer' ? 'Sobreponer' : `Perfil ${opts.tiradores.categoriaGola}`;
-    const color = opts.tiradores.color || 'Aluminio';
-    piezas.push(P(`Tirador ${tipoTxt} (${color})`, opts.tiradores.cantidad || 1, 'Herraje metálico (Tirador)', 0, 0, `Tirador`, { sup:false, inf:false, izq:false, der:false }, true));
-  }
-
-  TORNILLOS_DEF.forEach(t => { if (opts.tornillos?.[t.key]?.incluir) piezas.push(P(`${t.etiqueta} (bolsa)`, 1, 'Herraje metálico (Tornillos)', 0, 0, `Bolsa de 100 unidades`, { sup:false, inf:false, izq:false, der:false }, true)); });
-  if (opts.bisagraRecta?.incluir && opts.bisagraRecta.cantidad > 0) piezas.push(P(`${BISAGRA_RECTA_DEF.etiqueta} (unidad)`, opts.bisagraRecta.cantidad, 'Herraje metálico (Unidades)', 0, 0, `Bisagra recta adicional`, { sup:false, inf:false, izq:false, der:false }, true));
-  if (opts.elevacion) ELEVACION_DEF.forEach(e => { if (opts.elevacion[e.key]?.incluir) piezas.push(P(`${e.etiqueta} (unidad)`, 1, 'Herraje metálico (Sistema elevación)', 0, 0, `${e.etiqueta}`, { sup:false, inf:false, izq:false, der:false }, true)); });
-  if (opts.platera) PLATERA_DEF.forEach(p => { if (opts.platera[p.key]?.incluir) piezas.push(P(`${p.etiqueta} (kit escurridor)`, 1, 'Herraje metálico (Platera)', 0, 0, `${p.etiqueta}`, { sup:false, inf:false, izq:false, der:false }, true)); });
-  if (opts.condimentero) CONDIMENTERO_DEF.forEach(cd => { if (opts.condimentero[cd.key]?.incluir) piezas.push(P(`${cd.etiqueta} (kit condimentero)`, 1, 'Herraje metálico (Condimentero)', 0, 0, `${cd.etiqueta}`, { sup:false, inf:false, izq:false, der:false }, true)); });
-  return piezas;
+  // Delegado en el motor unico (motor-calculo.js): misma logica en calculadora y presupuesto.
+  return MotorCalculo.despieceDesdeMedidas({ alto, ancho, prof, espesor, veta }, opts, colores, CATALOGOS_MOTOR);
 }
 function calcularCantosPieza(p) {
   if (p.esHerraje) return 0;
@@ -1367,18 +1298,30 @@ document.getElementById('muebleForm').addEventListener('submit', e => {
 
   const componentesBase = calcularDespiece(alto, ancho, prof, espesor, opts, colores, veta);
 
-  for (let i = 0; i < cantMuebles; i++) {
-    muebles.push({
-      id: uid(), nombre, alto, ancho, prof, espesor, veta, descripcion: descripcionMueble,
-      cantidad: cantMuebles,
-      incluirPuertas: opts.incluirPuertas, incluirGavetas: opts.incluirGavetas, incluirRepisas: opts.incluirRepisas,
-      incluirPanel: opts.incluirPanel, incluirFinta: opts.incluirFinta, incluirRodapie: opts.incluirRodapie,
-      incluirPatas: opts.incluirPatas, precioSetPatas: opts.precioSetPatas,
-      tipoCorredera: opts.tipoCorredera, precioCorredera: getPrecioCorredera(opts.tipoCorredera, opts.preciosCorredera),
-      tornillos, bisagraRecta, elevacion, platera, condimentero, tiradores,
-      componentes: JSON.parse(JSON.stringify(componentesBase))
-    });
+  // P1.1: una tarjeta por mueble; la cantidad de unidades va en `cantidad`.
+  const datosMueble = {
+    id: editandoMuebleId || uid(), nombre, alto, ancho, prof, espesor, veta,
+    descripcion: descripcionMueble,
+    cantidad: cantMuebles,
+    colores,
+    incluirPuertas: opts.incluirPuertas, incluirGavetas: opts.incluirGavetas, incluirRepisas: opts.incluirRepisas,
+    incluirPanel: opts.incluirPanel, incluirFinta: opts.incluirFinta, incluirRodapie: opts.incluirRodapie,
+    incluirPatas: opts.incluirPatas, precioSetPatas: opts.precioSetPatas,
+    tipoCorredera: opts.tipoCorredera, precioCorredera: getPrecioCorredera(opts.tipoCorredera, opts.preciosCorredera),
+    tornillos, bisagraRecta, elevacion, platera, condimentero, tiradores,
+    componentes: JSON.parse(JSON.stringify(componentesBase))
+  };
+
+  if (editandoMuebleId) {
+    const idx = muebles.findIndex(x => x.id === editandoMuebleId);
+    if (idx >= 0) muebles[idx] = datosMueble; else muebles.push(datosMueble);
+    editandoMuebleId = null;
+    const btnTxt = document.getElementById('btnSubmitTexto');
+    if (btnTxt) btnTxt.textContent = 'Calcular y agregar mueble';
+  } else {
+    muebles.push(datosMueble);
   }
+  guardarProyecto();
 
   e.target.reset();
   document.getElementById('cantMuebles').value = 1;
@@ -1407,6 +1350,7 @@ function toggleCanto(muebleId, piezaId, borde) {
   const p = m.componentes.find(c => c.id === piezaId); if (!p || p.esHerraje) return;
   if (!p.cantos) p.cantos = { sup:false, inf:false, izq:false, der:false };
   p.cantos[borde] = !p.cantos[borde];
+  guardarProyecto();
   renderizarMuebles();
 }
 
@@ -1414,41 +1358,41 @@ function toggleCanto(muebleId, piezaId, borde) {
    EDICIÓN EN LÍNEA
    ============================================================ */
 function iniciarEdicionPrecioPatas(id) { editandoPrecioPatasId = id; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-patas-${id}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarPrecioPatas(id) { const i = document.getElementById(`edit-precio-patas-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioSetPatas = v; editandoPrecioPatasId = null; renderizarMuebles(); }
+function guardarPrecioPatas(id) { const i = document.getElementById(`edit-precio-patas-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioSetPatas = v; editandoPrecioPatasId = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionPrecioPatas() { editandoPrecioPatasId = null; renderizarMuebles(); }
 function manejarKeyPrecioPatas(e, id) { if (e.key === 'Enter') { e.preventDefault(); guardarPrecioPatas(id); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPrecioPatas(); } }
 function iniciarEdicionPrecioCorredera(id) { editandoPrecioCorrederaId = id; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-corredera-${id}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarPrecioCorredera(id) { const i = document.getElementById(`edit-precio-corredera-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioCorredera = v; editandoPrecioCorrederaId = null; renderizarMuebles(); }
+function guardarPrecioCorredera(id) { const i = document.getElementById(`edit-precio-corredera-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioCorredera = v; editandoPrecioCorrederaId = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionPrecioCorredera() { editandoPrecioCorrederaId = null; renderizarMuebles(); }
 function manejarKeyPrecioCorredera(e, id) { if (e.key === 'Enter') { e.preventDefault(); guardarPrecioCorredera(id); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPrecioCorredera(); } }
 
 function iniciarEdicionTornillo(muebleId, tipo) { editandoTornillo = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-tornillo-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarTornillo(muebleId, tipo) { const i = document.getElementById(`edit-precio-tornillo-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tornillos && m.tornillos[tipo]) m.tornillos[tipo].precio = v; editandoTornillo = null; renderizarMuebles(); }
+function guardarTornillo(muebleId, tipo) { const i = document.getElementById(`edit-precio-tornillo-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tornillos && m.tornillos[tipo]) m.tornillos[tipo].precio = v; editandoTornillo = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionTornillo() { editandoTornillo = null; renderizarMuebles(); }
 function manejarKeyTornillo(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarTornillo(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionTornillo(); } }
 
 function iniciarEdicionBisagraRecta(muebleId) { editandoBisagraRecta = { muebleId }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-bisagrarecta-${muebleId}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarBisagraRecta(muebleId) { const i = document.getElementById(`edit-precio-bisagrarecta-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.bisagraRecta) m.bisagraRecta.precio = v; editandoBisagraRecta = null; renderizarMuebles(); }
+function guardarBisagraRecta(muebleId) { const i = document.getElementById(`edit-precio-bisagrarecta-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.bisagraRecta) m.bisagraRecta.precio = v; editandoBisagraRecta = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionBisagraRecta() { editandoBisagraRecta = null; renderizarMuebles(); }
 function manejarKeyBisagraRecta(e, muebleId) { if (e.key === 'Enter') { e.preventDefault(); guardarBisagraRecta(muebleId); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionBisagraRecta(); } }
 
 function iniciarEdicionElevacion(muebleId, tipo) { editandoElevacion = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-elevacion-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarElevacion(muebleId, tipo) { const i = document.getElementById(`edit-precio-elevacion-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.elevacion && m.elevacion[tipo]) m.elevacion[tipo].precio = v; editandoElevacion = null; renderizarMuebles(); }
+function guardarElevacion(muebleId, tipo) { const i = document.getElementById(`edit-precio-elevacion-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.elevacion && m.elevacion[tipo]) m.elevacion[tipo].precio = v; editandoElevacion = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionElevacion() { editandoElevacion = null; renderizarMuebles(); }
 function manejarKeyElevacion(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarElevacion(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionElevacion(); } }
 
 function iniciarEdicionPlatera(muebleId, tipo) { editandoPlatera = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-platera-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarPlatera(muebleId, tipo) { const i = document.getElementById(`edit-precio-platera-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.platera && m.platera[tipo]) m.platera[tipo].precio = v; editandoPlatera = null; renderizarMuebles(); }
+function guardarPlatera(muebleId, tipo) { const i = document.getElementById(`edit-precio-platera-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.platera && m.platera[tipo]) m.platera[tipo].precio = v; editandoPlatera = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionPlatera() { editandoPlatera = null; renderizarMuebles(); }
 function manejarKeyPlatera(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarPlatera(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPlatera(); } }
 
 function iniciarEdicionCondimentero(muebleId, tipo) { editandoCondimentero = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-condimentero-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarCondimentero(muebleId, tipo) { const i = document.getElementById(`edit-precio-condimentero-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.condimentero && m.condimentero[tipo]) m.condimentero[tipo].precio = v; editandoCondimentero = null; renderizarMuebles(); }
+function guardarCondimentero(muebleId, tipo) { const i = document.getElementById(`edit-precio-condimentero-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.condimentero && m.condimentero[tipo]) m.condimentero[tipo].precio = v; editandoCondimentero = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionCondimentero() { editandoCondimentero = null; renderizarMuebles(); }
 function manejarKeyCondimentero(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarCondimentero(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionCondimentero(); } }
 
 function iniciarEdicionTirador(muebleId) { editandoTiradorId = muebleId; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-tirador-${muebleId}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarTirador(muebleId) { const i = document.getElementById(`edit-precio-tirador-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tiradores) m.tiradores.precio = v; editandoTiradorId = null; renderizarMuebles(); }
+function guardarTirador(muebleId) { const i = document.getElementById(`edit-precio-tirador-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tiradores) m.tiradores.precio = v; editandoTiradorId = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionTirador() { editandoTiradorId = null; renderizarMuebles(); }
 function manejarKeyTirador(e, muebleId) { if (e.key === 'Enter') { e.preventDefault(); guardarTirador(muebleId); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionTirador(); } }
 
@@ -1569,7 +1513,11 @@ function renderizarMuebles() {
             ${m.cantidad && m.cantidad > 1 ? `<span class="bg-emerald-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">${m.cantidad} uds.</span>` : ''}
             ${badges.join(' ')}
           </div>
-          <button onclick="eliminarMueble(${m.id})" class="text-slate-300 hover:text-red-400 transition p-1 no-print"><i class="fa-solid fa-trash-alt"></i></button>
+          <div class="flex items-center gap-1 no-print">
+            <button onclick="editarMueble(${m.id})" title="Editar mueble" class="text-slate-300 hover:text-amber-300 transition p-1"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="duplicarMueble(${m.id})" title="Duplicar mueble" class="text-slate-300 hover:text-emerald-300 transition p-1"><i class="fa-solid fa-copy"></i></button>
+            <button onclick="eliminarMueble(${m.id})" title="Eliminar mueble" class="text-slate-300 hover:text-red-400 transition p-1"><i class="fa-solid fa-trash-alt"></i></button>
+          </div>
         </div>
         ${descHTML}
       </div>
@@ -1696,162 +1644,129 @@ function renderizarCostos() {
   if (!panel || !cuerpo) return;
   if (muebles.length === 0) { panel.classList.add('hidden'); return; }
   panel.classList.remove('hidden');
+
   const cfg = leerConfigTablero();
+  const { filas, totales } = MotorCalculo.calcularProyecto(muebles, cfg, CATALOGOS_MOTOR);
   let html = '';
-  let totalPiezas = 0, areaNetaTotal = 0, areaDescTotal = 0;
-  let cCantosEst = 0, cCantosRev = 0, cBisagras = 0, cCorrederas = 0, cTiradores = 0, cPatas = 0, cTornillos = 0, cBisagraRecta = 0, cElevacion = 0, cPlatera = 0, cCondimentero = 0;
-  let cEnchapado = 0, cCortes = 0, cManoObra = 0, cGastosAdmin = 0;
-  let areaNetaEstructura = 0, areaNetaRevestimiento = 0;
-  let areaDescEstructura = 0, areaDescRevestimiento = 0;
 
-  muebles.forEach(m => {
-    const cantMueble = m.cantidad || 1;
-    let areaNetaMueble = 0, piezasMueble = 0, mlCantosEst = 0, mlCantosRev = 0;
-    let areaEstructuraMueble = 0, areaRevestimientoMueble = 0;
-    let costoBisagrasMueble = 0, costoCorrederasMueble = 0, costoPatasMueble = 0, costoTornillosMueble = 0, costoBisagraRectaMueble = 0, costoElevacionMueble = 0, costoPlateraMueble = 0, costoCondimenteroMueble = 0, costoTiradoresMueble = 0;
-
-    m.componentes.forEach(c => {
-      const cantTotal = c.cantidad * cantMueble;
-      if (c.esHerraje) {
-        const n = c.componente.toLowerCase();
-        if (n.includes('bisagras de cazoleta')) costoBisagrasMueble += cantTotal * cfg.precioParBisagra;
-        if (n.includes('correderas')) costoCorrederasMueble += cantTotal * (m.precioCorredera || 0);
-        if (n.includes('patas')) costoPatasMueble += cantTotal * (m.precioSetPatas || cfg.precioSetPatasGlobal);
-        if (n.includes('tornillos') && m.tornillos) TORNILLOS_DEF.forEach(t => { if (n.includes(t.etiqueta.toLowerCase().split(' x100')[0])) { const info = m.tornillos[t.key]; if (info?.incluir) costoTornillosMueble += cantTotal * info.precio; } });
-        if (n.includes('bisagra recta') && m.bisagraRecta?.incluir) costoBisagraRectaMueble += cantTotal * m.bisagraRecta.precio;
-        if (m.elevacion) ELEVACION_DEF.forEach(e => { if (n.includes(e.etiqueta.toLowerCase())) { const info = m.elevacion[e.key]; if (info?.incluir) costoElevacionMueble += cantTotal * info.precio; } });
-        if (m.platera) PLATERA_DEF.forEach(p => { if (n.includes(p.etiqueta.toLowerCase())) { const info = m.platera[p.key]; if (info?.incluir) costoPlateraMueble += cantTotal * info.precio; } });
-        if (m.condimentero) CONDIMENTERO_DEF.forEach(cd => { if (n.includes(cd.etiqueta.toLowerCase())) { const info = m.condimentero[cd.key]; if (info?.incluir) costoCondimenteroMueble += cantTotal * info.precio; } });
-        if (n.includes('tirador') && m.tiradores?.incluir) costoTiradoresMueble += cantTotal * m.tiradores.precio;
-      } else {
-        const area = (c.ancho * c.alto * cantTotal) / 1_000_000;
-        areaNetaMueble += area;
-        if (tipoLamina(c.componente) === 'revestimiento') areaRevestimientoMueble += area;
-        else areaEstructuraMueble += area;
-        piezasMueble += cantTotal;
-        
-        const mlPieza = calcularCantosPieza(c) * cantTotal;
-        if (tipoLamina(c.componente) === 'revestimiento') mlCantosRev += mlPieza;
-        else mlCantosEst += mlPieza;
-      }
-    });
-    
-    const areaDescMueble = areaNetaMueble * (1 + cfg.desperdicio / 100);
-    const areaDescEstMueble = areaEstructuraMueble * (1 + cfg.desperdicio / 100);
-    const areaDescRevMueble = areaRevestimientoMueble * (1 + cfg.desperdicio / 100);
-    
-    const costoCantoEstMueble = mlCantosEst * cfg.precioCantoEstructura;
-    const costoCantoRevMueble = mlCantosRev * cfg.precioCantoRevestimiento;
-    const mlCantosTotalesMueble = mlCantosEst + mlCantosRev;
-    const costoEnchapadoMueble = mlCantosTotalesMueble * cfg.precioEnchapado;
-    
-    const tablerosEstMueble = Math.ceil(areaDescEstMueble / cfg.areaTableroM2);
-    const tablerosRevMueble = Math.ceil(areaDescRevMueble / cfg.areaTableroM2);
-    const tablerosTotalesMueble = tablerosEstMueble + tablerosRevMueble;
-    const costoCortesMueble = tablerosTotalesMueble * cfg.cantidadCortesPorLamina * cfg.precioCorte;
-
-    const subtotalMaterialesMueble = 
-      (areaDescEstMueble * cfg.precioM2Estructura) + 
-      (areaDescRevMueble * cfg.precioM2Revestimiento) + 
-      costoCantoEstMueble + 
-      costoCantoRevMueble + 
-      costoEnchapadoMueble + 
-      costoCortesMueble + 
-      costoBisagrasMueble + 
-      costoCorrederasMueble + 
-      costoPatasMueble + 
-      costoTornillosMueble + 
-      costoBisagraRectaMueble + 
-      costoElevacionMueble + 
-      costoPlateraMueble + 
-      costoCondimenteroMueble + 
-      costoTiradoresMueble;
-
-    const costoManoObraMueble = subtotalMaterialesMueble * (cfg.porcentajeManoObra / 100);
-    const costoGastosAdminMueble = (subtotalMaterialesMueble + costoManoObraMueble) * (cfg.porcentajeGastosAdmin / 100);
-    const costoTotalMueble = subtotalMaterialesMueble + costoManoObraMueble + costoGastosAdminMueble;
-
-    totalPiezas += piezasMueble; areaNetaTotal += areaNetaMueble; areaDescTotal += areaDescMueble;
-    areaNetaEstructura += areaEstructuraMueble; areaNetaRevestimiento += areaRevestimientoMueble;
-    areaDescEstructura += areaDescEstMueble; areaDescRevestimiento += areaDescRevMueble;
-    
-    cCantosEst += costoCantoEstMueble; cCantosRev += costoCantoRevMueble;
-    cBisagras += costoBisagrasMueble; cCorrederas += costoCorrederasMueble; cTiradores += costoTiradoresMueble;
-    cPatas += costoPatasMueble; cTornillos += costoTornillosMueble; cBisagraRecta += costoBisagraRectaMueble;
-    cElevacion += costoElevacionMueble; cPlatera += costoPlateraMueble; cCondimentero += costoCondimenteroMueble;
-    cEnchapado += costoEnchapadoMueble; cCortes += costoCortesMueble;
-    cManoObra += costoManoObraMueble; cGastosAdmin += costoGastosAdminMueble;
-
-    const badgeCant = cantMueble > 1 ? `<span class="bg-emerald-600 text-white text-[10px] px-1.5 rounded-full ml-1">${cantMueble} uds</span>` : '';
-
+  filas.forEach((f) => {
+    const badgeCant = f.cantMueble > 1 ? `<span class="bg-emerald-600 text-white text-[10px] px-1.5 rounded-full ml-1">${f.cantMueble} uds</span>` : '';
     html += `<tr class="hover:bg-emerald-50">
-      <td class="py-2 px-3 font-medium text-slate-700 text-xs">${m.nombre}${badgeCant}</td>
-      <td class="py-2 px-3 text-center text-xs">${piezasMueble}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs">${areaNetaMueble.toFixed(3)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${areaDescMueble.toFixed(3)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(areaDescEstMueble * cfg.precioM2Estructura)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-emerald-700">${fmtMoney(areaDescRevMueble * cfg.precioM2Revestimiento)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(costoCantoEstMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-emerald-700">${fmtMoney(costoCantoRevMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-indigo-700">${fmtMoney(costoEnchapadoMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-rose-700">${fmtMoney(costoCortesMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(costoBisagrasMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-teal-700">${fmtMoney(costoCorrederasMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-teal-700">${fmtMoney(costoTiradoresMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-purple-700">${fmtMoney(costoPatasMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-orange-700">${fmtMoney(costoTornillosMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-rose-700">${fmtMoney(costoBisagraRectaMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-fuchsia-700">${fmtMoney(costoElevacionMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-cyan-700">${fmtMoney(costoPlateraMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-lime-700">${fmtMoney(costoCondimenteroMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-slate-700">${fmtMoney(costoManoObraMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs text-slate-700">${fmtMoney(costoGastosAdminMueble)}</td>
-      <td class="py-2 px-3 text-right font-mono text-xs font-semibold text-emerald-700">${fmtMoney(costoTotalMueble)}</td>
+      <td class="py-2 px-3 font-medium text-slate-700 text-xs">${f.nombre}${badgeCant}</td>
+      <td class="py-2 px-3 text-center text-xs">${f.piezas}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs">${f.areaNeta.toFixed(3)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${f.areaDesc.toFixed(3)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(f.costoMatEst)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-emerald-700">${fmtMoney(f.costoMatRev)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(f.costoCantoEst)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-emerald-700">${fmtMoney(f.costoCantoRev)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-indigo-700">${fmtMoney(f.costoEnchapado)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-rose-700">${fmtMoney(f.costoCortes)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-amber-700">${fmtMoney(f.bisagras)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-teal-700">${fmtMoney(f.correderas)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-teal-700">${fmtMoney(f.tiradores)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-purple-700">${fmtMoney(f.patas)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-orange-700">${fmtMoney(f.tornillos)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-rose-700">${fmtMoney(f.bisagraRecta)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-fuchsia-700">${fmtMoney(f.elevacion)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-cyan-700">${fmtMoney(f.platera)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-lime-700">${fmtMoney(f.condimentero)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-slate-700">${fmtMoney(f.manoObra)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs text-slate-700">${fmtMoney(f.gastosAdmin)}</td>
+      <td class="py-2 px-3 text-right font-mono text-xs font-semibold text-emerald-700">${fmtMoney(f.total)}</td>
     </tr>`;
   });
 
-  const tablerosEstructura = Math.ceil(areaDescEstructura / cfg.areaTableroM2);
-  const tablerosRevestimiento = Math.ceil(areaDescRevestimiento / cfg.areaTableroM2);
-  const costoRealEstructura = tablerosEstructura * cfg.precioEstructura;
-  const costoRealRevestimiento = tablerosRevestimiento * cfg.precioRevestimiento;
-  const costoMateriales = costoRealEstructura + costoRealRevestimiento;
-
   cuerpo.innerHTML = html;
-  const costoGeneral = costoMateriales + cCantosEst + cCantosRev + cEnchapado + cCortes + cBisagras + cCorrederas + cPatas + cTornillos + cBisagraRecta + cElevacion + cPlatera + cCondimentero + cTiradores + cManoObra + cGastosAdmin;
-  
-  document.getElementById('costoAreaNeta').textContent = areaNetaTotal.toFixed(3) + ' m²';
-  document.getElementById('costoAreaTotal').textContent = areaDescTotal.toFixed(3) + ' m²';
-  document.getElementById('costoTablerosEstructura').textContent = tablerosEstructura;
-  document.getElementById('costoTablerosRevestimiento').textContent = tablerosRevestimiento;
-  document.getElementById('costoTotal').textContent = fmtMoney(costoGeneral);
-  document.getElementById('costoTotalPiezas').textContent = totalPiezas;
-  document.getElementById('costoTotalAreaNeta').textContent = areaNetaTotal.toFixed(3);
-  document.getElementById('costoTotalAreaDesc').textContent = areaDescTotal.toFixed(3);
-  document.getElementById('costoTotalEstructura').textContent = fmtMoney(costoRealEstructura);
-  document.getElementById('costoTotalRevestimiento').textContent = fmtMoney(costoRealRevestimiento);
-  
-  document.getElementById('costoTotalCantoEst').textContent = fmtMoney(cCantosEst);
-  document.getElementById('costoTotalCantoRev').textContent = fmtMoney(cCantosRev);
-  document.getElementById('costoTotalEnchapado').textContent = fmtMoney(cEnchapado);
-  document.getElementById('costoTotalCortes').textContent = fmtMoney(cCortes);
-  
-  document.getElementById('costoTotalBisagras').textContent = fmtMoney(cBisagras);
-  document.getElementById('costoTotalCorrederas').textContent = fmtMoney(cCorrederas);
-  document.getElementById('costoTotalTiradores').textContent = fmtMoney(cTiradores);
-  document.getElementById('costoTotalPatas').textContent = fmtMoney(cPatas);
-  document.getElementById('costoTotalTornillos').textContent = fmtMoney(cTornillos);
-  document.getElementById('costoTotalBisagraRecta').textContent = fmtMoney(cBisagraRecta);
-  document.getElementById('costoTotalElevacion').textContent = fmtMoney(cElevacion);
-  document.getElementById('costoTotalPlatera').textContent = fmtMoney(cPlatera);
-  document.getElementById('costoTotalCondimentero').textContent = fmtMoney(cCondimentero);
-  document.getElementById('costoTotalManoObra').textContent = fmtMoney(cManoObra);
-  document.getElementById('costoTotalGastosAdmin').textContent = fmtMoney(cGastosAdmin);
-  document.getElementById('costoTotalGeneral').textContent = fmtMoney(costoGeneral);
+
+  document.getElementById('costoAreaNeta').textContent = totales.areaNeta.toFixed(3) + ' m²';
+  document.getElementById('costoAreaTotal').textContent = totales.areaDesc.toFixed(3) + ' m²';
+  document.getElementById('costoTablerosEstructura').textContent = totales.tablerosEst;
+  document.getElementById('costoTablerosRevestimiento').textContent = totales.tablerosRev;
+  document.getElementById('costoTotal').textContent = fmtMoney(totales.total);
+  document.getElementById('costoTotalPiezas').textContent = totales.piezas;
+  document.getElementById('costoTotalAreaNeta').textContent = totales.areaNeta.toFixed(3);
+  document.getElementById('costoTotalAreaDesc').textContent = totales.areaDesc.toFixed(3);
+  document.getElementById('costoTotalEstructura').textContent = fmtMoney(totales.costoMatEst);
+  document.getElementById('costoTotalRevestimiento').textContent = fmtMoney(totales.costoMatRev);
+
+  document.getElementById('costoTotalCantoEst').textContent = fmtMoney(totales.costoCantoEst);
+  document.getElementById('costoTotalCantoRev').textContent = fmtMoney(totales.costoCantoRev);
+  document.getElementById('costoTotalEnchapado').textContent = fmtMoney(totales.costoEnchapado);
+  document.getElementById('costoTotalCortes').textContent = fmtMoney(totales.costoCortes);
+
+  document.getElementById('costoTotalBisagras').textContent = fmtMoney(totales.bisagras);
+  document.getElementById('costoTotalCorrederas').textContent = fmtMoney(totales.correderas);
+  document.getElementById('costoTotalTiradores').textContent = fmtMoney(totales.tiradores);
+  document.getElementById('costoTotalPatas').textContent = fmtMoney(totales.patas);
+  document.getElementById('costoTotalTornillos').textContent = fmtMoney(totales.tornillos);
+  document.getElementById('costoTotalBisagraRecta').textContent = fmtMoney(totales.bisagraRecta);
+  document.getElementById('costoTotalElevacion').textContent = fmtMoney(totales.elevacion);
+  document.getElementById('costoTotalPlatera').textContent = fmtMoney(totales.platera);
+  document.getElementById('costoTotalCondimentero').textContent = fmtMoney(totales.condimentero);
+  document.getElementById('costoTotalManoObra').textContent = fmtMoney(totales.manoObra);
+  document.getElementById('costoTotalGastosAdmin').textContent = fmtMoney(totales.gastosAdmin);
+  document.getElementById('costoTotalGeneral').textContent = fmtMoney(totales.total);
 }
 
 /* ============================================================
    DIAGRAMA DE OPTIMIZACIÓN DE CORTES (BIN PACKING)
    ============================================================ */
+function empaquetarPiezas(piezas, L, A, opts) {
+  const o = opts || {};
+  const kerf = Math.max(0, Number(o.kerf) || 0);
+  const refilado = Math.max(0, Number(o.refilado) || 0);
+  const util = { L: Math.max(0, L - 2 * refilado), A: Math.max(0, A - 2 * refilado), offset: refilado, kerf };
+  const permiteRotarGlobal = o.rotar !== false;
+
+  const lista = (piezas || []).slice().sort((a, b) => (b.ancho * b.alto) - (a.ancho * a.alto));
+  const tableros = [];
+  const sobrantes = [];
+  let actual = { libres: [{ x: 0, y: 0, w: util.L, h: util.A }], colocadas: [] };
+
+  function intentosDe(p) {
+    const r = [{ w: p.ancho, h: p.alto, rotada: false }];
+    const puede = permiteRotarGlobal && p.rotar !== false;
+    if (puede && p.ancho !== p.alto) r.push({ w: p.alto, h: p.ancho, rotada: true });
+    return r;
+  }
+
+  function acomodar(p) {
+    const intentos = intentosDe(p);
+    for (let k = 0; k < intentos.length; k++) {
+      const it = intentos[k];
+      if (it.w > util.L || it.h > util.A) continue;
+      for (let i = 0; i < actual.libres.length; i++) {
+        const e = actual.libres[i];
+        if (it.w <= e.w && it.h <= e.h) {
+          actual.colocadas.push({ x: e.x, y: e.y, w: it.w, h: it.h, rotada: it.rotada, nombre: p.nombre });
+          const wK = Math.min(it.w + kerf, e.w);
+          const hK = Math.min(it.h + kerf, e.h);
+          actual.libres.splice(i, 1);
+          const abajo = { x: e.x, y: e.y + hK, w: e.w, h: e.h - hK };
+          const derecha = { x: e.x + wK, y: e.y, w: e.w - wK, h: it.h };
+          if (abajo.w > 0 && abajo.h > 0) actual.libres.push(abajo);
+          if (derecha.w > 0 && derecha.h > 0) actual.libres.push(derecha);
+          actual.libres.sort((a, b) => (a.w * a.h) - (b.w * b.h));
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  lista.forEach(p => {
+    if (acomodar(p)) return;
+    if (actual.colocadas.length) tableros.push(actual);
+    actual = { libres: [{ x: 0, y: 0, w: util.L, h: util.A }], colocadas: [] };
+    if (!acomodar(p)) sobrantes.push(p.nombre);
+  });
+  if (actual.colocadas.length) tableros.push(actual);
+
+  if (refilado > 0) tableros.forEach(t => t.colocadas.forEach(c => { c.x += refilado; c.y += refilado; }));
+  return { tableros, util, sobrantes };
+}
+
 function renderizarCortes() {
   const panel = document.getElementById('cortesPanel');
   if (muebles.length === 0) { panel.classList.add('hidden'); return; }
@@ -1859,6 +1774,8 @@ function renderizarCortes() {
 
   const cfg = leerConfigTablero();
   const { largo: L, ancho: A } = cfg;
+  const kerf = parseFloat((document.getElementById('kerfSierra') || {}).value) || 0;
+  const refilado = parseFloat((document.getElementById('refiladoBorde') || {}).value) || 0;
 
   let todasEstructura = [];
   let todasRevestimiento = [];
@@ -1868,7 +1785,7 @@ function renderizarCortes() {
       if (c.esHerraje || c.ancho <= 0 || c.alto <= 0) return;
       const cantTotal = c.cantidad * (m.cantidad || 1);
       for (let i = 0; i < cantTotal; i++) {
-        const pieza = { ancho: c.ancho, alto: c.alto, nombre: c.componente };
+        const pieza = { ancho: c.ancho, alto: c.alto, nombre: c.componente, rotar: !m.veta };
         if (tipoLamina(c.componente) === 'revestimiento') todasRevestimiento.push(pieza);
         else todasEstructura.push(pieza);
       }
@@ -1881,68 +1798,16 @@ function renderizarCortes() {
 
   contEst.innerHTML = '';
   contRev.innerHTML = '';
-  
+
   if (todasEstructura.length === 0 && todasRevestimiento.length === 0) {
     noMsg.classList.remove('hidden');
     return;
   }
   noMsg.classList.add('hidden');
 
-  function empaquetar(piezas, L, A) {
-    piezas.sort((a, b) => (b.ancho * b.alto) - (a.ancho * a.alto));
-    
-    let tableros = [];
-    let actual = { libres: [{x:0, y:0, w:L, h:A}], colocadas: [] };
-
-    piezas.forEach(p => {
-      let colocada = false;
-      let intentos = [{w:p.ancho, h:p.alto, rotada:false}];
-      if (p.ancho !== p.alto) intentos.push({w:p.alto, h:p.ancho, rotada:true});
-
-      for (let intento of intentos) {
-        if (intento.w > L || intento.h > A) continue;
-        for (let i = 0; i < actual.libres.length; i++) {
-          let espacio = actual.libres[i];
-          if (intento.w <= espacio.w && intento.h <= espacio.h) {
-            actual.colocadas.push({ x: espacio.x, y: espacio.y, w: intento.w, h: intento.h, rotada: intento.rotada, nombre: p.nombre });
-            let nuevoLibre1 = { x: espacio.x, y: espacio.y + intento.h, w: espacio.w, h: espacio.h - intento.h };
-            let nuevoLibre2 = { x: espacio.x + intento.w, y: espacio.y, w: espacio.w - intento.w, h: intento.h };
-            actual.libres.splice(i, 1);
-            if (nuevoLibre1.w > 0 && nuevoLibre1.h > 0) actual.libres.push(nuevoLibre1);
-            if (nuevoLibre2.w > 0 && nuevoLibre2.h > 0) actual.libres.push(nuevoLibre2);
-            actual.libres.sort((a,b) => (a.w * a.h) - (b.w * b.h));
-            colocada = true;
-            break;
-          }
-        }
-        if (colocada) break;
-      }
-
-      if (!colocada) {
-        tableros.push(actual);
-        actual = { libres: [{x:0, y:0, w:L, h:A}], colocadas: [] };
-        for (let intento of intentos) {
-          if (intento.w <= L && intento.h <= A) {
-             actual.colocadas.push({ x: 0, y: 0, w: intento.w, h: intento.h, rotada: intento.rotada, nombre: p.nombre });
-             let nuevoLibre1 = { x: 0, y: intento.h, w: L, h: A - intento.h };
-             let nuevoLibre2 = { x: intento.w, y: 0, w: L - intento.w, h: intento.h };
-             if (nuevoLibre1.w > 0 && nuevoLibre1.h > 0) actual.libres.push(nuevoLibre1);
-             if (nuevoLibre2.w > 0 && nuevoLibre2.h > 0) actual.libres.push(nuevoLibre2);
-             actual.libres.shift();
-             colocada = true;
-             break;
-          }
-        }
-      }
-    });
-    
-    if (actual.colocadas.length > 0) tableros.push(actual);
-    return tableros;
-  }
-
   const colores = ['bg-emerald-200', 'bg-sky-200', 'bg-amber-200', 'bg-fuchsia-200', 'bg-rose-200', 'bg-indigo-200', 'bg-teal-200', 'bg-lime-200'];
 
-  function dibujarTableros(tableros, titulo, colorBorde) {
+  function dibujarTableros(tableros, titulo, colorBorde, util) {
     if (tableros.length === 0) return '';
     const maxVisualWidth = 800;
     const factor = Math.min(maxVisualWidth / L, 1);
@@ -1950,7 +1815,7 @@ function renderizarCortes() {
     let html = `<div class="mb-6">
       <h3 class="text-lg font-bold ${colorBorde} mb-3 border-b pb-1"><i class="fa-solid fa-layer-group mr-1"></i>${titulo} (${tableros.length} tablero${tableros.length > 1 ? 's' : ''})</h3>
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">`;
-    
+
     tableros.forEach((t, index) => {
       const tabW = L * factor;
       const tabH = A * factor;
@@ -1962,17 +1827,19 @@ function renderizarCortes() {
         const pY = p.y * factor;
         const color = colores[Math.floor(Math.random() * colores.length)];
         const textSize = Math.min(pW, pH) > 40 ? 'text-[10px]' : 'text-[8px]';
-        piezasHtml += `<div class="pieza-corte ${color} ${textSize} text-slate-800 font-semibold flex-col leading-none" style="left:${pX}px; top:${pY}px; width:${pW}px; height:${pH}px;" title="${p.nombre} (${Math.round(p.w)}x${Math.round(p.h)})">
+        piezasHtml += `<div class="pieza-corte ${color} ${textSize} text-slate-800 font-semibold flex-col leading-none" style="left:${pX}px; top:${pY}px; width:${pW}px; height:${pH}px;" title="${p.nombre} (${Math.round(p.w)}x${Math.round(p.h)})${p.rotada ? ' girada' : ''}">
           <span class="block truncate w-full px-0.5">${p.nombre}</span>
           <span class="block text-[8px] opacity-75">${Math.round(p.w)}x${Math.round(p.h)}</span>
         </div>`;
       });
+      const utilHtml = `<div style="position:absolute;left:${util.offset * factor}px;top:${util.offset * factor}px;width:${util.L * factor}px;height:${util.A * factor}px;border:1px dashed #94a3b8;pointer-events:none;box-sizing:border-box;"></div>`;
       html += `<div>
         <div class="text-xs font-semibold text-slate-500 mb-1 flex justify-between">
           <span>Tablero ${index + 1}</span>
-          <span>${L} x ${A} mm</span>
+          <span>${L} x ${A} mm · útil ${util.L} x ${util.A} mm</span>
         </div>
         <div class="tablero-corte" style="width:${tabW}px; height:${tabH}px;">
+          ${utilHtml}
           ${piezasHtml}
         </div>
       </div>`;
@@ -1981,19 +1848,132 @@ function renderizarCortes() {
     return html;
   }
 
+  function avisoSobrantes(r) {
+    if (!r.sobrantes || r.sobrantes.length === 0) return '';
+    return `<p class="text-[11px] text-red-600 mb-2"><i class="fa-solid fa-triangle-exclamation mr-1"></i>No caben en la lámina útil (${r.util.L} x ${r.util.A} mm): ${r.sobrantes.join(', ')}</p>`;
+  }
+
   if (todasEstructura.length > 0) {
-    const tablerosEst = empaquetar(todasEstructura, L, A);
-    contEst.innerHTML = dibujarTableros(tablerosEst, 'Despiece: Estructura (Laterales, Pisos, Techos, Fondos)', 'text-amber-700 border-amber-300');
+    const rEst = empaquetarPiezas(todasEstructura, L, A, { kerf, refilado });
+    contEst.innerHTML = avisoSobrantes(rEst) + dibujarTableros(rEst.tableros, 'Despiece: Estructura (Laterales, Pisos, Techos, Fondos)', 'text-amber-700 border-amber-300', rEst.util);
   } else {
     contEst.innerHTML = '';
   }
 
   if (todasRevestimiento.length > 0) {
-    const tablerosRev = empaquetar(todasRevestimiento, L, A);
-    contRev.innerHTML = dibujarTableros(tablerosRev, 'Despiece: Revestimiento (Puertas, Frentes, Paneles)', 'text-emerald-700 border-emerald-300');
+    const rRev = empaquetarPiezas(todasRevestimiento, L, A, { kerf, refilado });
+    contRev.innerHTML = avisoSobrantes(rRev) + dibujarTableros(rRev.tableros, 'Despiece: Revestimiento (Puertas, Frentes, Paneles)', 'text-emerald-700 border-emerald-300', rRev.util);
   } else {
     contRev.innerHTML = '';
   }
+}
+
+function setChecked(id, valor) { const el = document.getElementById(id); if (el) el.checked = !!valor; }
+function setValor(id, valor) { const el = document.getElementById(id); if (el && valor !== undefined && valor !== null) el.value = valor; }
+
+function prefillFormulario(m) {
+  setValor('nombreMueble', m.nombre || '');
+  setValor('altoMueble', m.alto);
+  setValor('anchoMueble', m.ancho);
+  setValor('profMueble', m.prof);
+  setValor('espesorTablero', String(m.espesor));
+  setValor('vetaMueble', m.veta || '');
+  setValor('cantMuebles', m.cantidad || 1);
+
+  const col = m.colores || {};
+  setValor('colorLateral', col.lateral || 'Blanco');
+  setValor('colorPisoTecho', col.pisoTecho || 'Blanco');
+  setValor('colorFondo', col.fondo || 'Blanco');
+  setValor('colorPuerta', col.puerta || 'Roble');
+
+  const cuenta = (pref) => {
+    const c = (m.componentes || []).find(x => String(x.componente).indexOf(pref) === 0);
+    return c ? c.cantidad : 0;
+  };
+  const puertas = cuenta('Puerta');
+  const gavetas = cuenta('Frente de gaveta');
+  const repisas = cuenta('Repisa');
+
+  setChecked('incluirPuertas', puertas > 0);
+  setValor('cantPuertas', puertas || 1);
+  setChecked('incluirGavetas', gavetas > 0);
+  setValor('cantGavetas', gavetas || 1);
+  setChecked('incluirRepisas', repisas > 0);
+  setValor('cantRepisas', repisas || 1);
+  setChecked('incluirPanel', !!m.incluirPanel);
+  setChecked('incluirFinta', !!m.incluirFinta);
+  setChecked('incluirRodapie', !!m.incluirRodapie);
+  setChecked('incluirPatas', !!m.incluirPatas);
+  if (m.incluirPatas) setValor('precioSetPatas', Number(m.precioSetPatas || 0).toFixed(2));
+  setValor('tipoCorredera', m.tipoCorredera || 'telescopica');
+  if (m.precioCorredera != null) {
+    const campo = m.tipoCorredera === 'ocultaBlum' ? 'precioCorrederaBlum'
+      : (m.tipoCorredera === 'oculta' ? 'precioCorrederaOculta' : 'precioCorrederaTelescopica');
+    setValor(campo, m.precioCorredera);
+  }
+
+  TORNILLOS_DEF.forEach(t => {
+    const info = m.tornillos && m.tornillos[t.key];
+    setChecked(t.incluirId, info && info.incluir);
+    if (info) setValor(t.precioId, info.precio);
+  });
+  if (m.bisagraRecta) {
+    setChecked('incluirBisagraRecta', m.bisagraRecta.incluir);
+    setValor('cantBisagraRecta', m.bisagraRecta.cantidad || 1);
+    setValor('precioBisagraRecta', m.bisagraRecta.precio);
+  }
+  ELEVACION_DEF.forEach(e => {
+    const info = m.elevacion && m.elevacion[e.key];
+    setChecked(e.incluirId, info && info.incluir);
+    if (info) setValor(e.precioId, info.precio);
+  });
+  PLATERA_DEF.forEach(p => {
+    const info = m.platera && m.platera[p.key];
+    setChecked(p.incluirId, info && info.incluir);
+    if (info) setValor(p.precioId, info.precio);
+  });
+  CONDIMENTERO_DEF.forEach(cd => {
+    const info = m.condimentero && m.condimentero[cd.key];
+    setChecked(cd.incluirId, info && info.incluir);
+    if (info) setValor(cd.precioId, info.precio);
+  });
+  if (m.tiradores) {
+    setChecked('incluirTirador', m.tiradores.incluir);
+    setValor('tipoTiradorPrincipal', m.tiradores.tipoPrincipal || 'perfil');
+    if (m.tiradores.variedad) setValor('tipoTiradorVariedad', m.tiradores.variedad);
+    if (m.tiradores.categoriaGola) setValor('tipoGola', m.tiradores.categoriaGola);
+    setValor('cantTirador', m.tiradores.cantidad || 1);
+    setValor('precioTirador', m.tiradores.precio || 0);
+    setValor('colorTirador', m.tiradores.color || '');
+  }
+
+  ['incluirPuertas','incluirGavetas','incluirRepisas','incluirPanel','incluirFinta','incluirRodapie','incluirPatas','incluirBisagraRecta','incluirTirador'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+
+function duplicarMueble(id) {
+  const orig = muebles.find(x => x.id === id);
+  if (!orig) return;
+  const copia = JSON.parse(JSON.stringify(orig));
+  copia.id = uid();
+  copia.nombre = (orig.nombre || 'Mueble') + ' (copia)';
+  copia.componentes = (copia.componentes || []).map(c => Object.assign({}, c, { id: uid() }));
+  muebles.push(copia);
+  guardarProyecto();
+  renderizarMuebles();
+}
+
+function editarMueble(id) {
+  const m = muebles.find(x => x.id === id);
+  if (!m) return;
+  editandoMuebleId = id;
+  prefillFormulario(m);
+  const btnTxt = document.getElementById('btnSubmitTexto');
+  if (btnTxt) btnTxt.textContent = 'Guardar cambios';
+  const form = document.getElementById('muebleForm');
+  if (form && form.scrollIntoView) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function eliminarMueble(id) {
@@ -2007,12 +1987,14 @@ function eliminarMueble(id) {
   if (editandoPlatera?.muebleId === id) editandoPlatera = null;
   if (editandoCondimentero?.muebleId === id) editandoCondimentero = null;
   if (editandoTiradorId === id) editandoTiradorId = null;
+  guardarProyecto();
   renderizarMuebles();
 }
 function limpiarTodo() {
   if (muebles.length === 0) return;
   if (!confirm('¿Eliminar TODOS los muebles?')) return;
   muebles = []; editandoPrecioPatasId = null; editandoPrecioCorrederaId = null; editandoTornillo = null; editandoBisagraRecta = null; editandoElevacion = null; editandoPlatera = null; editandoCondimentero = null; editandoTiradorId = null;
+  guardarProyecto();
   renderizarMuebles();
 }
 
