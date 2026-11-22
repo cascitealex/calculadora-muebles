@@ -139,10 +139,12 @@
     <div><label>Puertas</label><input id="cPuertas" type="number" value="1"></div>
     <div><label>Gavetas</label><input id="cGavetas" type="number" value="0"></div>
     <div><label>Desperdicio %</label><input id="cDesperdicio" type="number" value="15"></div>
-    <div><label>Lámina ($)</label><input id="cPrecioTablero" type="number" step="0.01" value="80"></div>
-    <div><label>Canto ($/ml)</label><input id="cPrecioCanto" type="number" step="0.01" value="1"></div>
-    <div><label>Corte ($)</label><input id="cPrecioCorte" type="number" step="0.01" value="1.06"></div>
-    <div><label>Enchapado ($/ml)</label><input id="cPrecioEnchapado" type="number" step="0.01" value="1.58"></div>
+    <div><label>Lámina estructura ($)</label><input id="cPrecioTablero" type="number" step="0.01" value="100"></div>
+    <div><label>Lámina revest. ($)</label><input id="cPrecioTableroRev" type="number" step="0.01" value="150"></div>
+    <div><label>Canto est. ($/ml)</label><input id="cPrecioCanto" type="number" step="0.01" value="0.50"></div>
+    <div><label>Canto rev. ($/ml)</label><input id="cPrecioCantoRev" type="number" step="0.01" value="1"></div>
+    <div><label>Corte ($)</label><input id="cPrecioCorte" type="number" step="0.01" value="0.91"></div>
+    <div><label>Enchapado ($/ml)</label><input id="cPrecioEnchapado" type="number" step="0.01" value="2.36"></div>
   </div>
   <div class="fila">
     <button class="btn-aplicar" type="button" onclick="generarDesdeMedidas()">Generar líneas de madera</button>
@@ -161,20 +163,20 @@
 
       <div class="campo-cab" style="border-bottom:1px solid var(--linea)">
         <label>Nombre o Razón Social</label>
-        <div class="val"><input id="hNombre" value="JHOHANGS ANGEL CASTELLANO"></div>
+        <div class="val"><input id="hNombre" value="Nombre del Cliente"></div>
       </div>
       <div class="cab-derecha">
-        <div class="fila"><label>Presupuesto No.</label><input id="hNumero" value="221126"></div>
+        <div class="fila"><label>Presupuesto No.</label><input id="hNumero" value="000001"></div>
         <div class="fila"><label>Fecha</label><input id="hFecha" type="date"></div>
       </div>
 
       <div class="campo-cab">
         <label>Dirección</label>
-        <div class="val"><input id="hDireccion" value="SAN BERNARDINO"></div>
+        <div class="val"><input id="hDireccion" value="Dirección del proyecto"></div>
       </div>
       <div class="cab-derecha">
         <div class="fila"><label>Validez de la oferta</label><input id="hValidez" value="5 días"></div>
-        <div class="fila"><label>Casa BCV</label><input id="hBcv" value="36,50"></div>
+        <div class="fila"><label>Casa BCV</label><input id="hBcv" value="0,00"></div>
       </div>
 
       <div class="campo-cab">
@@ -265,6 +267,7 @@
   </div>
 </div>
 
+<script src="motor-calculo.js"></script>
 <script>
 // ===== INICIO CALCULO =====
 var LINEAS_EJEMPLO = [
@@ -279,104 +282,43 @@ var LINEAS_EJEMPLO = [
   { sec: 'herraje', desc: 'BLISTER TAPA TORNILLOS', unidad: 'BLISTER', cant: 1, precio: 2.2 }
 ];
 
-function paresBisagras(altoPuerta) {
-  if (altoPuerta <= 800) return 1;
-  if (altoPuerta <= 1400) return 2;
-  return 3;
-}
-
-function despieceDesdeMedidas(m) {
-  var piezas = [];
-  function P(nombre, ancho, alto, cantidad, cantos) {
-    piezas.push({ nombre: nombre, ancho: ancho, alto: alto, cantidad: cantidad, cantos: cantos || {} });
-  }
-  piezas.push({ nombre: 'Lateral', ancho: m.prof, alto: m.alto, cantidad: 2,
-    cantos: { sup: 1, inf: 1, der: 1 } });
-  piezas.push({ nombre: 'Techo / Piso', ancho: m.ancho - 36, alto: m.prof, cantidad: 2,
-    cantos: { sup: 1, inf: 1 } });
-  piezas.push({ nombre: 'Fondo', ancho: m.ancho - 36, alto: m.alto - 36, cantidad: 1, cantos: {} });
-
-  if (m.repisas > 0) {
-    piezas.push({ nombre: 'Repisa', ancho: m.ancho - 36, alto: m.prof - 18, cantidad: m.repisas,
-      cantos: { sup: 1 } });
-  }
-  var pares = 0;
-  if (m.puertas > 0) {
-    var altoPuerta = m.puertas === 1 ? m.alto - 3 : (m.alto / m.puertas) - 3;
-    piezas.push({ nombre: 'Puerta', ancho: m.ancho - 3, alto: altoPuerta, cantidad: m.puertas,
-      cantos: { sup: 1, inf: 1, izq: 1, der: 1 } });
-    pares = paresBisagras(altoPuerta) * m.puertas;
-  }
-  if (m.gavetas > 0) {
-    var n = m.gavetas;
-    piezas.push({ nombre: 'Frente de gaveta', ancho: m.ancho - 6,
-      alto: (m.alto - 3 * (n + 1)) / n, cantidad: n, cantos: { sup: 1, inf: 1, izq: 1, der: 1 } });
-    var anchoCajon = m.ancho - (m.espesor * 2) - 25 - 36;
-    piezas.push({ nombre: 'Lateral de gaveta', ancho: 500, alto: 161, cantidad: n * 2,
-      cantos: { sup: 1, der: 1 } });
-    piezas.push({ nombre: 'Frente interno gaveta', ancho: anchoCajon, alto: 161, cantidad: n * 2,
-      cantos: { sup: 1, inf: 1 } });
-    piezas.push({ nombre: 'Fondo de gaveta', ancho: anchoCajon, alto: m.prof - 116, cantidad: n,
-      cantos: {} });
-  }
-
-  var REV = ['Puerta', 'Frente de gaveta', 'Frente interno gaveta'];
-  var areaEst = 0, areaRev = 0, mlEst = 0, mlRev = 0;
-
-  piezas.forEach(function (p) {
-    var area = (p.ancho * p.alto * p.cantidad) / 1000000;
-    var mm = 0;
-    if (p.cantos.sup) mm += p.ancho;
-    if (p.cantos.inf) mm += p.ancho;
-    if (p.cantos.izq) mm += p.alto;
-    if (p.cantos.der) mm += p.alto;
-    var ml = (mm / 1000) * p.cantidad;
-    var rev = REV.some(function (r) { return p.nombre.indexOf(r) === 0; });
-    if (rev) { areaRev += area; mlRev += ml; } else { areaEst += area; mlEst += ml; }
-  });
-
-  return { areaEst: areaEst, areaRev: areaRev, mlEst: mlEst, mlRev: mlRev, pares: pares };
-}
-
 function lineasDesdeMedidas(m) {
-  var d = despieceDesdeMedidas(m);
-  var factor = 1 + m.desperdicio / 100;
-  var areaLamina = (m.largoLamina * m.anchoLamina) / 1000000;
-  var tabEst = Math.ceil((d.areaEst * factor) / areaLamina) || 0;
-  var tabRev = Math.ceil((d.areaRev * factor) / areaLamina) || 0;
-  var lineas = [];
-
-  if (tabEst > 0) lineas.push({ sec: 'madera', desc: 'TABLERO ESTRUCTURA ' + m.espesor + 'MM',
-    unidad: 'TABLERO', cant: tabEst, precio: m.precioTablero });
-  if (tabRev > 0) lineas.push({ sec: 'madera', desc: 'TABLERO REVESTIMIENTO ' + m.espesor + 'MM',
-    unidad: 'TABLERO', cant: tabRev, precio: m.precioTablero });
-  if (d.mlEst > 0) lineas.push({ sec: 'madera', desc: 'TAPA CANTO ESTRUCTURA 0,45MM',
-    unidad: 'ML', cant: Math.round(d.mlEst * 100) / 100, precio: m.precioCanto });
-  if (d.mlRev > 0) lineas.push({ sec: 'madera', desc: 'TAPA CANTO REVESTIMIENTO 1MM',
-    unidad: 'ML', cant: Math.round(d.mlRev * 100) / 100, precio: m.precioCanto });
-  lineas.push({ sec: 'madera', desc: 'SERVICIO DE CORTE', unidad: 'UNIDAD',
-    cant: (tabEst + tabRev) * m.cortesPorLamina, precio: m.precioCorte });
-  lineas.push({ sec: 'madera', desc: 'SERVICIO DE ENCHAPADO', unidad: 'UNIDAD',
-    cant: Math.round((d.mlEst + d.mlRev) * 100) / 100, precio: m.precioEnchapado });
-
-  if (m.gavetas > 0) lineas.push({ sec: 'herraje', desc: 'CORREDERAS', unidad: 'PAR',
-    cant: m.gavetas, precio: m.precioCorredera });
-  if (d.pares > 0) lineas.push({ sec: 'herraje', desc: 'BISAGRAS DE CAZOLETA', unidad: 'PAR',
-    cant: d.pares, precio: m.precioBisagra });
-
-  return lineas;
+  const opts = {
+    incluirRepisas: m.repisas > 0, cantRepisas: m.repisas,
+    incluirPuertas: m.puertas > 0, cantPuertas: m.puertas,
+    incluirGavetas: m.gavetas > 0, cantGavetas: m.gavetas,
+    tipoCorredera: 'telescopica', profGaveta: 500, altoGaveta: 161
+  };
+  const colores = { lateral: 'Blanco', pisoTecho: 'Blanco', fondo: 'Blanco', puerta: 'Roble' };
+  const mueble = {
+    espesor: m.espesor,
+    precioCorredera: m.precioCorredera,
+    componentes: MotorCalculo.despieceDesdeMedidas(
+      { alto: m.alto, ancho: m.ancho, prof: m.prof, espesor: m.espesor, veta: 'Vertical' },
+      opts, colores, {})
+  };
+  const cfg = {
+    desperdicio: m.desperdicio,
+    precioEstructura: m.precioTablero, precioRevestimiento: m.precioTableroRev,
+    precioCantoEstructura: m.precioCanto, precioCantoRevestimiento: m.precioCantoRev,
+    precioEnchapado: m.precioEnchapado, precioCorte: m.precioCorte,
+    cantidadCortesPorLamina: 5, precioParBisagra: m.precioBisagra
+  };
+  const r = MotorCalculo.lineasDesdeMueble(mueble, cfg, {});
+  return r.lineas.map(function (l) {
+    const herraje = /BISAGRA|CORREDERA/.test(l.desc);
+    return { sec: herraje ? 'herraje' : 'madera', desc: l.desc, unidad: l.unidad, cant: l.cant, precio: l.precio, total: l.total };
+  });
 }
 
 function totales(lineas, pctMano, pctAdmin) {
   var madera = 0, herrajes = 0;
   lineas.forEach(function (l) {
-    var t = (Number(l.cant) || 0) * (Number(l.precio) || 0);
+    var t = (l.total != null) ? (Number(l.total) || 0) : ((Number(l.cant) || 0) * (Number(l.precio) || 0));
     if (l.sec === 'madera') madera += t; else herrajes += t;
   });
-  var base = madera + herrajes;
-  var mano = base * (Number(pctMano) || 0) / 100;
-  var admin = base * (Number(pctAdmin) || 0) / 100;
-  return { madera: madera, herrajes: herrajes, base: base, mano: mano, admin: admin, total: base + mano + admin };
+  var t = MotorCalculo.totalesDesdeLineas(lineas, pctMano, pctAdmin);
+  return { madera: madera, herrajes: herrajes, base: t.base, mano: t.manoObra, admin: t.gastosAdmin, total: t.total };
 }
 // ===== FIN CALCULO =====
 
@@ -449,9 +391,10 @@ function leerMedidas() {
     repisas: n('cRepisas'), puertas: n('cPuertas'), gavetas: n('cGavetas'),
     desperdicio: n('cDesperdicio'),
     largoLamina: 2440, anchoLamina: 1830, cortesPorLamina: 5,
-    precioTablero: n('cPrecioTablero'), precioCanto: n('cPrecioCanto'),
+    precioTablero: n('cPrecioTablero'), precioTableroRev: n('cPrecioTableroRev'),
+    precioCanto: n('cPrecioCanto'), precioCantoRev: n('cPrecioCantoRev'),
     precioCorte: n('cPrecioCorte'), precioEnchapado: n('cPrecioEnchapado'),
-    precioCorredera: 13.93, precioBisagra: 2.50
+    precioCorredera: 2.00, precioBisagra: MotorCalculo.DEFAULTS.precioParBisagra
   };
 }
 
