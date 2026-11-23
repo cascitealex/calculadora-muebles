@@ -409,23 +409,28 @@
 
           <!-- Bisagra Recta -->
           <div class="mb-3 border border-rose-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-rose-50 hover:bg-rose-100 px-3 py-2 text-left transition"
+            <button type="button" class="accordion-header ds-acc-head bg-rose-50 hover:bg-rose-100 transition"
                     data-target="acc-bisagra-recta" aria-expanded="false" aria-controls="acc-bisagra-recta"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-rose-800"><i class="fa-solid fa-link text-rose-600"></i> Bisagra Recta (adicional)</span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-rose-500"></i>
+              <span class="ds-acc-title text-sm font-bold text-rose-800"><i class="fa-solid fa-link text-rose-600"></i> Bisagra Recta (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-rose-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="bisagra-recta"></span>
             </button>
             <div id="acc-bisagra-recta" class="accordion-body px-3">
-              <div class="py-2 space-y-2">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirBisagraRecta" class="ds-check w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500">
-                  <span class="text-sm font-medium text-slate-700">Bisagra recta (unidad)</span>
-                </label>
-                <div id="panelBisagraRecta" class="ml-6 mt-1 space-y-2 hidden">
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
-                    <input type="number" id="cantBisagraRecta" value="1" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></div>
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio unitario ($)</label>
-                    <input type="number" id="precioBisagraRecta" value="1.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></div>
+              <div class="py-2 ds-subblocks">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer">
+                    <input type="checkbox" id="incluirBisagraRecta" class="ds-check w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500">
+                    <span class="text-sm font-medium text-slate-700">Bisagra recta (unidad)</span>
+                  </label>
+                  <div id="panelBisagraRecta" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
+                        <span class="ds-unit-wrap"><input type="number" id="cantBisagraRecta" value="1" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"><span class="ds-unit">uds</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio unitario</label>
+                        <span class="ds-unit-wrap"><input type="number" id="precioBisagraRecta" value="1.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"><span class="ds-unit">$</span></span></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -433,111 +438,160 @@
 
           <!-- Sistema de Elevación -->
           <div class="mb-3 border border-fuchsia-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-fuchsia-50 hover:bg-fuchsia-100 px-3 py-2 text-left transition"
+            <button type="button" class="accordion-header ds-acc-head bg-fuchsia-50 hover:bg-fuchsia-100 transition"
                     data-target="acc-elevacion" aria-expanded="false" aria-controls="acc-elevacion"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-fuchsia-800"><i class="fa-solid fa-arrow-up-from-bracket text-fuchsia-600"></i> Sistema de Elevación (adicional)</span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-fuchsia-500"></i>
+              <span class="ds-acc-title text-sm font-bold text-fuchsia-800"><i class="fa-solid fa-arrow-up-from-bracket text-fuchsia-600"></i> Sistema de Elevación (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-fuchsia-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="elevacion"></span>
             </button>
             <div id="acc-elevacion" class="accordion-body px-3">
-              <div class="py-2 space-y-2">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirAmortiguadorAutoelevable" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
-                  <span class="text-sm font-medium text-slate-700">Amortiguador autoelevable</span>
-                </label>
-                <div id="panelAmortiguadorAutoelevable" class="ml-6 mt-1 mb-2 hidden">
-                  <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
-                  <input type="number" id="precioAmortiguadorAutoelevable" value="1.92" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2">
-                  <input type="checkbox" id="incluirElevacionPuertaDoble" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
-                  <span class="text-sm font-medium text-slate-700">Sistema de elevación puerta doble</span>
-                </label>
-                <div id="panelElevacionPuertaDoble" class="ml-6 mt-1 mb-2 hidden">
-                  <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
-                  <input type="number" id="precioElevacionPuertaDoble" value="124.66" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2">
-                  <input type="checkbox" id="incluirElevacionPuertaSencilla" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
-                  <span class="text-sm font-medium text-slate-700">Sistema de elevación de puerta sencilla</span>
-                </label>
-                <div id="panelElevacionPuertaSencilla" class="ml-6 mt-1 hidden">
-                  <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
-                  <input type="number" id="precioElevacionPuertaSencilla" value="49.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
+              <div class="py-2 ds-subblocks">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer">
+                    <input type="checkbox" id="incluirAmortiguadorAutoelevable" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                    <span class="text-sm font-medium text-slate-700">Amortiguador autoelevable</span>
+                  </label>
+                  <div id="panelAmortiguadorAutoelevable" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label>
+                        <span class="ds-unit-wrap"><input type="number" id="precioAmortiguadorAutoelevable" value="1.92" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"><span class="ds-unit">$</span></span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer">
+                    <input type="checkbox" id="incluirElevacionPuertaDoble" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                    <span class="text-sm font-medium text-slate-700">Sistema de elevación puerta doble</span>
+                  </label>
+                  <div id="panelElevacionPuertaDoble" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label>
+                        <span class="ds-unit-wrap"><input type="number" id="precioElevacionPuertaDoble" value="124.66" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"><span class="ds-unit">$</span></span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer">
+                    <input type="checkbox" id="incluirElevacionPuertaSencilla" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                    <span class="text-sm font-medium text-slate-700">Sistema de elevación de puerta sencilla</span>
+                  </label>
+                  <div id="panelElevacionPuertaSencilla" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label>
+                        <span class="ds-unit-wrap"><input type="number" id="precioElevacionPuertaSencilla" value="49.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"><span class="ds-unit">$</span></span></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Platera -->
           <div class="mb-3 border border-cyan-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-cyan-50 hover:bg-cyan-100 px-3 py-2 text-left transition"
+            <button type="button" class="accordion-header ds-acc-head bg-cyan-50 hover:bg-cyan-100 transition"
                     data-target="acc-platera" aria-expanded="false" aria-controls="acc-platera"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-cyan-800"><i class="fa-solid fa-utensils text-cyan-600"></i> Platera Kit Escurridor de Platos</span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-cyan-500"></i>
+              <span class="ds-acc-title text-sm font-bold text-cyan-800"><i class="fa-solid fa-utensils text-cyan-600"></i> Platera Kit Escurridor de Platos</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-cyan-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="platera"></span>
             </button>
             <div id="acc-platera" class="accordion-body px-3">
-              <div class="py-2 space-y-2">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirPlatera60" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 60 cm</span></label>
-                <div id="panelPlatera60" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera60" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera70" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 70 cm</span></label>
-                <div id="panelPlatera70" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera70" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera80" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 80 cm</span></label>
-                <div id="panelPlatera80" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera80" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera90" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 90 cm</span></label>
-                <div id="panelPlatera90" class="ml-6 mt-1 hidden"><input type="number" id="precioPlatera90" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+              <div class="py-2 ds-subblocks">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirPlatera60" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 60 cm</span></label>
+                  <div id="panelPlatera60" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioPlatera60" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirPlatera70" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 70 cm</span></label>
+                  <div id="panelPlatera70" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioPlatera70" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirPlatera80" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 80 cm</span></label>
+                  <div id="panelPlatera80" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioPlatera80" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirPlatera90" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 90 cm</span></label>
+                  <div id="panelPlatera90" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioPlatera90" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Condimenteros -->
           <div class="mb-3 border border-lime-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-lime-50 hover:bg-lime-100 px-3 py-2 text-left transition"
+            <button type="button" class="accordion-header ds-acc-head bg-lime-50 hover:bg-lime-100 transition"
                     data-target="acc-condimentero" aria-expanded="false" aria-controls="acc-condimentero"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-lime-800"><i class="fa-solid fa-jar text-lime-600"></i> Condimenteros (adicional)</span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-lime-500"></i>
+              <span class="ds-acc-title text-sm font-bold text-lime-800"><i class="fa-solid fa-jar text-lime-600"></i> Condimenteros (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-lime-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="condimenteros"></span>
             </button>
             <div id="acc-condimentero" class="accordion-body px-3">
-              <div class="py-2 space-y-2">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirCondimentero15" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 15 cm</span></label>
-                <div id="panelCondimentero15" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero15" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero20" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 20 cm</span></label>
-                <div id="panelCondimentero20" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero20" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero30" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 30 cm</span></label>
-                <div id="panelCondimentero30" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero30" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero35" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 35 cm</span></label>
-                <div id="panelCondimentero35" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero35" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero40" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 40 cm</span></label>
-                <div id="panelCondimentero40" class="ml-6 mt-1 hidden"><input type="number" id="precioCondimentero40" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+              <div class="py-2 ds-subblocks">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirCondimentero15" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 15 cm</span></label>
+                  <div id="panelCondimentero15" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioCondimentero15" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirCondimentero20" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 20 cm</span></label>
+                  <div id="panelCondimentero20" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioCondimentero20" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirCondimentero30" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 30 cm</span></label>
+                  <div id="panelCondimentero30" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioCondimentero30" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirCondimentero35" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 35 cm</span></label>
+                  <div id="panelCondimentero35" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioCondimentero35" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirCondimentero40" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 40 cm</span></label>
+                  <div id="panelCondimentero40" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio</label><span class="ds-unit-wrap"><input type="number" id="precioCondimentero40" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Patas y Tornillos -->
           <div class="mb-3 border border-slate-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-2 text-left transition"
+            <button type="button" class="accordion-header ds-acc-head bg-slate-100 hover:bg-slate-200 transition"
                     data-target="acc-patas-tornillos" aria-expanded="false" aria-controls="acc-patas-tornillos"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-slate-800"><i class="fa-solid fa-screwdriver text-orange-600"></i> Patas y Tornillos (adicional)</span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-slate-500"></i>
+              <span class="ds-acc-title text-sm font-bold text-slate-800"><i class="fa-solid fa-screwdriver text-orange-600"></i> Patas y Tornillos (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-slate-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="patas-tornillos"></span>
             </button>
             <div id="acc-patas-tornillos" class="accordion-body px-3">
-              <div class="py-2 space-y-3">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirPatas" class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
-                  <span class="text-sm font-medium text-slate-700">Incluir set de patas plásticas regulables (4 uds.)</span>
-                </label>
-                <div id="panelPatas" class="ml-6 space-y-3 hidden">
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio por set de 4 patas ($) <span class="text-amber-600 font-semibold">— sobrescribe el valor global</span></label>
-                    <input type="number" id="precioSetPatas" value="3.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+              <div class="py-2 ds-subblocks">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer">
+                    <input type="checkbox" id="incluirPatas" class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                    <span class="text-sm font-medium text-slate-700">Incluir set de patas plásticas regulables (4 uds.)</span>
+                  </label>
+                  <div id="panelPatas" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio set 4 patas <span class="text-amber-600 font-semibold">— sobrescribe global</span></label>
+                        <span class="ds-unit-wrap"><input type="number" id="precioSetPatas" value="3.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"><span class="ds-unit">$</span></span></div>
+                    </div>
+                  </div>
                 </div>
-                <div class="border-l-4 border-orange-400 pl-3 py-2 bg-orange-50/40 rounded">
-                  <p class="text-xs font-semibold text-slate-700 mb-2"><i class="fa-solid fa-screwdriver text-orange-600 mr-1"></i> Tornillos (por bolsa 100 uds.)</p>
-                  <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirTornillo6x2" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x2 x100 und</span></label>
-                  <div id="panelTornillo6x2" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioTornillo6x2" value="2.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
-                  <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirTornillo6x1_4" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x1 1/4 x100 und</span></label>
-                  <div id="panelTornillo6x1_4" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioTornillo6x1_4" value="1.26" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
-                  <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirTornillo5_8x6" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 5/8 x6 x100 und</span></label>
-                  <div id="panelTornillo5_8x6" class="ml-6 mt-1 hidden"><input type="number" id="precioTornillo5_8x6" value="1.68" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
+                <div class="ds-subblock">
+                  <p class="ds-group-title"><i class="fa-solid fa-screwdriver text-orange-600 mr-1"></i> Tornillos (por bolsa 100 uds.)</p>
+                  <div class="ds-subblocks">
+                    <div class="ds-subblock">
+                      <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirTornillo6x2" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x2 x100 und</span></label>
+                      <div id="panelTornillo6x2" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio bolsa</label><span class="ds-unit-wrap"><input type="number" id="precioTornillo6x2" value="2.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                    </div>
+                    <div class="ds-subblock">
+                      <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirTornillo6x1_4" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x1 1/4 x100 und</span></label>
+                      <div id="panelTornillo6x1_4" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio bolsa</label><span class="ds-unit-wrap"><input type="number" id="precioTornillo6x1_4" value="1.26" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                    </div>
+                    <div class="ds-subblock">
+                      <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirTornillo5_8x6" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 5/8 x6 x100 und</span></label>
+                      <div id="panelTornillo5_8x6" class="ds-subblock-body hidden"><div class="ds-grid ds-grid-2 ds-grid-responsive"><div><label class="block text-xs font-medium text-slate-600 mb-1">Precio bolsa</label><span class="ds-unit-wrap"><input type="number" id="precioTornillo5_8x6" value="1.68" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"><span class="ds-unit">$</span></span></div></div></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -670,10 +724,11 @@
           <span id="contadorMuebles" class="text-sm font-normal text-slate-500 ml-2"></span>
         </h2>
         <div id="listaMuebles" class="space-y-5">
-          <p class="text-slate-500 text-center py-8">
-            <i class="fa-solid fa-box-open text-3xl block mb-2 text-slate-300"></i>
-            No hay muebles agregados todavía.
-          </p>
+          <div class="ds-empty">
+            <i class="fa-solid fa-box-open ds-empty-icon"></i>
+            <p class="ds-empty-title">No hay muebles agregados todavía</p>
+            <p class="ds-empty-desc">Agrega un mueble desde la pestaña Muebles para ver su despiece.</p>
+          </div>
         </div>
       </div>
 
@@ -814,9 +869,10 @@
           <div id="cortesEstructuraContenedor"></div>
           <div id="cortesRevestimientoContenedor"></div>
           
-          <div id="noCortesMsg" class="text-center py-8 text-slate-400 hidden">
-            <i class="fa-solid fa-box-open text-3xl block mb-2"></i>
-            No hay piezas para mostrar.
+          <div id="noCortesMsg" class="ds-empty hidden">
+            <i class="fa-solid fa-scissors ds-empty-icon"></i>
+            <p class="ds-empty-title">No hay piezas para mostrar</p>
+            <p class="ds-empty-desc">Agrega muebles para generar el plano de cortes.</p>
           </div>
 
         </div>
@@ -1072,6 +1128,7 @@ function cargarMueblePorCodigo() {
 function mostrarCategoria(cat) {
   const cont = document.getElementById('infoCodigo');
   const lista = cat === 'todo' ? BIBLIOTECA : BIBLIOTECA.filter(b => b.categoria === cat);
+  if (lista.length === 0) { cont.innerHTML = `<div class="ds-empty ds-empty-compact"><i class="fa-solid fa-book-open ds-empty-icon"></i><p class="ds-empty-title">No hay códigos en esta categoría</p><p class="ds-empty-desc">Usa «Agregar código» para crear uno nuevo.</p></div>`; return; }
   let html = `<p class="font-bold text-slate-700 text-xs mb-2">${cat.toUpperCase()} — ${lista.length} muebles</p><div class="space-y-1 max-h-96 overflow-y-auto">`;
   lista.forEach(b => {
     html += `<div class="flex justify-between items-center gap-1 bg-slate-50 hover:bg-amber-50 border border-slate-200 rounded px-2 py-1">
@@ -1108,7 +1165,7 @@ function abrirAgregarCodigo(c = '') {
   setTimeout(() => document.getElementById('ncCodigo').focus(), 100);
 }
 function abrirEditarCodigo(c) {
-  const m = buscarPorCodigo(c); if (!m) { alert('Código no encontrado.'); return; }
+  const m = buscarPorCodigo(c); if (!m) { mostrarToast('Código no encontrado.', 'warning'); return; }
   editandoCodigoActual = c;
   document.getElementById('modalTitulo').innerHTML = `<i class="fa-solid fa-pen mr-2"></i>Editar código: ${m.codigo}`;
   document.getElementById('modalHeader').className = 'bg-blue-600 px-5 py-3 flex items-center justify-between';
@@ -1230,8 +1287,8 @@ function calcularCantosPieza(p) {
   return ml;
 }
 function validar(alto, ancho, prof, espesor) {
-  if ([alto, ancho, prof].some(v => isNaN(v) || v <= 0)) { alert('Las dimensiones deben ser números mayores a cero.'); return false; }
-  if (ancho - (espesor * 2) <= 0) { alert('El ancho es menor o igual al espacio de los dos laterales.'); return false; }
+  if ([alto, ancho, prof].some(v => isNaN(v) || v <= 0)) { mostrarToast('Las dimensiones deben ser números mayores a cero.', 'danger'); return false; }
+  if (ancho - (espesor * 2) <= 0) { mostrarToast('El ancho es menor o igual al espacio de los dos laterales.', 'danger'); return false; }
   return true;
 }
 
@@ -1450,41 +1507,41 @@ function toggleCanto(muebleId, piezaId, borde) {
    EDICIÓN EN LÍNEA
    ============================================================ */
 function iniciarEdicionPrecioPatas(id) { editandoPrecioPatasId = id; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-patas-${id}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarPrecioPatas(id) { const i = document.getElementById(`edit-precio-patas-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioSetPatas = v; editandoPrecioPatasId = null; guardarProyecto(); renderizarMuebles(); }
+function guardarPrecioPatas(id) { const i = document.getElementById(`edit-precio-patas-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { mostrarToast('Precio inválido.', 'danger'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioSetPatas = v; editandoPrecioPatasId = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionPrecioPatas() { editandoPrecioPatasId = null; renderizarMuebles(); }
 function manejarKeyPrecioPatas(e, id) { if (e.key === 'Enter') { e.preventDefault(); guardarPrecioPatas(id); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPrecioPatas(); } }
 function iniciarEdicionPrecioCorredera(id) { editandoPrecioCorrederaId = id; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-corredera-${id}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarPrecioCorredera(id) { const i = document.getElementById(`edit-precio-corredera-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioCorredera = v; editandoPrecioCorrederaId = null; guardarProyecto(); renderizarMuebles(); }
+function guardarPrecioCorredera(id) { const i = document.getElementById(`edit-precio-corredera-${id}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { mostrarToast('Precio inválido.', 'danger'); return; } const m = muebles.find(x => x.id === id); if (m) m.precioCorredera = v; editandoPrecioCorrederaId = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionPrecioCorredera() { editandoPrecioCorrederaId = null; renderizarMuebles(); }
 function manejarKeyPrecioCorredera(e, id) { if (e.key === 'Enter') { e.preventDefault(); guardarPrecioCorredera(id); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPrecioCorredera(); } }
 
 function iniciarEdicionTornillo(muebleId, tipo) { editandoTornillo = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-tornillo-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarTornillo(muebleId, tipo) { const i = document.getElementById(`edit-precio-tornillo-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tornillos && m.tornillos[tipo]) m.tornillos[tipo].precio = v; editandoTornillo = null; guardarProyecto(); renderizarMuebles(); }
+function guardarTornillo(muebleId, tipo) { const i = document.getElementById(`edit-precio-tornillo-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { mostrarToast('Precio inválido.', 'danger'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tornillos && m.tornillos[tipo]) m.tornillos[tipo].precio = v; editandoTornillo = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionTornillo() { editandoTornillo = null; renderizarMuebles(); }
 function manejarKeyTornillo(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarTornillo(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionTornillo(); } }
 
 function iniciarEdicionBisagraRecta(muebleId) { editandoBisagraRecta = { muebleId }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-bisagrarecta-${muebleId}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarBisagraRecta(muebleId) { const i = document.getElementById(`edit-precio-bisagrarecta-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.bisagraRecta) m.bisagraRecta.precio = v; editandoBisagraRecta = null; guardarProyecto(); renderizarMuebles(); }
+function guardarBisagraRecta(muebleId) { const i = document.getElementById(`edit-precio-bisagrarecta-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { mostrarToast('Precio inválido.', 'danger'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.bisagraRecta) m.bisagraRecta.precio = v; editandoBisagraRecta = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionBisagraRecta() { editandoBisagraRecta = null; renderizarMuebles(); }
 function manejarKeyBisagraRecta(e, muebleId) { if (e.key === 'Enter') { e.preventDefault(); guardarBisagraRecta(muebleId); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionBisagraRecta(); } }
 
 function iniciarEdicionElevacion(muebleId, tipo) { editandoElevacion = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-elevacion-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarElevacion(muebleId, tipo) { const i = document.getElementById(`edit-precio-elevacion-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.elevacion && m.elevacion[tipo]) m.elevacion[tipo].precio = v; editandoElevacion = null; guardarProyecto(); renderizarMuebles(); }
+function guardarElevacion(muebleId, tipo) { const i = document.getElementById(`edit-precio-elevacion-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { mostrarToast('Precio inválido.', 'danger'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.elevacion && m.elevacion[tipo]) m.elevacion[tipo].precio = v; editandoElevacion = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionElevacion() { editandoElevacion = null; renderizarMuebles(); }
 function manejarKeyElevacion(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarElevacion(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionElevacion(); } }
 
 function iniciarEdicionPlatera(muebleId, tipo) { editandoPlatera = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-platera-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarPlatera(muebleId, tipo) { const i = document.getElementById(`edit-precio-platera-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.platera && m.platera[tipo]) m.platera[tipo].precio = v; editandoPlatera = null; guardarProyecto(); renderizarMuebles(); }
+function guardarPlatera(muebleId, tipo) { const i = document.getElementById(`edit-precio-platera-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { mostrarToast('Precio inválido.', 'danger'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.platera && m.platera[tipo]) m.platera[tipo].precio = v; editandoPlatera = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionPlatera() { editandoPlatera = null; renderizarMuebles(); }
 function manejarKeyPlatera(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarPlatera(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionPlatera(); } }
 
 function iniciarEdicionCondimentero(muebleId, tipo) { editandoCondimentero = { muebleId, tipo }; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-condimentero-${muebleId}-${tipo}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarCondimentero(muebleId, tipo) { const i = document.getElementById(`edit-precio-condimentero-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.condimentero && m.condimentero[tipo]) m.condimentero[tipo].precio = v; editandoCondimentero = null; guardarProyecto(); renderizarMuebles(); }
+function guardarCondimentero(muebleId, tipo) { const i = document.getElementById(`edit-precio-condimentero-${muebleId}-${tipo}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { mostrarToast('Precio inválido.', 'danger'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.condimentero && m.condimentero[tipo]) m.condimentero[tipo].precio = v; editandoCondimentero = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionCondimentero() { editandoCondimentero = null; renderizarMuebles(); }
 function manejarKeyCondimentero(e, muebleId, tipo) { if (e.key === 'Enter') { e.preventDefault(); guardarCondimentero(muebleId, tipo); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionCondimentero(); } }
 
 function iniciarEdicionTirador(muebleId) { editandoTiradorId = muebleId; renderizarMuebles(); setTimeout(() => { const i = document.getElementById(`edit-precio-tirador-${muebleId}`); if (i) { i.focus(); i.select(); } }, 50); }
-function guardarTirador(muebleId) { const i = document.getElementById(`edit-precio-tirador-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { alert('Precio inválido.'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tiradores) m.tiradores.precio = v; editandoTiradorId = null; guardarProyecto(); renderizarMuebles(); }
+function guardarTirador(muebleId) { const i = document.getElementById(`edit-precio-tirador-${muebleId}`); if (!i) return; const v = parseFloat(i.value); if (isNaN(v) || v < 0) { mostrarToast('Precio inválido.', 'danger'); return; } const m = muebles.find(x => x.id === muebleId); if (m && m.tiradores) m.tiradores.precio = v; editandoTiradorId = null; guardarProyecto(); renderizarMuebles(); }
 function cancelarEdicionTirador() { editandoTiradorId = null; renderizarMuebles(); }
 function manejarKeyTirador(e, muebleId) { if (e.key === 'Enter') { e.preventDefault(); guardarTirador(muebleId); } else if (e.key === 'Escape') { e.preventDefault(); cancelarEdicionTirador(); } }
 
@@ -1495,7 +1552,7 @@ function renderizarMuebles() {
   const cont = document.getElementById('listaMuebles');
   const contador = document.getElementById('contadorMuebles');
   if (muebles.length === 0) {
-    cont.innerHTML = `<p class="text-slate-500 text-center py-8"><i class="fa-solid fa-box-open text-3xl block mb-2 text-slate-300"></i>No hay muebles agregados todavía.</p>`;
+    cont.innerHTML = `<div class="ds-empty"><i class="fa-solid fa-box-open ds-empty-icon"></i><p class="ds-empty-title">No hay muebles agregados todavía</p><p class="ds-empty-desc">Agrega un mueble desde la pestaña Muebles para ver su despiece.</p></div>`;
     contador.textContent = '';
     document.getElementById('resumenPanel').classList.add('hidden');
     document.getElementById('costoPanel').classList.add('hidden');
@@ -1725,7 +1782,7 @@ function renderizarCantos() {
     });
   });
   
-  if (html === '') html = `<tr><td colspan="8" class="py-4 text-center text-slate-400 text-xs">No hay cantos seleccionados.</td></tr>`;
+  if (html === '') html = `<tr><td colspan="8" class="ds-empty-cell"><div class="ds-empty ds-empty-compact"><i class="fa-solid fa-ruler-combined ds-empty-icon"></i><p class="ds-empty-title">No hay cantos seleccionados</p></div></td></tr>`;
   cuerpo.innerHTML = html;
   
   document.getElementById('cantosTotalML').textContent = totalML.toFixed(3);
@@ -2064,6 +2121,7 @@ function editarMueble(id) {
   if (!m) return;
   editandoMuebleId = id;
   prefillFormulario(m);
+  if (typeof window.__dsRefrescarResumenes === 'function') window.__dsRefrescarResumenes();
   const btnTxt = document.getElementById('btnSubmitTexto');
   if (btnTxt) btnTxt.textContent = 'Guardar cambios';
   activarTab('muebles');
@@ -2098,14 +2156,14 @@ function limpiarTodo() {
    ============================================================ */
 function descargarCSV(n, c) { const b = new Blob(['\uFEFF' + c], {type:'text/csv;charset=utf-8;'}); const u = URL.createObjectURL(b); const a = document.createElement('a'); a.href = u; a.download = n; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(u); }
 function exportarCatalogo() {
-  if (BIBLIOTECA.length === 0) { alert('Catálogo vacío.'); return; }
+  if (BIBLIOTECA.length === 0) { mostrarToast('Catálogo vacío.', 'warning'); return; }
   const cab = ['Codigo','Descripcion','Nombre','Categoria','Tipo','Alto','Ancho','Prof','Precio','Caracteristicas'];
   const filas = BIBLIOTECA.map(m => [m.codigo, m.descripcion || '', m.nombre, m.categoria, m.tipo, m.altoBase, m.ancho || 600, m.profBase, m.precio, m.caracteristicas || '']);
   const csv = [cab, ...filas].map(r => r.map(v => { const s = String(v); return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }).join(';')).join('\n');
   descargarCSV('catalogo_muebles.csv', csv);
 }
 function exportarCSVResumen() {
-  if (muebles.length === 0) { alert('No hay muebles.'); return; }
+  if (muebles.length === 0) { mostrarToast('No hay muebles.', 'warning'); return; }
   const cab = ['Componente/Herraje','Cantidad total','Ancho (mm)','Alto (mm)','Material/Tipo','Muebles'];
   const filas = []; const grupos = new Map();
   muebles.forEach(m => {
@@ -2123,7 +2181,7 @@ function exportarCSVResumen() {
   descargarCSV('resumen_corte_herrajes.csv', csv);
 }
 function exportarCSVCompleto() {
-  if (muebles.length === 0) { alert('No hay muebles.'); return; }
+  if (muebles.length === 0) { mostrarToast('No hay muebles.', 'warning'); return; }
   const cab = ['Mueble','Descripción','Pieza/Herraje','Cantidad','Material/Tipo','Veta','Largo (mm)','Ancho (mm)','Área (m²)','Cantos','ML canto','Observaciones'];
   const filas = [];
   muebles.forEach(m => {
@@ -2144,7 +2202,7 @@ function exportarCSVCompleto() {
   descargarCSV('despiece_completo.csv', csv);
 }
 function exportarCSVCostos() {
-  if (muebles.length === 0) { alert('No hay muebles.'); return; }
+  if (muebles.length === 0) { mostrarToast('No hay muebles.', 'warning'); return; }
   const cfg = leerConfigTablero();
   const filas = [
     ['Largo tablero (mm)', cfg.largo], ['Ancho tablero (mm)', cfg.ancho],
@@ -2379,7 +2437,7 @@ function lineasParaPresupuesto() {
 }
 
 function pasarAPresupuesto() {
-  if (!muebles.length) { alert('No hay muebles para cotizar.'); return; }
+  if (!muebles.length) { mostrarToast('No hay muebles para cotizar.', 'warning'); return; }
   const cfg = leerConfigTablero();
   const titulo = muebles.length === 1
     ? (muebles[0].nombre || 'Mueble')
@@ -2444,13 +2502,48 @@ function pasarAPresupuesto() {
 
 </script>
 <script>
-/* Fase 3 · Grupos 1 y 2: plegado de .ds-acc y resúmenes inline ligeros.
-   Solo lee valores de inputs/checkboxes/selects; no usa MotorCalculo, ids nuevos ni localStorage. */
+/* Fase 3 · Grupos 1, 2 y 3: toasts (.ds-toast), plegado de .ds-acc, resúmenes inline
+   y estados vacíos por sección. Sin MotorCalculo, sin ids nuevos ni cambios en localStorage. */
+function mostrarToast(mensaje, tipo) {
+  var t = tipo || 'info';
+  var cont = document.querySelector('.ds-toast-container');
+  if (!cont) {
+    cont = document.createElement('div');
+    cont.className = 'ds-toast-container no-print';
+    cont.setAttribute('aria-live', 'polite');
+    cont.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(cont);
+  }
+  var toast = document.createElement('div');
+  toast.className = 'ds-toast ds-toast-' + t;
+  toast.setAttribute('role', 'status');
+  var span = document.createElement('span');
+  span.className = 'ds-toast-msg';
+  span.textContent = String(mensaje || '');
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'ds-toast-close';
+  btn.setAttribute('aria-label', 'Cerrar notificación');
+  btn.innerHTML = '&times;';
+  var timer = null;
+  function cerrar() {
+    if (timer) { clearTimeout(timer); timer = null; }
+    if (toast.parentNode) toast.parentNode.removeChild(toast);
+  }
+  btn.addEventListener('click', cerrar);
+  toast.appendChild(span);
+  toast.appendChild(btn);
+  cont.appendChild(toast);
+  var ms = t === 'danger' ? 5000 : (t === 'warning' ? 4000 : 3000);
+  timer = setTimeout(cerrar, ms);
+}
+
 (function () {
   function el(id) { return document.getElementById(id); }
   function val(id) { var e = el(id); return e ? String(e.value).trim() : ''; }
   function chk(id) { var e = el(id); return !!(e && e.checked); }
   function num(id, def) { var n = parseInt(val(id), 10); return isNaN(n) || n < 1 ? def : n; }
+
   var resumenes = {
     params: function () {
       var p = [];
@@ -2492,15 +2585,78 @@ function pasarAPresupuesto() {
       if (chk('incluirFinta')) p.push('Finta');
       if (chk('incluirRodapie')) p.push('Rodapié');
       return p.length ? p.join(' · ') : 'Sin terminaciones';
+    },
+    'bisagra-recta': function () {
+      if (!chk('incluirBisagraRecta')) return 'Sin bisagras extra';
+      var c = num('cantBisagraRecta', 1);
+      return 'Bisagra recta · ' + c + (c === 1 ? ' ud' : ' uds');
+    },
+    elevacion: function () {
+      var p = [];
+      if (chk('incluirAmortiguadorAutoelevable')) p.push('Amortiguador');
+      if (chk('incluirElevacionPuertaDoble')) p.push('Puerta doble');
+      if (chk('incluirElevacionPuertaSencilla')) p.push('Puerta sencilla');
+      return p.length ? p.join(' · ') : 'Sin elevación';
+    },
+    platera: function () {
+      var med = [];
+      ['60', '70', '80', '90'].forEach(function (m) { if (chk('incluirPlatera' + m)) med.push(m); });
+      return med.length ? ('Platera ' + med.join('+') + ' cm') : 'Sin platera';
+    },
+    condimenteros: function () {
+      var med = [];
+      ['15', '20', '30', '35', '40'].forEach(function (m) { if (chk('incluirCondimentero' + m)) med.push(m); });
+      return med.length ? ('Condimentero ' + med.join('+') + ' cm') : 'Sin condimenteros';
+    },
+    'patas-tornillos': function () {
+      var p = [];
+      if (chk('incluirPatas')) p.push('Patas (set 4)');
+      var t = [];
+      if (chk('incluirTornillo6x2')) t.push('6x2');
+      if (chk('incluirTornillo6x1_4')) t.push('6x1 1/4');
+      if (chk('incluirTornillo5_8x6')) t.push('5/8 x6');
+      if (t.length === 1) p.push('Torn. ' + t[0]);
+      else if (t.length > 1) p.push('Tornillos (' + t.length + ')');
+      return p.length ? p.join(' · ') : 'Sin patas ni tornillos';
     }
   };
+
+  function asegurarVacio(tabId, clave, icono, titulo, desc) {
+    var sec = el(tabId);
+    if (!sec) return null;
+    var box = sec.querySelector('[data-ds-empty="' + clave + '"]');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'ds-empty no-print';
+      box.setAttribute('data-ds-empty', clave);
+      box.innerHTML = '<i class="fa-solid ' + icono + ' ds-empty-icon"></i>' +
+        '<p class="ds-empty-title">' + titulo + '</p>' +
+        '<p class="ds-empty-desc">' + desc + '</p>';
+      sec.appendChild(box);
+    }
+    return box;
+  }
+
+  function actualizarVacios() {
+    var sinMuebles = !(typeof muebles !== 'undefined' && Array.isArray(muebles) && muebles.length > 0);
+    var eM = asegurarVacio('tab-muebles', 'muebles', 'fa-cube', 'Aún no hay muebles en este proyecto', 'Completa las medidas arriba y pulsa «Calcular y agregar mueble».');
+    if (eM) eM.hidden = !sinMuebles;
+    var eCo = asegurarVacio('tab-cortes', 'cortes', 'fa-scissors', 'Sin planos de corte todavía', 'Agrega al menos un mueble para calcular el aprovechamiento de láminas.');
+    if (eCo) eCo.hidden = !sinMuebles;
+    var eCs = asegurarVacio('tab-costos', 'costos', 'fa-calculator', 'Sin análisis de costos todavía', 'Agrega muebles al proyecto para ver el desglose de materiales, herrajes y totales.');
+    if (eCs) eCs.hidden = !sinMuebles;
+  }
+
   function refrescar() {
     document.querySelectorAll('[data-ds-summary]').forEach(function (node) {
       var f = resumenes[node.getAttribute('data-ds-summary')];
       if (f) { var t = f(); if (node.textContent !== t) node.textContent = t; }
     });
+    actualizarVacios();
   }
   function refrescarAsync() { setTimeout(refrescar, 0); }
+  window.__dsRefrescarResumenes = refrescar;
+
   document.addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('[data-ds-acc-toggle]') : null;
     if (b) {
