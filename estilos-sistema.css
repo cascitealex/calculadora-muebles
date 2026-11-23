@@ -830,3 +830,94 @@ body.ds-app .accordion-header.ds-acc-head {
   .ds-subblock-body { margin-left: 12px; }
 }
 }
+
+/* =====================================================================
+   FASE 3 · GRUPO 3 — Toasts sobre #barraResumen y estados vacíos (.ds-empty*)
+   Solo pantalla (no altera @media print).
+   ===================================================================== */
+@media screen {
+.ds-toast-container {
+  position: fixed;
+  right: 16px;
+  bottom: 76px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: calc(100vw - 32px);
+  pointer-events: none;
+}
+.ds-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 240px;
+  max-width: 380px;
+  padding: 10px 14px;
+  font: 500 .86rem/1.35 var(--font-sans);
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+.ds-toast-info    { background: var(--accent); }
+.ds-toast-success { background: var(--success); }
+.ds-toast-warning { background: var(--warning); }
+.ds-toast-danger  { background: var(--danger); }
+.ds-toast-msg { flex: 1; }
+.ds-toast-close {
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, .85);
+  font-size: 1.15rem;
+  line-height: 1;
+  padding: 2px 4px;
+  cursor: pointer;
+}
+.ds-toast-close:hover { color: #fff; }
+.ds-toast-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 3px; }
+
+/* Estados vacíos */
+.ds-empty {
+  text-align: center;
+  padding: 32px 20px;
+  margin-top: var(--space-3);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-secondary);
+}
+.ds-empty[hidden] { display: none; }
+.ds-empty-compact { padding: 18px 14px; margin-top: var(--space-2); }
+.ds-empty-icon {
+  display: block;
+  font-size: 1.6rem;
+  color: #9CA3AF;
+  margin-bottom: 8px;
+}
+.ds-empty-title {
+  margin: 0;
+  font: 600 .9rem/1.35 var(--font-sans);
+  color: var(--text-primary);
+}
+.ds-empty-desc {
+  margin: 4px auto 0;
+  max-width: 420px;
+  font: 400 .8rem/1.45 var(--font-sans);
+  color: var(--text-secondary);
+}
+.ds-empty-cell { padding: 12px !important; background: #fff !important; }
+.ds-empty-cell .ds-empty { margin-top: 0; }
+
+@media (max-width: 640px) {
+  .ds-toast-container {
+    left: 12px;
+    right: 12px;
+    bottom: 104px;
+    max-width: none;
+  }
+  .ds-toast { min-width: 0; max-width: none; width: 100%; }
+}
+}
