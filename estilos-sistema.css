@@ -793,3 +793,40 @@ body.ds-app .ds-unit-wrap input { padding-right: 3rem; }
   .ds-grid-colores { grid-template-columns: 1fr; }
 }
 }
+
+/* =====================================================================
+   FASE 3 · GRUPO 2 — Sub-bloques y responsive para Puertas/Gavetas,
+   Tiradores, Repisas y Terminaciones (solo pantalla, sin tocar @media print).
+   ===================================================================== */
+@media screen {
+.ds-subblocks > .ds-subblock + .ds-subblock {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--border);
+}
+.ds-check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+.ds-subblock-body {
+  margin-top: var(--space-2);
+  margin-left: 24px;
+}
+.ds-subblock-body > * + * { margin-top: var(--space-3); }
+.ds-price-box { min-width: 0; }
+body.ds-app .accordion-header.ds-acc-head {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 14px;
+  text-align: left;
+}
+@media (max-width: 1024px) {
+  .ds-grid-gavetas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+  .ds-grid-responsive, .ds-grid-gavetas { grid-template-columns: 1fr; }
+  .ds-subblock-body { margin-left: 12px; }
+}
+}
