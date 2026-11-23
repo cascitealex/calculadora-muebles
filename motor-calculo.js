@@ -121,8 +121,9 @@
     let numPuertas = 0, altoPuertaCalc = 0;
     if (o.incluirPuertas && o.cantPuertas > 0) {
       numPuertas = o.cantPuertas;
-      const anchoPuerta = ancho - DESC.PUERTA;
-      const altoPuerta = numPuertas === 1 ? (alto - DESC.PUERTA) : ((alto / numPuertas) - DESC.PUERTA);
+      // Medidas exactas de puertas: alto = altoLateral - 3 ; ancho = (ancho - 3*N)/N
+      const altoPuerta = alto - DESC.PUERTA;
+      const anchoPuerta = (ancho - (DESC.PUERTA * numPuertas)) / numPuertas;
       altoPuertaCalc = altoPuerta - reduccionAltura;
       piezas.push(P(numPuertas === 1 ? 'Puerta' : `Puerta (${numPuertas} uds.)`, numPuertas,
         `${baseMat} (${col.puerta})`, anchoPuerta, altoPuertaCalc,
