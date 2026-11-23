@@ -732,3 +732,64 @@ body.ds-app #modalAgregar label.flex input[type="number"] { width: 4rem; }
   body.ds-app .ds-titulo { font-size: 1.1rem; }
 }
 }
+
+/* =====================================================================
+   FASE 3 · GRUPO 1 — Formulario base + acordeones "Parámetros" y "Acabados"
+   Solo pantalla (no afecta @media print). Sin ids: se usan clases ds-* y data-*.
+   ===================================================================== */
+@media screen {
+.ds-form-section { margin-top: var(--space-4); }
+.ds-form-section:first-child { margin-top: 0; }
+.ds-form-finalizar > * + * { margin-top: var(--space-3); }
+.ds-section-title {
+  margin: 0 0 var(--space-2); font: 600 .72rem/1.3 var(--font-sans);
+  text-transform: uppercase; letter-spacing: .06em; color: var(--text-secondary);
+}
+.ds-unit-note { font-weight: 500; text-transform: none; letter-spacing: 0; font-family: var(--font-mono); color: var(--text-secondary); }
+.ds-grid { display: grid; gap: var(--space-3); }
+.ds-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ds-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ds-grid > div { min-width: 0; }
+
+/* Campo con unidad (mm, $, %, $/ML) */
+.ds-unit-wrap { position: relative; display: block; }
+body.ds-app .ds-unit-wrap input { padding-right: 3rem; }
+.ds-unit {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;
+  font: 500 .72rem/1 var(--font-mono); color: var(--text-secondary);
+}
+.ds-unit-wrap input[type="number"]::-webkit-outer-spin-button,
+.ds-unit-wrap input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ds-unit-wrap input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+/* Acordeón limpio con resumen inline */
+.ds-acc { margin-top: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+.ds-acc-head {
+  width: 100%; min-height: 44px; display: grid; grid-template-columns: 1fr auto; align-items: center;
+  column-gap: var(--space-2); row-gap: 2px; padding: 8px 14px; text-align: left; cursor: pointer;
+  background: var(--surface); border: 0; font-family: var(--font-sans); color: var(--text-primary);
+}
+.ds-acc-head:hover { background: var(--bg); }
+.ds-acc-title { font-size: .9rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.ds-acc-title i { color: var(--accent); }
+.ds-acc-chev { grid-row: 1; grid-column: 2; color: var(--text-secondary); transition: transform .2s; }
+.ds-acc-head[aria-expanded="true"] .ds-acc-chev { transform: rotate(180deg); }
+.ds-acc-summary {
+  grid-column: 1 / -1; font: 400 .72rem/1.4 var(--font-mono); font-variant-numeric: tabular-nums;
+  color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ds-acc-head[aria-expanded="true"] .ds-acc-summary { display: none; }
+.ds-acc-summary:empty { display: none; }
+.ds-acc-body { padding: 12px 14px 14px; border-top: 1px solid var(--border); }
+.ds-acc-body[hidden] { display: none; }
+.ds-group + .ds-group { margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px dashed var(--border); }
+.ds-group-title { margin: 0 0 var(--space-2); font: 600 .78rem/1.3 var(--font-sans); color: var(--text-primary); }
+.ds-hint { margin: 6px 0 0; font: 400 .72rem/1.4 var(--font-sans); color: var(--text-secondary); }
+
+@media (max-width: 420px) {
+  .ds-grid-3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .ds-grid-colores { grid-template-columns: 1fr; }
+}
+}
