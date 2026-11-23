@@ -70,7 +70,9 @@
   <header class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
       <h1 class="text-3xl font-bold text-slate-900">
-        <i class="fa-solid fa-calculator text-amber-600 mr-2"></i>Calculadora de Despiece + Catálogo
+        <a href="index.html" style="text-decoration:none; cursor:pointer;" class="text-slate-900 hover:text-amber-600">
+          <i class="fa-solid fa-calculator text-amber-600 mr-2"></i>Calculadora de Despiece + Catálogo
+        </a>
       </h1>
       <p class="text-slate-600 mt-1">Catálogo editable · Herrajes colapsables · Adicionales</p>
     </div>
@@ -269,9 +271,7 @@
                 </label>
                 <div id="panelPuertas" class="ml-6 space-y-3">
                   <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de puertas</label>
-                    <select id="cantPuertas" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                      <option value="1">1 puerta</option><option value="2" selected>2 puertas</option><option value="3">3 puertas</option><option value="4">4 puertas</option>
-                    </select></div>
+                    <input type="number" id="cantPuertas" value="1" min="1" max="10" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                 </div>
                 <label class="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" id="incluirGavetas" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
@@ -2306,6 +2306,93 @@ function montarTabs() {
 }
 
 montarTabs();
+
+
+/* ============================================================
+   FASE 9: transferencia a presupuesto, enter y botones
+   ============================================================ */
+function lineasParaPresupuesto() {
+  const cfg = leerConfigTablero();
+  const mapa = new Map();
+  muebles.forEach(m => {
+    MotorCalculo.lineasDesdeMueble(m, cfg, CATALOGOS_MOTOR).lineas.forEach(l => {
+      const esHerraje = /BISAGRA|CORREDERA|TIRADOR|PATAS/.test(l.desc);
+      const key = l.desc + '|' + l.precio;
+      if (mapa.has(key)) {
+        const x = mapa.get(key);
+        x.cant = Math.round((x.cant + l.cant) * 1000) / 1000;
+        x.total = Math.round((x.total + l.total) * 100) / 100;
+      } else {
+        mapa.set(key, { sec: esHerraje ? 'herraje' : 'madera', desc: l.desc, unidad: l.unidad, cant: l.cant, precio: l.precio, total: l.total });
+      }
+    });
+  });
+  return Array.from(mapa.values());
+}
+
+function pasarAPresupuesto() {
+  if (!muebles.length) { alert('No hay muebles para cotizar.'); return; }
+  const cfg = leerConfigTablero();
+  const titulo = muebles.length === 1
+    ? (muebles[0].nombre || 'Mueble')
+    : ('PROYECTO: ' + muebles.map(m => m.nombre).join(', '));
+  const payload = {
+    titulo: titulo,
+    manoPct: cfg.porcentajeManoObra,
+    adminPct: cfg.porcentajeGastosAdmin,
+    lineas: lineasParaPresupuesto()
+  };
+  try { localStorage.setItem('presupuesto_transferencia_v1', JSON.stringify(payload)); } catch (e) {}
+  try { window.location.href = 'presupuesto.html?desde=calculadora'; } catch (e) {}
+}
+
+(function montarBotonesPresupuesto() {
+  const barra = document.getElementById('barraResumen');
+  if (barra) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.style.cssText = 'flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;background:#fbbf24;color:#1e293b;border:0;border-radius:8px;font-weight:700;font-size:.8rem;cursor:pointer;';
+    b.innerHTML = '<i class="fa-solid fa-file-invoice-dollar"></i> Presupuesto';
+    b.addEventListener('click', e => { e.stopPropagation(); pasarAPresupuesto(); });
+    barra.appendChild(b);
+  }
+  const secCostos = document.getElementById('tab-costos');
+  if (secCostos) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.id = 'btnPasarPresupuesto';
+    b.style.cssText = 'display:inline-flex;align-items:center;gap:8px;margin:0 auto 16px;padding:12px 22px;background:#b45309;color:#fff;border:0;border-radius:12px;font-weight:700;font-size:.9rem;cursor:pointer;';
+    b.innerHTML = '<i class="fa-solid fa-file-invoice-dollar"></i> Pasar a Presupuesto';
+    b.addEventListener('click', pasarAPresupuesto);
+    secCostos.insertBefore(b, secCostos.firstChild);
+  }
+})();
+
+(function enterAvanzaCampo() {
+  const form = document.getElementById('muebleForm');
+  if (!form) return;
+  form.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const t = e.target;
+    if (!t || (t.tagName !== 'INPUT' && t.tagName !== 'SELECT')) return;
+    if (t.type === 'submit' || t.type === 'button') return;
+    e.preventDefault();
+    const campos = Array.from(form.querySelectorAll('input, select, textarea, button[type="submit"]'));
+    const visibles = campos.filter(c => {
+      if (c.type === 'hidden' || c.disabled) return false;
+      let el = c;
+      while (el && el !== form) {
+        if (el.hasAttribute('hidden')) return false;
+        if (el.className && typeof el.className === 'string' && String(el.className).split(/\s+/).indexOf('hidden') >= 0) return false;
+        el = el.parentElement;
+      }
+      return true;
+    });
+    const idx = visibles.indexOf(t);
+    const sig = visibles[idx + 1];
+    if (sig) sig.focus();
+  });
+})();
 
 </script>
 </body>
