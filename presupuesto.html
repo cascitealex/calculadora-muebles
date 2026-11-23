@@ -445,6 +445,21 @@ var campoFecha = document.getElementById('hFecha');
 var hoy = new Date();
 campoFecha.value = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
 
+
+// Fase 9: precarga automatica desde la calculadora
+(function () {
+  try {
+    var raw = localStorage.getItem('presupuesto_transferencia_v1');
+    if (!raw) return;
+    var t = JSON.parse(raw);
+    if (!t || !Array.isArray(t.lineas) || t.lineas.length === 0) return;
+    lineas = t.lineas.map(function (l) { return { sec: l.sec, desc: l.desc, unidad: l.unidad, cant: l.cant, precio: l.precio, total: l.total }; });
+    if (t.titulo) document.getElementById('hTitulo').value = t.titulo;
+    if (t.manoPct != null) document.getElementById('pctMano').value = t.manoPct;
+    if (t.adminPct != null) document.getElementById('pctAdmin').value = t.adminPct;
+    // F10: NO se elimina la clave para que F5 conserve la cotizacion transferida.
+  } catch (e) {}
+})();
 renderTablas();
 </script>
 </body>
