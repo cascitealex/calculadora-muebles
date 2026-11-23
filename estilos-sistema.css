@@ -1,0 +1,734 @@
+/* estilos-sistema.css — Sistema de diseño compartido (Fase 1)
+   Solo tokens + clases base con prefijo .ds-  (no altera elementos existentes).
+   Se enlaza ANTES de los <style> inline de cada página. */
+
+:root {
+  --bg: #F8F9FA;
+  --surface: #FFFFFF;
+  --border: #E5E7EB;
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --accent: #1E3A5F;
+  --success: #0F766E;
+  --warning: #B45309;
+  --danger: #B91C1C;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+
+  --radius: 8px;
+  --radius-sm: 6px;
+  --shadow-sm: 0 1px 2px rgba(17, 24, 39, .06);
+  --shadow-md: 0 4px 12px rgba(17, 24, 39, .10);
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-6: 24px;
+}
+
+/* Utilidades tipográficas */
+.ds-font { font-family: var(--font-sans); color: var(--text-primary); }
+.ds-num, .ds-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.ds-muted { color: var(--text-secondary); }
+
+/* Botones */
+.ds-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  padding: 8px 14px; font: 500 14px/1.2 var(--font-sans);
+  color: var(--text-primary); background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; transition: background .15s, border-color .15s, box-shadow .15s;
+}
+.ds-btn:hover { background: var(--bg); border-color: var(--text-secondary); }
+.ds-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ds-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ds-btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ds-btn-primary:hover { background: #172e4c; border-color: #172e4c; }
+.ds-btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+.ds-btn-danger  { background: var(--danger);  border-color: var(--danger);  color: #fff; }
+.ds-btn-ghost   { background: transparent; border-color: transparent; color: var(--text-secondary); }
+
+/* Inputs */
+.ds-input, .ds-select, .ds-textarea {
+  width: 100%; padding: 8px 10px; font: 400 14px/1.3 var(--font-sans);
+  color: var(--text-primary); background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  transition: border-color .15s, box-shadow .15s;
+}
+.ds-input.ds-num { font-family: var(--font-mono); }
+.ds-input:focus, .ds-select:focus, .ds-textarea:focus {
+  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(30, 58, 95, .15);
+}
+.ds-label { display: block; margin-bottom: 4px; font: 500 12px/1.3 var(--font-sans); color: var(--text-secondary); }
+
+/* Cards */
+.ds-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: var(--space-4);
+}
+.ds-card-title { margin: 0 0 var(--space-3); font: 600 15px/1.3 var(--font-sans); color: var(--text-primary); }
+
+/* Tabs */
+.ds-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); background: var(--surface); overflow-x: auto; }
+.ds-tab {
+  padding: 10px 16px; font: 500 14px/1.2 var(--font-sans); color: var(--text-secondary);
+  background: none; border: 0; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap;
+}
+.ds-tab:hover { color: var(--text-primary); }
+.ds-tab.active, .ds-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Tablas */
+.ds-table { width: 100%; border-collapse: collapse; font: 400 14px/1.4 var(--font-sans); background: var(--surface); }
+.ds-table th {
+  text-align: left; padding: 8px 10px; font: 600 12px/1.3 var(--font-sans);
+  text-transform: uppercase; letter-spacing: .04em; color: var(--text-secondary);
+  background: var(--bg); border-bottom: 1px solid var(--border);
+}
+.ds-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--text-primary); }
+.ds-table td.ds-num, .ds-table th.ds-num { text-align: right; }
+.ds-table tbody tr:hover { background: var(--bg); }
+
+/* Barra sticky */
+.ds-sticky-bar {
+  position: sticky; bottom: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+  padding: 10px var(--space-4); background: var(--surface);
+  border-top: 1px solid var(--border); box-shadow: 0 -2px 8px rgba(17, 24, 39, .06);
+}
+
+/* Toasts */
+.ds-toast-container { position: fixed; right: 16px; bottom: 16px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
+.ds-toast {
+  min-width: 220px; max-width: 360px; padding: 10px 14px;
+  font: 500 14px/1.3 var(--font-sans); color: #fff; background: var(--text-primary);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow-md);
+}
+.ds-toast-success { background: var(--success); }
+.ds-toast-warning { background: var(--warning); }
+.ds-toast-danger  { background: var(--danger); }
+
+/* Badges de estado */
+.ds-badge { display: inline-block; padding: 2px 8px; font: 500 12px/1.4 var(--font-sans); border-radius: 999px; border: 1px solid var(--border); }
+.ds-badge-success { color: var(--success); border-color: var(--success); }
+.ds-badge-warning { color: var(--warning); border-color: var(--warning); }
+.ds-badge-danger  { color: var(--danger);  border-color: var(--danger); }
+
+/* Impresión: solo oculta componentes ds-; no toca el layout A4 existente */
+@media print {
+  .ds-toast-container, .ds-sticky-bar, .ds-tabs { display: none !important; }
+  .ds-card { box-shadow: none; }
+}
+
+/* =====================================================================
+   FASE 2 — Identidad minimalista para calculadora.html
+   Todo va dentro de @media screen y bajo el scope  body.ds-app  para:
+   (a) ganar en especificidad a Tailwind CDN y a los <style> inyectados por JS,
+   (b) NO alterar la impresión (los <style media="print"> de la página siguen mandando).
+   ===================================================================== */
+
+/* Utilidades ds-* adicionales (aisladas de impresión) */
+.ds-stack > * + * { margin-top: var(--space-3); }
+.ds-row { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.ds-right { text-align: right; }
+.ds-nowrap { white-space: nowrap; }
+.ds-check { accent-color: var(--accent); width: 16px; height: 16px; }
+.ds-btn-sm { padding: 6px 10px; font-size: 13px; }
+.ds-titulo { margin: 0; font: 600 1.35rem/1.25 var(--font-sans); letter-spacing: -.01em; color: var(--accent); }
+.ds-titulo a { color: inherit; text-decoration: none; }
+.ds-titulo a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ds-subtitulo { margin: 4px 0 0; font: 400 .85rem/1.4 var(--font-sans); color: var(--text-secondary); }
+
+@media screen {
+body.ds-app { font-family: var(--font-sans); background: var(--bg); color: var(--text-primary); padding-bottom: 72px; }
+
+/* ---------- Tarjetas ---------- */
+body.ds-app .rounded-xl { border-radius: var(--radius); }
+body.ds-app .shadow-md, body.ds-app .shadow-sm { box-shadow: var(--shadow-sm); }
+body.ds-app .border-slate-200, body.ds-app .border-slate-100 { border-color: var(--border); }
+
+/* ---------- Paleta Tailwind -> tokens (excepto piezas del diagrama de cortes) ---------- */
+body.ds-app [class~="bg-amber-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-amber-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-amber-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-amber-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-amber-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-emerald-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-emerald-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-emerald-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-emerald-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-emerald-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-indigo-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-indigo-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-indigo-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-indigo-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-indigo-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-blue-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-blue-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-blue-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-blue-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-blue-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-sky-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-sky-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-sky-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-sky-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-sky-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-teal-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-teal-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-teal-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-teal-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-teal-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-rose-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-rose-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-rose-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-rose-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-rose-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-fuchsia-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-fuchsia-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-fuchsia-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-fuchsia-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-fuchsia-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-purple-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-purple-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-purple-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-purple-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-purple-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-cyan-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-cyan-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-cyan-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-cyan-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-cyan-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-lime-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-lime-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-lime-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-lime-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-lime-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-yellow-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-yellow-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-yellow-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-yellow-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-yellow-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-green-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-green-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-green-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-green-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-green-900"]:not(.pieza-corte),
+body.ds-app [class~="bg-violet-500"]:not(.pieza-corte),
+body.ds-app [class~="bg-violet-600"]:not(.pieza-corte),
+body.ds-app [class~="bg-violet-700"]:not(.pieza-corte),
+body.ds-app [class~="bg-violet-800"]:not(.pieza-corte),
+body.ds-app [class~="bg-violet-900"]:not(.pieza-corte) { background-color: var(--accent); }
+body.ds-app [class~="hover:bg-amber-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-amber-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-amber-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-emerald-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-emerald-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-emerald-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-indigo-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-indigo-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-indigo-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-blue-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-blue-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-blue-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-sky-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-sky-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-sky-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-teal-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-teal-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-teal-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-orange-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-orange-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-orange-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-rose-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-rose-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-rose-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-fuchsia-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-fuchsia-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-fuchsia-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-purple-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-purple-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-purple-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-cyan-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-cyan-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-cyan-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-lime-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-lime-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-lime-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-yellow-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-yellow-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-yellow-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-green-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-green-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-green-800"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-violet-600"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-violet-700"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-violet-800"]:hover:not(.pieza-corte) { background-color: #172E4C; }
+body.ds-app [class~="bg-amber-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-amber-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-amber-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-emerald-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-emerald-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-emerald-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-indigo-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-indigo-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-indigo-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-blue-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-blue-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-blue-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-sky-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-sky-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-sky-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-teal-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-teal-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-teal-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-rose-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-rose-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-rose-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-fuchsia-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-fuchsia-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-fuchsia-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-purple-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-purple-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-purple-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-cyan-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-cyan-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-cyan-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-lime-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-lime-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-lime-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-yellow-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-yellow-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-yellow-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-green-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-green-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-green-200"]:not(.pieza-corte),
+body.ds-app [class~="bg-violet-50"]:not(.pieza-corte),
+body.ds-app [class~="bg-violet-100"]:not(.pieza-corte),
+body.ds-app [class~="bg-violet-200"]:not(.pieza-corte) { background-color: var(--bg); }
+body.ds-app [class~="bg-amber-50/40"]:not(.pieza-corte),
+body.ds-app [class~="bg-amber-50/50"]:not(.pieza-corte),
+body.ds-app [class~="bg-orange-50/40"]:not(.pieza-corte) { background-color: rgba(180, 83, 9, .06); }
+body.ds-app [class~="hover:bg-amber-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-amber-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-amber-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-emerald-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-emerald-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-emerald-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-indigo-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-indigo-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-indigo-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-blue-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-blue-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-blue-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-sky-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-sky-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-sky-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-teal-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-teal-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-teal-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-orange-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-orange-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-orange-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-rose-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-rose-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-rose-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-fuchsia-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-fuchsia-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-fuchsia-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-purple-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-purple-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-purple-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-cyan-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-cyan-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-cyan-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-lime-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-lime-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-lime-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-yellow-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-yellow-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-yellow-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-green-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-green-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-green-200"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-violet-50"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-violet-100"]:hover:not(.pieza-corte),
+body.ds-app [class~="hover:bg-violet-200"]:hover:not(.pieza-corte) { background-color: #EEF1F4; }
+body.ds-app [class~="bg-red-500"], body.ds-app [class~="bg-red-600"] { background-color: var(--danger); }
+body.ds-app [class~="hover:bg-red-600"]:hover { background-color: #991B1B; }
+body.ds-app [class~="border-amber-100"],
+body.ds-app [class~="border-amber-200"],
+body.ds-app [class~="border-amber-300"],
+body.ds-app [class~="border-amber-400"],
+body.ds-app [class~="border-emerald-100"],
+body.ds-app [class~="border-emerald-200"],
+body.ds-app [class~="border-emerald-300"],
+body.ds-app [class~="border-emerald-400"],
+body.ds-app [class~="border-indigo-100"],
+body.ds-app [class~="border-indigo-200"],
+body.ds-app [class~="border-indigo-300"],
+body.ds-app [class~="border-indigo-400"],
+body.ds-app [class~="border-blue-100"],
+body.ds-app [class~="border-blue-200"],
+body.ds-app [class~="border-blue-300"],
+body.ds-app [class~="border-blue-400"],
+body.ds-app [class~="border-sky-100"],
+body.ds-app [class~="border-sky-200"],
+body.ds-app [class~="border-sky-300"],
+body.ds-app [class~="border-sky-400"],
+body.ds-app [class~="border-teal-100"],
+body.ds-app [class~="border-teal-200"],
+body.ds-app [class~="border-teal-300"],
+body.ds-app [class~="border-teal-400"],
+body.ds-app [class~="border-orange-100"],
+body.ds-app [class~="border-orange-200"],
+body.ds-app [class~="border-orange-300"],
+body.ds-app [class~="border-orange-400"],
+body.ds-app [class~="border-rose-100"],
+body.ds-app [class~="border-rose-200"],
+body.ds-app [class~="border-rose-300"],
+body.ds-app [class~="border-rose-400"],
+body.ds-app [class~="border-fuchsia-100"],
+body.ds-app [class~="border-fuchsia-200"],
+body.ds-app [class~="border-fuchsia-300"],
+body.ds-app [class~="border-fuchsia-400"],
+body.ds-app [class~="border-purple-100"],
+body.ds-app [class~="border-purple-200"],
+body.ds-app [class~="border-purple-300"],
+body.ds-app [class~="border-purple-400"],
+body.ds-app [class~="border-cyan-100"],
+body.ds-app [class~="border-cyan-200"],
+body.ds-app [class~="border-cyan-300"],
+body.ds-app [class~="border-cyan-400"],
+body.ds-app [class~="border-lime-100"],
+body.ds-app [class~="border-lime-200"],
+body.ds-app [class~="border-lime-300"],
+body.ds-app [class~="border-lime-400"],
+body.ds-app [class~="border-yellow-100"],
+body.ds-app [class~="border-yellow-200"],
+body.ds-app [class~="border-yellow-300"],
+body.ds-app [class~="border-yellow-400"],
+body.ds-app [class~="border-green-100"],
+body.ds-app [class~="border-green-200"],
+body.ds-app [class~="border-green-300"],
+body.ds-app [class~="border-green-400"],
+body.ds-app [class~="border-violet-100"],
+body.ds-app [class~="border-violet-200"],
+body.ds-app [class~="border-violet-300"],
+body.ds-app [class~="border-violet-400"] { border-color: var(--border); }
+body.ds-app [class~="text-emerald-500"],
+body.ds-app [class~="text-emerald-600"],
+body.ds-app [class~="text-emerald-700"],
+body.ds-app [class~="text-emerald-800"],
+body.ds-app [class~="text-emerald-900"],
+body.ds-app [class~="text-green-500"],
+body.ds-app [class~="text-green-600"],
+body.ds-app [class~="text-green-700"],
+body.ds-app [class~="text-green-800"],
+body.ds-app [class~="text-green-900"] { color: var(--success); }
+body.ds-app [class~="text-amber-500"],
+body.ds-app [class~="text-amber-600"],
+body.ds-app [class~="text-amber-700"],
+body.ds-app [class~="text-amber-800"],
+body.ds-app [class~="text-amber-900"],
+body.ds-app [class~="text-orange-500"],
+body.ds-app [class~="text-orange-600"],
+body.ds-app [class~="text-orange-700"],
+body.ds-app [class~="text-orange-800"],
+body.ds-app [class~="text-orange-900"],
+body.ds-app [class~="text-yellow-500"],
+body.ds-app [class~="text-yellow-600"],
+body.ds-app [class~="text-yellow-700"],
+body.ds-app [class~="text-yellow-800"],
+body.ds-app [class~="text-yellow-900"] { color: var(--warning); }
+body.ds-app [class~="text-indigo-500"],
+body.ds-app [class~="text-indigo-600"],
+body.ds-app [class~="text-indigo-700"],
+body.ds-app [class~="text-indigo-800"],
+body.ds-app [class~="text-indigo-900"],
+body.ds-app [class~="text-blue-500"],
+body.ds-app [class~="text-blue-600"],
+body.ds-app [class~="text-blue-700"],
+body.ds-app [class~="text-blue-800"],
+body.ds-app [class~="text-blue-900"],
+body.ds-app [class~="text-sky-500"],
+body.ds-app [class~="text-sky-600"],
+body.ds-app [class~="text-sky-700"],
+body.ds-app [class~="text-sky-800"],
+body.ds-app [class~="text-sky-900"],
+body.ds-app [class~="text-teal-500"],
+body.ds-app [class~="text-teal-600"],
+body.ds-app [class~="text-teal-700"],
+body.ds-app [class~="text-teal-800"],
+body.ds-app [class~="text-teal-900"],
+body.ds-app [class~="text-cyan-500"],
+body.ds-app [class~="text-cyan-600"],
+body.ds-app [class~="text-cyan-700"],
+body.ds-app [class~="text-cyan-800"],
+body.ds-app [class~="text-cyan-900"],
+body.ds-app [class~="text-fuchsia-500"],
+body.ds-app [class~="text-fuchsia-600"],
+body.ds-app [class~="text-fuchsia-700"],
+body.ds-app [class~="text-fuchsia-800"],
+body.ds-app [class~="text-fuchsia-900"],
+body.ds-app [class~="text-purple-500"],
+body.ds-app [class~="text-purple-600"],
+body.ds-app [class~="text-purple-700"],
+body.ds-app [class~="text-purple-800"],
+body.ds-app [class~="text-purple-900"],
+body.ds-app [class~="text-lime-500"],
+body.ds-app [class~="text-lime-600"],
+body.ds-app [class~="text-lime-700"],
+body.ds-app [class~="text-lime-800"],
+body.ds-app [class~="text-lime-900"],
+body.ds-app [class~="text-violet-500"],
+body.ds-app [class~="text-violet-600"],
+body.ds-app [class~="text-violet-700"],
+body.ds-app [class~="text-violet-800"],
+body.ds-app [class~="text-violet-900"],
+body.ds-app [class~="text-rose-500"],
+body.ds-app [class~="text-rose-600"],
+body.ds-app [class~="text-rose-700"],
+body.ds-app [class~="text-rose-800"],
+body.ds-app [class~="text-rose-900"] { color: var(--accent); }
+body.ds-app [class~="text-amber-200"],
+body.ds-app [class~="text-amber-300"],
+body.ds-app [class~="text-amber-400"],
+body.ds-app [class~="text-emerald-200"],
+body.ds-app [class~="text-emerald-300"],
+body.ds-app [class~="text-emerald-400"],
+body.ds-app [class~="text-indigo-200"],
+body.ds-app [class~="text-indigo-300"],
+body.ds-app [class~="text-indigo-400"],
+body.ds-app [class~="text-blue-200"],
+body.ds-app [class~="text-blue-300"],
+body.ds-app [class~="text-blue-400"],
+body.ds-app [class~="text-sky-200"],
+body.ds-app [class~="text-sky-300"],
+body.ds-app [class~="text-sky-400"],
+body.ds-app [class~="text-teal-200"],
+body.ds-app [class~="text-teal-300"],
+body.ds-app [class~="text-teal-400"],
+body.ds-app [class~="text-orange-200"],
+body.ds-app [class~="text-orange-300"],
+body.ds-app [class~="text-orange-400"],
+body.ds-app [class~="text-rose-200"],
+body.ds-app [class~="text-rose-300"],
+body.ds-app [class~="text-rose-400"],
+body.ds-app [class~="text-fuchsia-200"],
+body.ds-app [class~="text-fuchsia-300"],
+body.ds-app [class~="text-fuchsia-400"],
+body.ds-app [class~="text-purple-200"],
+body.ds-app [class~="text-purple-300"],
+body.ds-app [class~="text-purple-400"],
+body.ds-app [class~="text-cyan-200"],
+body.ds-app [class~="text-cyan-300"],
+body.ds-app [class~="text-cyan-400"],
+body.ds-app [class~="text-lime-200"],
+body.ds-app [class~="text-lime-300"],
+body.ds-app [class~="text-lime-400"],
+body.ds-app [class~="text-yellow-200"],
+body.ds-app [class~="text-yellow-300"],
+body.ds-app [class~="text-yellow-400"],
+body.ds-app [class~="text-green-200"],
+body.ds-app [class~="text-green-300"],
+body.ds-app [class~="text-green-400"],
+body.ds-app [class~="text-violet-200"],
+body.ds-app [class~="text-violet-300"],
+body.ds-app [class~="text-violet-400"] { color: var(--text-secondary); }
+body.ds-app [class~="text-red-400"],
+body.ds-app [class~="text-red-500"],
+body.ds-app [class~="text-red-600"],
+body.ds-app [class~="text-red-700"] { color: var(--danger); }
+body.ds-app [class~="hover:text-amber-200"]:hover,
+body.ds-app [class~="hover:text-amber-300"]:hover,
+body.ds-app [class~="hover:text-amber-600"]:hover,
+body.ds-app [class~="hover:text-amber-700"]:hover,
+body.ds-app [class~="hover:text-emerald-200"]:hover,
+body.ds-app [class~="hover:text-emerald-300"]:hover,
+body.ds-app [class~="hover:text-emerald-600"]:hover,
+body.ds-app [class~="hover:text-emerald-700"]:hover,
+body.ds-app [class~="hover:text-indigo-200"]:hover,
+body.ds-app [class~="hover:text-indigo-300"]:hover,
+body.ds-app [class~="hover:text-indigo-600"]:hover,
+body.ds-app [class~="hover:text-indigo-700"]:hover,
+body.ds-app [class~="hover:text-blue-200"]:hover,
+body.ds-app [class~="hover:text-blue-300"]:hover,
+body.ds-app [class~="hover:text-blue-600"]:hover,
+body.ds-app [class~="hover:text-blue-700"]:hover,
+body.ds-app [class~="hover:text-sky-200"]:hover,
+body.ds-app [class~="hover:text-sky-300"]:hover,
+body.ds-app [class~="hover:text-sky-600"]:hover,
+body.ds-app [class~="hover:text-sky-700"]:hover,
+body.ds-app [class~="hover:text-teal-200"]:hover,
+body.ds-app [class~="hover:text-teal-300"]:hover,
+body.ds-app [class~="hover:text-teal-600"]:hover,
+body.ds-app [class~="hover:text-teal-700"]:hover,
+body.ds-app [class~="hover:text-orange-200"]:hover,
+body.ds-app [class~="hover:text-orange-300"]:hover,
+body.ds-app [class~="hover:text-orange-600"]:hover,
+body.ds-app [class~="hover:text-orange-700"]:hover,
+body.ds-app [class~="hover:text-rose-200"]:hover,
+body.ds-app [class~="hover:text-rose-300"]:hover,
+body.ds-app [class~="hover:text-rose-600"]:hover,
+body.ds-app [class~="hover:text-rose-700"]:hover,
+body.ds-app [class~="hover:text-fuchsia-200"]:hover,
+body.ds-app [class~="hover:text-fuchsia-300"]:hover,
+body.ds-app [class~="hover:text-fuchsia-600"]:hover,
+body.ds-app [class~="hover:text-fuchsia-700"]:hover,
+body.ds-app [class~="hover:text-purple-200"]:hover,
+body.ds-app [class~="hover:text-purple-300"]:hover,
+body.ds-app [class~="hover:text-purple-600"]:hover,
+body.ds-app [class~="hover:text-purple-700"]:hover,
+body.ds-app [class~="hover:text-cyan-200"]:hover,
+body.ds-app [class~="hover:text-cyan-300"]:hover,
+body.ds-app [class~="hover:text-cyan-600"]:hover,
+body.ds-app [class~="hover:text-cyan-700"]:hover,
+body.ds-app [class~="hover:text-lime-200"]:hover,
+body.ds-app [class~="hover:text-lime-300"]:hover,
+body.ds-app [class~="hover:text-lime-600"]:hover,
+body.ds-app [class~="hover:text-lime-700"]:hover,
+body.ds-app [class~="hover:text-yellow-200"]:hover,
+body.ds-app [class~="hover:text-yellow-300"]:hover,
+body.ds-app [class~="hover:text-yellow-600"]:hover,
+body.ds-app [class~="hover:text-yellow-700"]:hover,
+body.ds-app [class~="hover:text-green-200"]:hover,
+body.ds-app [class~="hover:text-green-300"]:hover,
+body.ds-app [class~="hover:text-green-600"]:hover,
+body.ds-app [class~="hover:text-green-700"]:hover,
+body.ds-app [class~="hover:text-violet-200"]:hover,
+body.ds-app [class~="hover:text-violet-300"]:hover,
+body.ds-app [class~="hover:text-violet-600"]:hover,
+body.ds-app [class~="hover:text-violet-700"]:hover { color: var(--accent); }
+body.ds-app [class~="hover:text-red-400"]:hover, body.ds-app [class~="hover:text-red-600"]:hover { color: var(--danger); }
+body.ds-app [class~="text-white"] { color: #fff; }
+body.ds-app i.fa-solid[class*="text-"]:not(.text-white):not(.text-slate-300):not(.text-slate-400) { color: var(--accent); }
+
+/* Degradados: eliminados */
+body.ds-app .bg-gradient-to-r { background-image: none !important; background-color: var(--bg) !important; border: 1px solid var(--border); border-left: 3px solid var(--accent); }
+body.ds-app .bg-gradient-to-r .text-white { color: var(--text-primary) !important; }
+body.ds-app .bg-gradient-to-r i { color: var(--accent) !important; }
+body.ds-app .bg-gradient-to-br { background-image: none !important; background-color: var(--bg) !important; border: 1px solid var(--border) !important; }
+
+/* ---------- Encabezado ---------- */
+body.ds-app header { padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+
+/* ---------- Inputs / selects / checkboxes ---------- */
+body.ds-app input[type="text"], body.ds-app input[type="number"], body.ds-app select, body.ds-app textarea {
+  border-color: #D1D5DB; border-radius: var(--radius-sm); background-color: #fff;
+  color: var(--text-primary); font-family: var(--font-sans);
+}
+body.ds-app input[type="number"] { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+body.ds-app input:focus, body.ds-app select:focus, body.ds-app textarea:focus {
+  outline: none !important; border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, .15) !important;
+}
+body.ds-app input[type="checkbox"] { accent-color: var(--accent); }
+body.ds-app #codigoMueble { font-family: var(--font-mono); font-weight: 600; color: var(--accent); }
+body.ds-app label.block { color: var(--text-secondary); }
+body.ds-app button:focus-visible, body.ds-app .accordion-header:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.ds-app .accordion-header:hover { filter: none; }
+
+/* Cabeceras de paneles de resultados: sobrias, sin bloques de color */
+body.ds-app :is(#cantosPanel,#costoPanel,#resumenPanel,#cortesPanel) > div:first-child { background: #fff !important; border-bottom: 1px solid var(--border); }
+body.ds-app :is(#cantosPanel,#costoPanel,#resumenPanel,#cortesPanel) > div:first-child h2 { color: var(--text-primary) !important; font-size: 1rem; font-weight: 600; }
+body.ds-app :is(#cantosPanel,#costoPanel,#resumenPanel,#cortesPanel) > div:first-child h2 i { color: var(--accent) !important; }
+body.ds-app :is(#cantosPanel,#costoPanel,#resumenPanel,#cortesPanel) > div:first-child span { color: var(--text-secondary) !important; }
+
+/* ---------- Tarjetas de mueble (render JS) ---------- */
+body.ds-app .card-mueble > .bg-gradient-to-r { border: 0; border-bottom: 1px solid var(--border); border-left: 3px solid var(--accent); }
+body.ds-app .card-mueble > .bg-gradient-to-r h3 { color: var(--text-primary) !important; font-weight: 600; }
+body.ds-app .card-mueble > .bg-gradient-to-r .rounded-full { background: #fff !important; color: var(--text-secondary) !important; border: 1px solid var(--border); font-weight: 500; }
+body.ds-app .card-mueble > .bg-gradient-to-r .rounded-full button { color: var(--text-secondary) !important; }
+body.ds-app .card-mueble > .bg-gradient-to-r button.p-1 { color: var(--text-secondary) !important; }
+body.ds-app .card-mueble > .bg-gradient-to-r button.p-1:hover { color: var(--accent) !important; }
+body.ds-app .card-mueble > .bg-gradient-to-r button.p-1:last-child:hover { color: var(--danger) !important; }
+body.ds-app .card-mueble > .bg-gradient-to-r p { color: var(--text-secondary) !important; }
+body.ds-app .canto-badge { border-radius: 4px; }
+
+/* ---------- Tablas ---------- */
+body.ds-app table { border-collapse: collapse; }
+body.ds-app thead { background: var(--bg) !important; color: var(--text-secondary) !important; }
+body.ds-app thead th {
+  padding: 10px 12px !important; font-size: .68rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .04em; border-bottom: 1px solid var(--border);
+}
+body.ds-app tbody td { padding-top: .6rem; padding-bottom: .6rem; color: var(--text-primary); }
+body.ds-app tbody tr:hover { background-color: var(--bg); }
+body.ds-app tfoot { background: var(--bg) !important; border-top: 1px solid var(--border); }
+body.ds-app td.text-right, body.ds-app td.text-center, body.ds-app td.font-mono, body.ds-app .font-mono, body.ds-app tfoot td[id] {
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1;
+}
+body.ds-app #costoPanel table th, body.ds-app #costoPanel table td { white-space: nowrap; }
+body.ds-app #costoPanel p.font-bold { font-family: var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text-primary); }
+body.ds-app #costoPanel #costoTotal { color: var(--success); }
+body.ds-app #costoTotalGeneral, body.ds-app #cantosTotalCosto { color: var(--accent); font-weight: 700; }
+
+/* Diagrama de cortes */
+body.ds-app .tablero-corte { box-shadow: none; border: 1px solid #9CA3AF; border-radius: var(--radius-sm); background-color: #fff; }
+body.ds-app .pieza-corte { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- Pestañas (JS inyecta sus estilos después; subimos especificidad) ---------- */
+body.ds-app nav.tabnav { background: #fff; border-bottom: 1px solid var(--border); padding: 0 12px; gap: 0; scrollbar-width: thin; }
+body.ds-app nav.tabnav button {
+  font-family: var(--font-sans); font-size: .88rem; font-weight: 500; color: var(--text-secondary);
+  padding: 12px 16px; min-height: 44px; border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+body.ds-app nav.tabnav button:hover { color: var(--text-primary); }
+body.ds-app nav.tabnav button.tab-activo, body.ds-app nav.tabnav button[aria-selected="true"] {
+  color: var(--accent); border-bottom-color: var(--accent); font-weight: 600;
+}
+body.ds-app nav.tabnav button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+body.ds-app .cortes-config { border-radius: var(--radius); border-color: var(--border); }
+body.ds-app .cortes-config-titulo { color: var(--text-primary); font-weight: 600; }
+
+/* ---------- Barra sticky #barraResumen ---------- */
+body.ds-app .tabs-contenido { padding-bottom: 150px; }
+body.ds-app #barraResumen.sticky-summary {
+  background: #fff; color: var(--text-primary); border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 8px rgba(17, 24, 39, .06); padding: 8px 16px; gap: 8px 22px; justify-content: center;
+}
+body.ds-app #barraResumen b { color: var(--text-secondary); font-weight: 500; font-size: .64rem; }
+body.ds-app #barraResumen .ss-item span:last-child {
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 1rem; font-weight: 600; color: var(--text-primary);
+}
+body.ds-app #barraResumen .ss-costo span:last-child { color: var(--accent); }
+body.ds-app #barraResumen button {
+  background: var(--accent) !important; color: #fff !important; border-radius: var(--radius-sm) !important;
+  padding: 7px 12px !important; font-size: .8rem !important; font-weight: 500 !important; font-family: var(--font-sans);
+}
+body.ds-app #btnPasarPresupuesto {
+  background: var(--accent) !important; border-radius: var(--radius-sm) !important; font-weight: 500 !important;
+  padding: 10px 18px !important; font-size: .88rem !important; font-family: var(--font-sans);
+}
+
+/* ---------- Modal (catálogo) ---------- */
+body.ds-app #modalAgregar { background-color: rgba(17, 24, 39, .45); }
+body.ds-app #modalAgregar > div { border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border); }
+body.ds-app #modalHeader { background: #fff !important; border-bottom: 1px solid var(--border); }
+body.ds-app #modalHeader * { color: var(--text-primary) !important; }
+body.ds-app #modalHeader h3 { font-size: 1rem; font-weight: 600; }
+body.ds-app #modalHeader h3 i { color: var(--accent) !important; }
+body.ds-app #modalAgregar .grid > div { min-width: 0; }
+body.ds-app #modalAgregar input[type="number"] { width: 100%; }
+body.ds-app #modalAgregar label.flex input[type="number"] { width: 4rem; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1024px) {
+  body.ds-app .tabs-contenido { padding-left: 4px; padding-right: 4px; }
+}
+@media (max-width: 640px) {
+  body.ds-app .tabs-contenido { padding-bottom: 190px; }
+  body.ds-app nav.tabnav button { padding: 12px 12px; font-size: .82rem; }
+  body.ds-app #barraResumen.sticky-summary { padding: 6px 10px; gap: 4px 12px; }
+  body.ds-app .ds-titulo { font-size: 1.1rem; }
+}
+}
