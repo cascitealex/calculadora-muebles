@@ -278,54 +278,62 @@
 
           <!-- Puertas y Gavetas -->
           <div class="mb-3 border border-slate-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-2 text-left transition"
-                    data-target="acc-puertas-gavetas" aria-expanded="true" aria-controls="acc-puertas-gavetas"
+            <button type="button" class="accordion-header ds-acc-head bg-slate-100 hover:bg-slate-200 transition"
+                    data-target="acc-puertas-gavetas" data-default="open" aria-expanded="true" aria-controls="acc-puertas-gavetas"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-slate-800">
+              <span class="ds-acc-title text-sm font-bold text-slate-800">
                 <i class="fa-solid fa-door-closed text-indigo-600"></i> Puertas y Gavetas
               </span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-slate-500"></i>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-slate-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="puertas-gavetas"></span>
             </button>
             <div id="acc-puertas-gavetas" class="accordion-body is-open px-3">
-              <div class="space-y-3 py-2">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirPuertas" checked class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
-                  <span class="text-sm font-medium text-slate-700">Incluir puertas (con bisagras automáticas)</span>
-                </label>
-                <div id="panelPuertas" class="ml-6 space-y-3">
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de puertas</label>
-                    <input type="number" id="cantPuertas" value="1" min="1" max="10" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
-                </div>
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirGavetas" class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
-                  <span class="text-sm font-medium text-slate-700">Incluir gavetas</span>
-                </label>
-                <div id="panelGavetas" class="ml-6 space-y-3 hidden">
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">N° de gavetas</label>
-                    <input type="number" id="cantGavetas" value="2" min="1" max="10" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Prof. gaveta (mm)</label>
-                      <input type="number" id="profGaveta" value="500" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto caja (mm)</label>
-                      <input type="number" id="altoGaveta" value="150" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+              <div class="ds-subblocks py-2">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer">
+                    <input type="checkbox" id="incluirPuertas" checked class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                    <span class="text-sm font-medium text-slate-700">Incluir puertas (con bisagras automáticas)</span>
+                  </label>
+                  <div id="panelPuertas" class="ds-subblock-body">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de puertas</label>
+                        <span class="ds-unit-wrap"><input type="number" id="cantPuertas" value="1" min="1" max="10" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"><span class="ds-unit">uds</span></span></div>
+                    </div>
                   </div>
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Tipo de corredera</label>
-                    <select id="tipoCorredera" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                      <option value="telescopica" selected>Telescópica estándar (25 mm)</option>
-                      <option value="oculta">Oculta genérica (10 mm)</option>
-                      <option value="ocultaBlum">Oculta Blum / Push (despiece especial)</option>
-                    </select></div>
-                  <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2">
-                    <p class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-dollar-sign text-emerald-600"></i> Precio de la corredera</p>
-                    <div id="precioCorrederaTelescopicaWrap">
-                      <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par telescópica ($)</label>
-                      <input type="number" id="precioCorrederaTelescopica" value="2.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
-                    <div id="precioCorrederaOcultaWrap" class="hidden">
-                      <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par oculta genérica ($)</label>
-                      <input type="number" id="precioCorrederaOculta" value="3.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
-                    <div id="precioCorrederaBlumWrap" class="hidden">
-                      <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par oculta Blum / Push ($)</label>
-                      <input type="number" id="precioCorrederaBlum" value="8.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                </div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer">
+                    <input type="checkbox" id="incluirGavetas" class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                    <span class="text-sm font-medium text-slate-700">Incluir gavetas</span>
+                  </label>
+                  <div id="panelGavetas" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-3 ds-grid-gavetas">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">N° de gavetas</label>
+                        <span class="ds-unit-wrap"><input type="number" id="cantGavetas" value="2" min="1" max="10" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"><span class="ds-unit">uds</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Prof. gaveta</label>
+                        <span class="ds-unit-wrap"><input type="number" id="profGaveta" value="500" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"><span class="ds-unit">mm</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto caja</label>
+                        <span class="ds-unit-wrap"><input type="number" id="altoGaveta" value="150" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"><span class="ds-unit">mm</span></span></div>
+                    </div>
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Tipo de corredera</label>
+                        <select id="tipoCorredera" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                          <option value="telescopica" selected>Telescópica estándar (25 mm)</option>
+                          <option value="oculta">Oculta genérica (10 mm)</option>
+                          <option value="ocultaBlum">Oculta Blum / Push (despiece especial)</option>
+                        </select></div>
+                      <div class="ds-price-box">
+                        <div id="precioCorrederaTelescopicaWrap">
+                          <label class="block text-xs font-medium text-slate-600 mb-1">Par telescópica</label>
+                          <span class="ds-unit-wrap"><input type="number" id="precioCorrederaTelescopica" value="2.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"><span class="ds-unit">$</span></span></div>
+                        <div id="precioCorrederaOcultaWrap" class="hidden">
+                          <label class="block text-xs font-medium text-slate-600 mb-1">Par oculta genérica</label>
+                          <span class="ds-unit-wrap"><input type="number" id="precioCorrederaOculta" value="3.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"><span class="ds-unit">$</span></span></div>
+                        <div id="precioCorrederaBlumWrap" class="hidden">
+                          <label class="block text-xs font-medium text-slate-600 mb-1">Par oculta Blum / Push</label>
+                          <span class="ds-unit-wrap"><input type="number" id="precioCorrederaBlum" value="8.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"><span class="ds-unit">$</span></span></div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -334,61 +342,65 @@
 
           <!-- TIRADORES -->
           <div class="mb-3 border border-teal-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-teal-50 hover:bg-teal-100 px-3 py-2 text-left transition"
+            <button type="button" class="accordion-header ds-acc-head bg-teal-50 hover:bg-teal-100 transition"
                     data-target="acc-tiradores" aria-expanded="false" aria-controls="acc-tiradores"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-teal-800"><i class="fa-solid fa-grip text-teal-600"></i> Tiradores (adicional)</span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-teal-500"></i>
+              <span class="ds-acc-title text-sm font-bold text-teal-800"><i class="fa-solid fa-grip text-teal-600"></i> Tiradores (adicional)</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-teal-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="tiradores"></span>
             </button>
             <div id="acc-tiradores" class="accordion-body px-3">
-              <div class="py-2 space-y-3">
-                <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirTirador" class="ds-check w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500">
-                  <span class="text-sm font-medium text-slate-700">Incluir tiradores</span>
-                </label>
-                <div id="panelTirador" class="ml-6 space-y-3 hidden">
-                  <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Tipo Principal</label>
-                    <select id="tipoTiradorPrincipal" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                      <option value="sobreponer">Tirador de Sobreponer</option>
-                      <option value="perfil" selected>Tirador Tipo Perfil</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Variedad</label>
-                    <select id="tipoTiradorVariedad" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                      <option value="gola" selected>Gola</option>
-                      <option value="otro">Otro Perfil</option>
-                    </select>
-                  </div>
-
-                  <div id="wrapTiradorPerfilGola" class="space-y-3">
-                    <div>
-                      <label class="block text-xs font-medium text-slate-600 mb-1">Categoría Perfil Gola</label>
-                      <select id="tipoGola" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                        <option value="C" selected>Perfil C</option>
-                        <option value="L">Perfil L</option>
-                      </select>
-                    </div>
-                    <div id="wrapReduccionAltura" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
-                      <p class="text-xs font-semibold text-amber-800"><i class="fa-solid fa-scissors"></i> El Perfil L requiere reducción de altura en frentes</p>
+              <div class="py-2 ds-subblocks">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer">
+                    <input type="checkbox" id="incluirTirador" class="ds-check w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500">
+                    <span class="text-sm font-medium text-slate-700">Incluir tiradores</span>
+                  </label>
+                  <div id="panelTirador" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
                       <div>
-                        <label class="block text-xs font-medium text-slate-600 mb-1">Reducción de Altura (mm)</label>
-                        <input type="number" id="reduccionAlturaPerfilL" value="30" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Tipo Principal</label>
+                        <select id="tipoTiradorPrincipal" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                          <option value="sobreponer">Tirador de Sobreponer</option>
+                          <option value="perfil" selected>Tirador Tipo Perfil</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Variedad</label>
+                        <select id="tipoTiradorVariedad" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                          <option value="gola" selected>Gola</option>
+                          <option value="otro">Otro Perfil</option>
+                        </select>
                       </div>
                     </div>
-                  </div>
 
-                  <div class="grid grid-cols-2 gap-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
-                      <input type="number" id="cantTirador" value="2" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio ($/u)</label>
-                      <input type="number" id="precioTirador" value="5.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Color</label>
-                      <input type="text" id="colorTirador" value="Aluminio" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Altura (mm) (opcional)</label>
-                      <input type="number" id="alturaTirador" value="0" min="0" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                    <div id="wrapTiradorPerfilGola" class="space-y-3">
+                      <div>
+                        <label class="block text-xs font-medium text-slate-600 mb-1">Categoría Perfil Gola</label>
+                        <select id="tipoGola" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                          <option value="C" selected>Perfil C</option>
+                          <option value="L">Perfil L</option>
+                        </select>
+                      </div>
+                      <div id="wrapReduccionAltura" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2">
+                        <p class="text-xs font-semibold text-amber-800"><i class="fa-solid fa-scissors"></i> El Perfil L requiere reducción de altura en frentes</p>
+                        <div>
+                          <label class="block text-xs font-medium text-slate-600 mb-1">Reducción de Altura</label>
+                          <span class="ds-unit-wrap"><input type="number" id="reduccionAlturaPerfilL" value="30" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">mm</span></span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive bg-slate-50 border border-slate-200 rounded-lg p-3">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
+                        <span class="ds-unit-wrap"><input type="number" id="cantTirador" value="2" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"><span class="ds-unit">uds</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio unitario</label>
+                        <span class="ds-unit-wrap"><input type="number" id="precioTirador" value="5.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"><span class="ds-unit">$/u</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Color</label>
+                        <input type="text" id="colorTirador" value="Aluminio" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Altura (opcional)</label>
+                        <span class="ds-unit-wrap"><input type="number" id="alturaTirador" value="0" min="0" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"><span class="ds-unit">mm</span></span></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -541,70 +553,80 @@
 
           <!-- Repisas -->
           <div class="mb-3 border border-amber-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-amber-50 hover:bg-amber-100 px-3 py-2 text-left transition"
+            <button type="button" class="accordion-header ds-acc-head bg-amber-50 hover:bg-amber-100 transition"
                     data-target="acc-repisas" aria-expanded="false" aria-controls="acc-repisas"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-amber-800"><i class="fa-solid fa-layer-group text-amber-600"></i> Repisas</span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-amber-500"></i>
+              <span class="ds-acc-title text-sm font-bold text-amber-800"><i class="fa-solid fa-layer-group text-amber-600"></i> Repisas</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-amber-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="repisas"></span>
             </button>
             <div id="acc-repisas" class="accordion-body px-3">
-              <div class="py-2">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirRepisas" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir repisas (espesor 18 mm)</span></label>
-                <div id="panelRepisas" class="ml-6 mt-2 hidden"><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de repisas</label><input type="number" id="cantRepisas" value="1" min="1" max="20" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+              <div class="py-2 ds-subblocks">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirRepisas" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir repisas (espesor 18 mm)</span></label>
+                  <div id="panelRepisas" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de repisas</label><span class="ds-unit-wrap"><input type="number" id="cantRepisas" value="1" min="1" max="20" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">uds</span></span></div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Panel / Finta / Rodapié -->
           <div class="mb-3 border border-amber-200 rounded-lg overflow-hidden">
-            <button type="button" class="accordion-header w-full flex items-center justify-between gap-2 bg-amber-50 hover:bg-amber-100 px-3 py-2 text-left transition"
+            <button type="button" class="accordion-header ds-acc-head bg-amber-50 hover:bg-amber-100 transition"
                     data-target="acc-panel-finta-rodapie" aria-expanded="false" aria-controls="acc-panel-finta-rodapie"
                     onclick="toggleAccordion(this)" onkeydown="accKeydown(event, this)">
-              <span class="flex items-center gap-2 text-sm font-bold text-amber-800"><i class="fa-solid fa-table-columns text-amber-600"></i> Panel · Finta · Rodapié</span>
-              <i class="fa-solid fa-chevron-down accordion-chevron text-amber-500"></i>
+              <span class="ds-acc-title text-sm font-bold text-amber-800"><i class="fa-solid fa-table-columns text-amber-600"></i> Panel · Finta · Rodapié</span>
+              <i class="fa-solid fa-chevron-down accordion-chevron ds-acc-chev text-amber-500"></i>
+              <span class="ds-acc-summary" data-ds-summary="terminaciones"></span>
             </button>
             <div id="acc-panel-finta-rodapie" class="accordion-body px-3">
-              <div class="py-2 space-y-3">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirPanel" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir panel</span></label>
-                <div id="panelPanel" class="ml-6 space-y-3 hidden">
-                  <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho (mm)</label><input type="number" id="anchoPanel" value="600" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto (mm)</label><input type="number" id="altoPanel" value="720" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+              <div class="py-2 ds-subblocks">
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirPanel" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir panel lateral</span></label>
+                  <div id="panelPanel" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho</label><span class="ds-unit-wrap"><input type="number" id="anchoPanel" value="600" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">mm</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto</label><span class="ds-unit-wrap"><input type="number" id="altoPanel" value="720" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">mm</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><span class="ds-unit-wrap"><input type="number" id="cantPanel" value="1" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">uds</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor</label>
+                        <select id="espesorPanel" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                          <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
+                        </select></div>
+                    </div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionPanel" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                   </div>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantPanel" value="1" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
-                      <select id="espesorPanel" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                        <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
-                      </select></div>
-                  </div>
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionPanel" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                 </div>
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirFinta" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir finta</span></label>
-                <div id="panelFinta" class="ml-6 space-y-3 hidden">
-                  <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho (mm)</label><input type="number" id="anchoFinta" value="600" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto (mm)</label><input type="number" id="altoFinta" value="80" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirFinta" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir finta</span></label>
+                  <div id="panelFinta" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho</label><span class="ds-unit-wrap"><input type="number" id="anchoFinta" value="600" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">mm</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto</label><span class="ds-unit-wrap"><input type="number" id="altoFinta" value="80" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">mm</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><span class="ds-unit-wrap"><input type="number" id="cantFinta" value="1" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">uds</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor</label>
+                        <select id="espesorFinta" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                          <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
+                        </select></div>
+                    </div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionFinta" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                   </div>
-                  <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantFinta" value="1" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
-                      <select id="espesorFinta" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                        <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
-                      </select></div>
-                  </div>
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionFinta" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                 </div>
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirRodapie" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir rodapié (alto 150 mm)</span></label>
-                <div id="panelRodapie" class="ml-6 space-y-3 hidden">
-                  <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantRodapie" value="1" min="1" max="20" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
-                      <select id="espesorRodapie" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
-                        <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
-                      </select></div>
+                <div class="ds-subblock">
+                  <label class="ds-check-row cursor-pointer"><input type="checkbox" id="incluirRodapie" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir rodapié (alto 150 mm)</span></label>
+                  <div id="panelRodapie" class="ds-subblock-body hidden">
+                    <div class="ds-grid ds-grid-2 ds-grid-responsive">
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><span class="ds-unit-wrap"><input type="number" id="cantRodapie" value="1" min="1" max="20" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"><span class="ds-unit">uds</span></span></div>
+                      <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor</label>
+                        <select id="espesorRodapie" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                          <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
+                        </select></div>
+                    </div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionRodapie" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                   </div>
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionRodapie" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                 </div>
               </div>
             </div>
@@ -2422,10 +2444,13 @@ function pasarAPresupuesto() {
 
 </script>
 <script>
-/* Fase 3 · Grupo 1: plegado y resumen de los bloques .ds-acc.
-   Solo lee valores de inputs; no usa MotorCalculo, ids nuevos ni localStorage. */
+/* Fase 3 · Grupos 1 y 2: plegado de .ds-acc y resúmenes inline ligeros.
+   Solo lee valores de inputs/checkboxes/selects; no usa MotorCalculo, ids nuevos ni localStorage. */
 (function () {
-  function val(id) { var e = document.getElementById(id); return e ? String(e.value).trim() : ''; }
+  function el(id) { return document.getElementById(id); }
+  function val(id) { var e = el(id); return e ? String(e.value).trim() : ''; }
+  function chk(id) { var e = el(id); return !!(e && e.checked); }
+  function num(id, def) { var n = parseInt(val(id), 10); return isNaN(n) || n < 1 ? def : n; }
   var resumenes = {
     params: function () {
       var p = [];
@@ -2441,14 +2466,41 @@ function pasarAPresupuesto() {
         if (v && vistos.indexOf(v) < 0) vistos.push(v);
       });
       return vistos.join(' · ');
+    },
+    'puertas-gavetas': function () {
+      var p = [];
+      if (chk('incluirPuertas')) { var n = num('cantPuertas', 1); p.push(n === 1 ? '1 puerta' : n + ' puertas'); }
+      if (chk('incluirGavetas')) { var g = num('cantGavetas', 1); p.push(g === 1 ? '1 gaveta' : g + ' gavetas'); }
+      return p.length ? p.join(' · ') : 'Sin puertas ni gavetas';
+    },
+    tiradores: function () {
+      if (!chk('incluirTirador')) return 'Sin tiradores';
+      var tipo = val('tipoTiradorPrincipal') === 'sobreponer'
+        ? 'Sobreponer'
+        : (val('tipoTiradorVariedad') === 'gola' ? ('Perfil Gola ' + (val('tipoGola') || 'C')) : 'Otro Perfil');
+      var c = num('cantTirador', 1);
+      return tipo + ' · ' + c + (c === 1 ? ' ud' : ' uds');
+    },
+    repisas: function () {
+      if (!chk('incluirRepisas')) return 'Sin repisas';
+      var n = num('cantRepisas', 1);
+      return n === 1 ? '1 repisa' : n + ' repisas';
+    },
+    terminaciones: function () {
+      var p = [];
+      if (chk('incluirPanel')) p.push('Panel');
+      if (chk('incluirFinta')) p.push('Finta');
+      if (chk('incluirRodapie')) p.push('Rodapié');
+      return p.length ? p.join(' · ') : 'Sin terminaciones';
     }
   };
   function refrescar() {
-    document.querySelectorAll('[data-ds-summary]').forEach(function (el) {
-      var f = resumenes[el.getAttribute('data-ds-summary')];
-      if (f) { var t = f(); if (el.textContent !== t) el.textContent = t; }
+    document.querySelectorAll('[data-ds-summary]').forEach(function (node) {
+      var f = resumenes[node.getAttribute('data-ds-summary')];
+      if (f) { var t = f(); if (node.textContent !== t) node.textContent = t; }
     });
   }
+  function refrescarAsync() { setTimeout(refrescar, 0); }
   document.addEventListener('click', function (e) {
     var b = e.target.closest ? e.target.closest('[data-ds-acc-toggle]') : null;
     if (b) {
@@ -2458,10 +2510,15 @@ function pasarAPresupuesto() {
       if (body) { if (abrir) body.removeAttribute('hidden'); else body.setAttribute('hidden', ''); }
       return;
     }
-    setTimeout(refrescar, 0); // cambios programáticos (cargar código, editar mueble, limpiar)
+    refrescarAsync();
   });
   document.addEventListener('input', refrescar);
   document.addEventListener('change', refrescar);
+  var form = el('muebleForm');
+  if (form) {
+    form.addEventListener('reset', refrescarAsync);
+    form.addEventListener('submit', refrescarAsync);
+  }
   refrescar();
 })();
 </script>
