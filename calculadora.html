@@ -1409,6 +1409,7 @@ function renderizarMuebles() {
     document.getElementById('costoPanel').classList.add('hidden');
     document.getElementById('cantosPanel').classList.add('hidden');
     document.getElementById('cortesPanel').classList.add('hidden');
+    actualizarBarraResumen();
     return;
   }
   contador.textContent = `(${muebles.length} mueble${muebles.length > 1 ? 's' : ''})`;
@@ -1545,6 +1546,7 @@ function renderizarMuebles() {
   renderizarCantos();
   renderizarCostos();
   renderizarCortes();
+  actualizarBarraResumen();
 }
 
 function renderizarResumen() {
@@ -1972,6 +1974,7 @@ function editarMueble(id) {
   prefillFormulario(m);
   const btnTxt = document.getElementById('btnSubmitTexto');
   if (btnTxt) btnTxt.textContent = 'Guardar cambios';
+  activarTab('muebles');
   const form = document.getElementById('muebleForm');
   if (form && form.scrollIntoView) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -2087,6 +2090,179 @@ function exportarCSVCantos() { exportarCSVCompleto(); }
 poblarDatalist();
 renderizarMuebles();
 inicializarAcordeon();
+
+/* ============================================================
+   TABS + BARRA DE RESUMEN (Fase 5)
+   ============================================================ */
+const TABS_F5 = ['muebles', 'despiece', 'cortes', 'costos', 'catalogo'];
+
+function activarTab(nombre) {
+  if (TABS_F5.indexOf(nombre) < 0) nombre = 'muebles';
+  document.querySelectorAll('[role="tab"]').forEach(b => {
+    const activo = b.dataset.tab === nombre;
+    b.setAttribute('aria-selected', activo ? 'true' : 'false');
+    b.classList.toggle('tab-activo', activo);
+  });
+  document.querySelectorAll('[role="tabpanel"]').forEach(p => {
+    p.hidden = (p.id !== 'tab-' + nombre);
+  });
+  if (nombre === 'cortes') {
+    requestAnimationFrame(() => renderizarCortes());
+  }
+  try { localStorage.setItem('tab_activa_v1', nombre); } catch (e) {}
+}
+
+function actualizarBarraResumen() {
+  const el = document.getElementById('brMuebles');
+  if (!el) return;
+  const n = muebles.length;
+  let piezas = 0, tableros = 0, costo = 0;
+  if (n > 0) {
+    try {
+      const r = MotorCalculo.calcularProyecto(muebles, leerConfigTablero(), CATALOGOS_MOTOR);
+      piezas = r.totales.piezas;
+      tableros = r.totales.tablerosTotal;
+      costo = r.totales.total;
+    } catch (e) {}
+  }
+  document.getElementById('brMuebles').textContent = n;
+  document.getElementById('brPiezas').textContent = piezas;
+  document.getElementById('brTableros').textContent = tableros;
+  document.getElementById('brCosto').textContent = fmtMoney(costo);
+}
+
+function montarTabs() {
+  const formPanel = document.getElementById('formPanel');
+  if (!formPanel) return;
+  const grid = formPanel.parentElement;
+  const contenedor = grid.parentElement;
+
+  // estilos
+  const estilo = document.createElement('style');
+  estilo.textContent = [
+    '.tabnav{display:flex;gap:4px;padding:10px 12px 0;background:#fff;border-bottom:1px solid #e2e8f0;overflow-x:auto;position:sticky;top:0;z-index:20;}',
+    '.tabnav button{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;padding:10px 14px;font-size:.86rem;font-weight:600;color:#64748b;background:transparent;border:0;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;font-family:inherit;}',
+    '.tabnav button.tab-activo{color:#b45309;border-bottom-color:#b45309;}',
+    '.tabs-contenido{padding:16px 12px 120px;max-width:1120px;margin:0 auto;}',
+    '.tabs-contenido section[role="tabpanel"][hidden]{display:none;}',
+    '.sticky-summary{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;gap:8px;justify-content:space-around;align-items:center;padding:10px 12px;background:#1e293b;color:#fff;box-shadow:0 -6px 18px rgba(0,0,0,.18);cursor:pointer;flex-wrap:wrap;}',
+    '.sticky-summary .ss-item{display:flex;flex-direction:column;align-items:center;min-width:70px;}',
+    '.sticky-summary b{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#94a3b8;}',
+    '.sticky-summary .ss-item span:last-child{font-size:1.05rem;font-weight:700;}',
+    '.sticky-summary .ss-costo span:last-child{color:#fbbf24;}',
+    '.cortes-config{max-width:1080px;margin:0 auto 16px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;}',
+    '.cortes-config-titulo{font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;color:#33414c;margin:0 0 10px;}',
+    '.cortes-config .grid{max-width:520px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}',
+    '.tab-panel-card{max-width:1080px;margin:0 auto;}',
+    '@media (max-width:640px){.sticky-summary{gap:4px;}.sticky-summary .ss-item{min-width:58px;}}',
+    '@media print{.sticky-summary,.tabnav{display:none !important;}}'
+  ].join('\n');
+  document.head.appendChild(estilo);
+
+  const nav = document.createElement('nav');
+  nav.setAttribute('role', 'tablist');
+  nav.setAttribute('aria-label', 'Secciones del proyecto');
+  nav.className = 'tabnav no-print';
+  const tabs = [
+    ['muebles', 'fa-cube', 'Muebles'],
+    ['despiece', 'fa-list-check', 'Despiece'],
+    ['cortes', 'fa-scissors', 'Cortes'],
+    ['costos', 'fa-dollar-sign', 'Costos'],
+    ['catalogo', 'fa-book', 'Catálogo']
+  ];
+  tabs.forEach(t => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('role', 'tab');
+    b.id = 'tabBtn-' + t[0];
+    b.dataset.tab = t[0];
+    b.setAttribute('aria-controls', 'tab-' + t[0]);
+    b.setAttribute('aria-selected', 'false');
+    b.innerHTML = '<i class="fa-solid ' + t[1] + '"></i> <span>' + t[2] + '</span>';
+    b.addEventListener('click', () => activarTab(t[0]));
+    nav.appendChild(b);
+  });
+
+  const barra = document.createElement('div');
+  barra.id = 'barraResumen';
+  barra.className = 'sticky-summary no-print';
+  barra.setAttribute('role', 'status');
+  barra.innerHTML = '<span class="ss-item"><b>Muebles</b><span id="brMuebles">0</span></span>' +
+    '<span class="ss-item"><b>Piezas</b><span id="brPiezas">0</span></span>' +
+    '<span class="ss-item"><b>Tableros</b><span id="brTableros">0</span></span>' +
+    '<span class="ss-item ss-costo"><b>Costo total</b><span id="brCosto">$0.00</span></span>';
+  barra.addEventListener('click', () => activarTab('costos'));
+
+  const main = document.createElement('main');
+  main.className = 'tabs-contenido';
+
+  const seccion = k => {
+    const s = document.createElement('section');
+    s.id = 'tab-' + k;
+    s.setAttribute('role', 'tabpanel');
+    s.setAttribute('aria-labelledby', 'tabBtn-' + k);
+    s.hidden = true;
+    return s;
+  };
+
+  const secMuebles = seccion('muebles');
+  const secDespiece = seccion('despiece');
+  const secCortes = seccion('cortes');
+  const secCostos = seccion('costos');
+  const secCatalogo = seccion('catalogo');
+
+  // Capturar referencias ANTES de mover (querySelector sobre subarboles
+  // para no depender de que el nodo siga en el documento).
+  const catBox = formPanel.querySelector('#codigoMueble').closest('.bg-gradient-to-br');
+  const kerfWrap = formPanel.querySelector('#kerfSierra').parentElement.parentElement;
+  const listaCard = document.getElementById('listaMuebles').parentElement;
+  const cantosPanel = document.getElementById('cantosPanel');
+  const cortesPanel = document.getElementById('cortesPanel');
+  const resumenPanel = document.getElementById('resumenPanel');
+  const costoPanel = document.getElementById('costoPanel');
+
+  // Muebles: formulario (sin caja de catalogo, sin parametros de corte)
+  secMuebles.appendChild(formPanel);
+  formPanel.classList.add('tab-panel-card');
+
+  // Catalogo: caja ambar de codigos
+  secCatalogo.appendChild(catBox);
+
+  // Cortes: parametros (kerf/refilado) + planos
+  const cortesConfig = document.createElement('div');
+  cortesConfig.className = 'cortes-config';
+  cortesConfig.innerHTML = '<h3 class="cortes-config-titulo">Parámetros de corte</h3>';
+  cortesConfig.appendChild(kerfWrap);
+  secCortes.appendChild(cortesConfig);
+  secCortes.appendChild(cortesPanel);
+
+  // Despiece: tarjeta con lista + cantos
+  secDespiece.appendChild(listaCard);
+  secDespiece.appendChild(cantosPanel);
+
+  // Costos: resumen + analisis de costo
+  secCostos.appendChild(resumenPanel);
+  secCostos.appendChild(costoPanel);
+
+  [secMuebles, secDespiece, secCortes, secCostos, secCatalogo].forEach(x => main.appendChild(x));
+
+  grid.replaceWith(nav, barra, main);
+
+  let inicial = null;
+  try { inicial = localStorage.getItem('tab_activa_v1'); } catch (e) {}
+  if (!inicial || muebles.length === 0) inicial = 'muebles';
+  activarTab(inicial);
+  actualizarBarraResumen();
+
+  let rafBarra = null;
+  document.addEventListener('input', () => {
+    if (rafBarra) return;
+    rafBarra = requestAnimationFrame(() => { rafBarra = null; actualizarBarraResumen(); });
+  });
+}
+
+montarTabs();
+
 </script>
 </body>
 </html>
