@@ -6,6 +6,10 @@
 <title>Calculadora de Despiece + Catálogo + Herrajes Colapsables</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos-sistema.css">
 <style>
   .accordion-body {
     max-height: 0;
@@ -63,40 +67,40 @@
   .pieza-corte { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 </style>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-6">
+<body class="ds-app bg-slate-100 text-slate-800 min-h-screen p-4 md:p-6">
 
 <div class="max-w-7xl mx-auto">
 
   <header class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-3xl font-bold text-slate-900">
-        <a href="index.html" style="text-decoration:none; cursor:pointer;" class="text-slate-900 hover:text-amber-600">
-          <i class="fa-solid fa-calculator text-amber-600 mr-2"></i>Calculadora de Despiece + Catálogo
+      <h1 class="ds-titulo">
+        <a href="index.html" style="text-decoration:none; cursor:pointer;">
+          <i class="fa-solid fa-calculator mr-2"></i>Calculadora de Despiece + Catálogo
         </a>
       </h1>
-      <p class="text-slate-600 mt-1">Catálogo editable · Herrajes colapsables · Adicionales</p>
+      <p class="ds-subtitulo">Catálogo editable · Herrajes colapsables · Adicionales</p>
     </div>
     <div class="flex gap-2 no-print flex-wrap">
-      <button onclick="abrirAgregarCodigo()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm transition">
-        <i class="fa-solid fa-plus mr-1"></i> Agregar código
+      <button onclick="abrirAgregarCodigo()" class="ds-btn ds-btn-primary ds-btn-sm">
+        <i class="fa-solid fa-plus"></i> Agregar código
       </button>
-      <button onclick="exportarCatalogo()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm transition">
-        <i class="fa-solid fa-book mr-1"></i> Catálogo CSV
+      <button onclick="exportarCatalogo()" class="ds-btn ds-btn-sm">
+        <i class="fa-solid fa-book"></i> Catálogo CSV
       </button>
-      <button onclick="exportarCSVResumen()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-sm transition">
-        <i class="fa-solid fa-file-csv mr-1"></i> Resumen CSV
+      <button onclick="exportarCSVResumen()" class="ds-btn ds-btn-sm">
+        <i class="fa-solid fa-file-csv"></i> Resumen CSV
       </button>
-      <button onclick="exportarCSVCompleto()" class="bg-slate-600 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-sm transition">
-        <i class="fa-solid fa-file-export mr-1"></i> Despiece CSV
+      <button onclick="exportarCSVCompleto()" class="ds-btn ds-btn-sm">
+        <i class="fa-solid fa-file-export"></i> Despiece CSV
       </button>
-      <button onclick="exportarCSVCostos()" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-2 rounded-lg text-sm transition">
-        <i class="fa-solid fa-dollar-sign mr-1"></i> Costos CSV
+      <button onclick="exportarCSVCostos()" class="ds-btn ds-btn-sm">
+        <i class="fa-solid fa-dollar-sign"></i> Costos CSV
       </button>
-      <button onclick="resetAcordeon()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-sm transition no-print">
-        <i class="fa-solid fa-rotate mr-1"></i> Reset secciones
+      <button onclick="resetAcordeon()" class="ds-btn ds-btn-sm no-print">
+        <i class="fa-solid fa-rotate"></i> Reset secciones
       </button>
-      <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm transition">
-        <i class="fa-solid fa-print mr-1"></i> Imprimir
+      <button onclick="window.print()" class="ds-btn ds-btn-sm">
+        <i class="fa-solid fa-print"></i> Imprimir
       </button>
     </div>
   </header>
@@ -104,7 +108,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
     <!-- ===================== FORMULARIO ===================== -->
-    <div id="formPanel" class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-slate-200 h-fit lg:sticky lg:top-4">
+    <div id="formPanel" class="ds-card lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-slate-200 h-fit lg:sticky lg:top-4">
       <h2 class="text-xl font-semibold mb-4 text-slate-800">
         <i class="fa-solid fa-cube text-amber-600 mr-2"></i>Datos del mueble
       </h2>
@@ -115,7 +119,7 @@
         </label>
         <div class="flex gap-2">
           <input type="text" id="codigoMueble" list="listaCodigos"
-                 class="flex-1 px-3 py-2 border-2 border-amber-400 rounded-lg text-sm font-mono font-bold text-amber-900 focus:ring-2 focus:ring-amber-500 focus:outline-none uppercase"
+                 class="ds-input flex-1 px-3 py-2 border-2 border-amber-400 rounded-lg text-sm font-mono font-bold text-amber-900 focus:ring-2 focus:ring-amber-500 focus:outline-none uppercase"
                  placeholder="Ej: BA03001"
                  oninput="this.value = this.value.toUpperCase(); validarCodigoEnVivo()">
           <datalist id="listaCodigos"></datalist>
@@ -139,24 +143,24 @@
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-1">Nombre / Código</label>
           <input type="text" id="nombreMueble" required
-                 class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                 class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
                  placeholder="Ej. BA060">
         </div>
         <div class="grid grid-cols-3 gap-3">
           <div><label class="block text-sm font-medium text-slate-700 mb-1">Alto (mm)</label>
-            <input type="number" id="altoMueble" required min="1" value="720" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <input type="number" id="altoMueble" required min="1" value="720" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
           <div><label class="block text-sm font-medium text-slate-700 mb-1">Ancho (mm)</label>
-            <input type="number" id="anchoMueble" required min="1" value="600" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <input type="number" id="anchoMueble" required min="1" value="600" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
           <div><label class="block text-sm font-medium text-slate-700 mb-1">Prof. (mm)</label>
-            <input type="number" id="profMueble" required min="1" value="580" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <input type="number" id="profMueble" required min="1" value="580" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div><label class="block text-sm font-medium text-slate-700 mb-1">Espesor</label>
-            <select id="espesorTablero" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            <select id="espesorTablero" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
               <option value="18" selected>18 mm</option><option value="12">12 mm</option><option value="8">8 mm</option>
             </select></div>
           <div><label class="block text-sm font-medium text-slate-700 mb-1">Veta</label>
-            <select id="vetaMueble" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            <select id="vetaMueble" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none">
               <option value="Vertical" selected>Vertical</option><option value="Horizontal">Horizontal</option><option value="">Sin veta</option>
             </select></div>
         </div>
@@ -164,57 +168,57 @@
         <div class="border-t border-slate-200 pt-4 space-y-3">
           <p class="text-sm font-semibold text-slate-800"><i class="fa-solid fa-dollar-sign text-emerald-600 mr-1"></i> Tablero y cantos</p>
           <div class="grid grid-cols-2 gap-2">
-            <div><label class="block text-xs font-medium text-slate-600 mb-1">Largo lámina (mm)</label><input type="number" id="largoTablero" value="2440" min="1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-            <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho lámina (mm)</label><input type="number" id="anchoTablero" value="1830" min="1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Largo lámina (mm)</label><input type="number" id="largoTablero" value="2440" min="1" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho lámina (mm)</label><input type="number" id="anchoTablero" value="1830" min="1" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <div><label class="block text-xs font-medium text-slate-600 mb-1"><i class="fa-solid fa-cube text-amber-600 mr-1"></i>Precio lámina ESTRUCTURA ($)</label><input type="number" id="precioTableroEstructura" value="100" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-            <div><label class="block text-xs font-medium text-slate-600 mb-1"><i class="fa-solid fa-paint-roller text-emerald-600 mr-1"></i>Precio lámina REVESTIMIENTO ($)</label><input type="number" id="precioTableroRevestimiento" value="150" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1"><i class="fa-solid fa-cube text-amber-600 mr-1"></i>Precio lámina ESTRUCTURA ($)</label><input type="number" id="precioTableroEstructura" value="100" min="0" step="0.01" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1"><i class="fa-solid fa-paint-roller text-emerald-600 mr-1"></i>Precio lámina REVESTIMIENTO ($)</label><input type="number" id="precioTableroRevestimiento" value="150" min="0" step="0.01" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <div><label class="block text-xs font-medium text-slate-600 mb-1">Desperdicio (%)</label><input type="number" id="desperdicioPct" value="15" min="0" max="80" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Desperdicio (%)</label><input type="number" id="desperdicioPct" value="15" min="0" max="80" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Canto Estructura 0.45mm ($/ML)</label>
-              <input type="number" id="precioCantoEstructura" value="0.50" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <input type="number" id="precioCantoEstructura" value="0.50" min="0" step="0.01" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Canto Revestimiento 1mm ($/ML)</label>
-              <input type="number" id="precioCantoRevestimiento" value="1.00" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <input type="number" id="precioCantoRevestimiento" value="1.00" min="0" step="0.01" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
-            <div><label class="block text-xs font-medium text-slate-600 mb-1">Par Bisagra ($)</label><input type="number" id="precioParBisagra" value="2.50" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Par Bisagra ($)</label><input type="number" id="precioParBisagra" value="2.50" min="0" step="0.01" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
           </div>
           
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Enchapado ($/ML)</label>
-              <input type="number" id="precioEnchapado" value="2.36" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <input type="number" id="precioEnchapado" value="2.36" min="0" step="0.01" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Precio por corte ($)</label>
-              <input type="number" id="precioCorte" value="0.91" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <input type="number" id="precioCorte" value="0.91" min="0" step="0.01" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Cortes por lámina (cant.)</label>
-              <input type="number" id="cantidadCortesPorLamina" value="5" min="1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <input type="number" id="cantidadCortesPorLamina" value="5" min="1" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Set 4 Patas global ($)</label>
-              <input type="number" id="precioSetPatasGlobal" value="3.00" min="0" step="0.01" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <input type="number" id="precioSetPatasGlobal" value="3.00" min="0" step="0.01" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Kerf de sierra (mm)</label>
-              <input type="number" id="kerfSierra" value="4" min="0" step="0.5" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <input type="number" id="kerfSierra" value="4" min="0" step="0.5" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
             <div>
               <label class="block text-xs font-medium text-slate-600 mb-1">Refilado por borde (mm)</label>
-              <input type="number" id="refiladoBorde" value="10" min="0" step="1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              <input type="number" id="refiladoBorde" value="10" min="0" step="1" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
             </div>
           </div>
 
@@ -224,11 +228,11 @@
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1">Mano de Obra (%)</label>
-                <input type="number" id="porcentajeManoObra" value="20" min="0" step="0.1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <input type="number" id="porcentajeManoObra" value="20" min="0" step="0.1" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
               </div>
               <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1">Gastos Admin. (%)</label>
-                <input type="number" id="porcentajeGastosAdmin" value="15" min="0" step="0.1" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <input type="number" id="porcentajeGastosAdmin" value="15" min="0" step="0.1" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
               </div>
             </div>
             <p class="text-[10px] text-slate-500 mt-1">* Aplicados sobre el subtotal directo de cada mueble.</p>
@@ -239,10 +243,10 @@
         <div class="border-t border-slate-200 pt-4 space-y-3">
           <label class="block text-sm font-semibold text-slate-800"><i class="fa-solid fa-palette text-amber-600 mr-1"></i> Asignación de colores</label>
           <div class="grid grid-cols-2 gap-2">
-            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Laterales</label><input type="text" id="colorLateral" value="Blanco" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Piso / Techo</label><input type="text" id="colorPisoTecho" value="Blanco" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Fondo</label><input type="text" id="colorFondo" value="Blanco" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Puertas / Frentes</label><input type="text" id="colorPuerta" value="Roble" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Laterales</label><input type="text" id="colorLateral" value="Blanco" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Piso / Techo</label><input type="text" id="colorPisoTecho" value="Blanco" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Fondo</label><input type="text" id="colorFondo" value="Blanco" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+            <div><label class="block text-xs font-medium text-slate-600 mb-1">Color Puertas / Frentes</label><input type="text" id="colorPuerta" value="Roble" class="ds-input w-full px-2 py-1.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
           </div>
         </div>
 
@@ -266,28 +270,28 @@
             <div id="acc-puertas-gavetas" class="accordion-body is-open px-3">
               <div class="space-y-3 py-2">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirPuertas" checked class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                  <input type="checkbox" id="incluirPuertas" checked class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
                   <span class="text-sm font-medium text-slate-700">Incluir puertas (con bisagras automáticas)</span>
                 </label>
                 <div id="panelPuertas" class="ml-6 space-y-3">
                   <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de puertas</label>
-                    <input type="number" id="cantPuertas" value="1" min="1" max="10" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                    <input type="number" id="cantPuertas" value="1" min="1" max="10" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                 </div>
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirGavetas" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                  <input type="checkbox" id="incluirGavetas" class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
                   <span class="text-sm font-medium text-slate-700">Incluir gavetas</span>
                 </label>
                 <div id="panelGavetas" class="ml-6 space-y-3 hidden">
                   <div><label class="block text-xs font-medium text-slate-600 mb-1">N° de gavetas</label>
-                    <input type="number" id="cantGavetas" value="2" min="1" max="10" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                    <input type="number" id="cantGavetas" value="2" min="1" max="10" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                   <div class="grid grid-cols-2 gap-3">
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Prof. gaveta (mm)</label>
-                      <input type="number" id="profGaveta" value="500" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                      <input type="number" id="profGaveta" value="500" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto caja (mm)</label>
-                      <input type="number" id="altoGaveta" value="150" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                      <input type="number" id="altoGaveta" value="150" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                   </div>
                   <div><label class="block text-xs font-medium text-slate-600 mb-1">Tipo de corredera</label>
-                    <select id="tipoCorredera" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <select id="tipoCorredera" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                       <option value="telescopica" selected>Telescópica estándar (25 mm)</option>
                       <option value="oculta">Oculta genérica (10 mm)</option>
                       <option value="ocultaBlum">Oculta Blum / Push (despiece especial)</option>
@@ -296,13 +300,13 @@
                     <p class="text-xs font-semibold text-slate-700"><i class="fa-solid fa-dollar-sign text-emerald-600"></i> Precio de la corredera</p>
                     <div id="precioCorrederaTelescopicaWrap">
                       <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par telescópica ($)</label>
-                      <input type="number" id="precioCorrederaTelescopica" value="2.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                      <input type="number" id="precioCorrederaTelescopica" value="2.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                     <div id="precioCorrederaOcultaWrap" class="hidden">
                       <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par oculta genérica ($)</label>
-                      <input type="number" id="precioCorrederaOculta" value="3.50" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                      <input type="number" id="precioCorrederaOculta" value="3.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                     <div id="precioCorrederaBlumWrap" class="hidden">
                       <label class="block text-xs font-medium text-slate-600 mb-1">Precio por par oculta Blum / Push ($)</label>
-                      <input type="number" id="precioCorrederaBlum" value="8.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                      <input type="number" id="precioCorrederaBlum" value="8.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                   </div>
                 </div>
               </div>
@@ -320,13 +324,13 @@
             <div id="acc-tiradores" class="accordion-body px-3">
               <div class="py-2 space-y-3">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirTirador" class="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500">
+                  <input type="checkbox" id="incluirTirador" class="ds-check w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500">
                   <span class="text-sm font-medium text-slate-700">Incluir tiradores</span>
                 </label>
                 <div id="panelTirador" class="ml-6 space-y-3 hidden">
                   <div>
                     <label class="block text-xs font-medium text-slate-600 mb-1">Tipo Principal</label>
-                    <select id="tipoTiradorPrincipal" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    <select id="tipoTiradorPrincipal" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
                       <option value="sobreponer">Tirador de Sobreponer</option>
                       <option value="perfil" selected>Tirador Tipo Perfil</option>
                     </select>
@@ -334,7 +338,7 @@
                   
                   <div>
                     <label class="block text-xs font-medium text-slate-600 mb-1">Variedad</label>
-                    <select id="tipoTiradorVariedad" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    <select id="tipoTiradorVariedad" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
                       <option value="gola" selected>Gola</option>
                       <option value="otro">Otro Perfil</option>
                     </select>
@@ -343,7 +347,7 @@
                   <div id="wrapTiradorPerfilGola" class="space-y-3">
                     <div>
                       <label class="block text-xs font-medium text-slate-600 mb-1">Categoría Perfil Gola</label>
-                      <select id="tipoGola" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                      <select id="tipoGola" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
                         <option value="C" selected>Perfil C</option>
                         <option value="L">Perfil L</option>
                       </select>
@@ -352,20 +356,20 @@
                       <p class="text-xs font-semibold text-amber-800"><i class="fa-solid fa-scissors"></i> El Perfil L requiere reducción de altura en frentes</p>
                       <div>
                         <label class="block text-xs font-medium text-slate-600 mb-1">Reducción de Altura (mm)</label>
-                        <input type="number" id="reduccionAlturaPerfilL" value="30" min="1" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <input type="number" id="reduccionAlturaPerfilL" value="30" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
                       </div>
                     </div>
                   </div>
 
                   <div class="grid grid-cols-2 gap-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
-                      <input type="number" id="cantTirador" value="2" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                      <input type="number" id="cantTirador" value="2" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio ($/u)</label>
-                      <input type="number" id="precioTirador" value="5.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                      <input type="number" id="precioTirador" value="5.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Color</label>
-                      <input type="text" id="colorTirador" value="Aluminio" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                      <input type="text" id="colorTirador" value="Aluminio" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Altura (mm) (opcional)</label>
-                      <input type="number" id="alturaTirador" value="0" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
+                      <input type="number" id="alturaTirador" value="0" min="0" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none"></div>
                   </div>
                 </div>
               </div>
@@ -383,14 +387,14 @@
             <div id="acc-bisagra-recta" class="accordion-body px-3">
               <div class="py-2 space-y-2">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirBisagraRecta" class="w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500">
+                  <input type="checkbox" id="incluirBisagraRecta" class="ds-check w-4 h-4 text-rose-600 border-slate-300 rounded focus:ring-rose-500">
                   <span class="text-sm font-medium text-slate-700">Bisagra recta (unidad)</span>
                 </label>
                 <div id="panelBisagraRecta" class="ml-6 mt-1 space-y-2 hidden">
                   <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label>
-                    <input type="number" id="cantBisagraRecta" value="1" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></div>
+                    <input type="number" id="cantBisagraRecta" value="1" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></div>
                   <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio unitario ($)</label>
-                    <input type="number" id="precioBisagraRecta" value="1.50" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></div>
+                    <input type="number" id="precioBisagraRecta" value="1.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none"></div>
                 </div>
               </div>
             </div>
@@ -407,26 +411,26 @@
             <div id="acc-elevacion" class="accordion-body px-3">
               <div class="py-2 space-y-2">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirAmortiguadorAutoelevable" class="w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                  <input type="checkbox" id="incluirAmortiguadorAutoelevable" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
                   <span class="text-sm font-medium text-slate-700">Amortiguador autoelevable</span>
                 </label>
                 <div id="panelAmortiguadorAutoelevable" class="ml-6 mt-1 mb-2 hidden">
                   <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
-                  <input type="number" id="precioAmortiguadorAutoelevable" value="1.92" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
+                  <input type="number" id="precioAmortiguadorAutoelevable" value="1.92" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
                 <label class="flex items-center gap-2 cursor-pointer mt-2">
-                  <input type="checkbox" id="incluirElevacionPuertaDoble" class="w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                  <input type="checkbox" id="incluirElevacionPuertaDoble" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
                   <span class="text-sm font-medium text-slate-700">Sistema de elevación puerta doble</span>
                 </label>
                 <div id="panelElevacionPuertaDoble" class="ml-6 mt-1 mb-2 hidden">
                   <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
-                  <input type="number" id="precioElevacionPuertaDoble" value="124.66" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
+                  <input type="number" id="precioElevacionPuertaDoble" value="124.66" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
                 <label class="flex items-center gap-2 cursor-pointer mt-2">
-                  <input type="checkbox" id="incluirElevacionPuertaSencilla" class="w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
+                  <input type="checkbox" id="incluirElevacionPuertaSencilla" class="ds-check w-4 h-4 text-fuchsia-600 border-slate-300 rounded focus:ring-fuchsia-500">
                   <span class="text-sm font-medium text-slate-700">Sistema de elevación de puerta sencilla</span>
                 </label>
                 <div id="panelElevacionPuertaSencilla" class="ml-6 mt-1 hidden">
                   <label class="block text-xs font-medium text-slate-600 mb-1">Precio ($)</label>
-                  <input type="number" id="precioElevacionPuertaSencilla" value="49.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
+                  <input type="number" id="precioElevacionPuertaSencilla" value="49.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"></div>
               </div>
             </div>
           </div>
@@ -441,14 +445,14 @@
             </button>
             <div id="acc-platera" class="accordion-body px-3">
               <div class="py-2 space-y-2">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirPlatera60" class="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 60 cm</span></label>
-                <div id="panelPlatera60" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera60" value="29.94" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera70" class="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 70 cm</span></label>
-                <div id="panelPlatera70" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera70" value="29.94" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera80" class="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 80 cm</span></label>
-                <div id="panelPlatera80" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera80" value="29.94" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera90" class="w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 90 cm</span></label>
-                <div id="panelPlatera90" class="ml-6 mt-1 hidden"><input type="number" id="precioPlatera90" value="29.94" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirPlatera60" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 60 cm</span></label>
+                <div id="panelPlatera60" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera60" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera70" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 70 cm</span></label>
+                <div id="panelPlatera70" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera70" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera80" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 80 cm</span></label>
+                <div id="panelPlatera80" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioPlatera80" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirPlatera90" class="ds-check w-4 h-4 text-cyan-600 border-slate-300 rounded focus:ring-cyan-500"><span class="text-sm font-medium text-slate-700">Platera 90 cm</span></label>
+                <div id="panelPlatera90" class="ml-6 mt-1 hidden"><input type="number" id="precioPlatera90" value="29.94" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none"></div>
               </div>
             </div>
           </div>
@@ -463,16 +467,16 @@
             </button>
             <div id="acc-condimentero" class="accordion-body px-3">
               <div class="py-2 space-y-2">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirCondimentero15" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 15 cm</span></label>
-                <div id="panelCondimentero15" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero15" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero20" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 20 cm</span></label>
-                <div id="panelCondimentero20" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero20" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero30" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 30 cm</span></label>
-                <div id="panelCondimentero30" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero30" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero35" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 35 cm</span></label>
-                <div id="panelCondimentero35" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero35" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
-                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero40" class="w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 40 cm</span></label>
-                <div id="panelCondimentero40" class="ml-6 mt-1 hidden"><input type="number" id="precioCondimentero40" value="67.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirCondimentero15" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 15 cm</span></label>
+                <div id="panelCondimentero15" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero15" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero20" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 20 cm</span></label>
+                <div id="panelCondimentero20" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero20" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero30" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 30 cm</span></label>
+                <div id="panelCondimentero30" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero30" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero35" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 35 cm</span></label>
+                <div id="panelCondimentero35" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioCondimentero35" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirCondimentero40" class="ds-check w-4 h-4 text-lime-600 border-slate-300 rounded focus:ring-lime-500"><span class="text-sm font-medium text-slate-700">Condimentero 40 cm</span></label>
+                <div id="panelCondimentero40" class="ml-6 mt-1 hidden"><input type="number" id="precioCondimentero40" value="67.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-lime-500 focus:outline-none"></div>
               </div>
             </div>
           </div>
@@ -488,21 +492,21 @@
             <div id="acc-patas-tornillos" class="accordion-body px-3">
               <div class="py-2 space-y-3">
                 <label class="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" id="incluirPatas" class="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
+                  <input type="checkbox" id="incluirPatas" class="ds-check w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500">
                   <span class="text-sm font-medium text-slate-700">Incluir set de patas plásticas regulables (4 uds.)</span>
                 </label>
                 <div id="panelPatas" class="ml-6 space-y-3 hidden">
                   <div><label class="block text-xs font-medium text-slate-600 mb-1">Precio por set de 4 patas ($) <span class="text-amber-600 font-semibold">— sobrescribe el valor global</span></label>
-                    <input type="number" id="precioSetPatas" value="3.00" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
+                    <input type="number" id="precioSetPatas" value="3.00" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"></div>
                 </div>
                 <div class="border-l-4 border-orange-400 pl-3 py-2 bg-orange-50/40 rounded">
                   <p class="text-xs font-semibold text-slate-700 mb-2"><i class="fa-solid fa-screwdriver text-orange-600 mr-1"></i> Tornillos (por bolsa 100 uds.)</p>
-                  <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirTornillo6x2" class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x2 x100 und</span></label>
-                  <div id="panelTornillo6x2" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioTornillo6x2" value="2.50" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
-                  <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirTornillo6x1_4" class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x1 1/4 x100 und</span></label>
-                  <div id="panelTornillo6x1_4" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioTornillo6x1_4" value="1.26" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
-                  <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirTornillo5_8x6" class="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 5/8 x6 x100 und</span></label>
-                  <div id="panelTornillo5_8x6" class="ml-6 mt-1 hidden"><input type="number" id="precioTornillo5_8x6" value="1.68" min="0" step="0.01" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
+                  <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirTornillo6x2" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x2 x100 und</span></label>
+                  <div id="panelTornillo6x2" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioTornillo6x2" value="2.50" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
+                  <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirTornillo6x1_4" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 6x1 1/4 x100 und</span></label>
+                  <div id="panelTornillo6x1_4" class="ml-6 mt-1 mb-2 hidden"><input type="number" id="precioTornillo6x1_4" value="1.26" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
+                  <label class="flex items-center gap-2 cursor-pointer mt-2"><input type="checkbox" id="incluirTornillo5_8x6" class="ds-check w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"><span class="text-sm font-medium text-slate-700">Tornillos 5/8 x6 x100 und</span></label>
+                  <div id="panelTornillo5_8x6" class="ml-6 mt-1 hidden"><input type="number" id="precioTornillo5_8x6" value="1.68" min="0" step="0.01" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"></div>
                 </div>
               </div>
             </div>
@@ -526,8 +530,8 @@
             </button>
             <div id="acc-repisas" class="accordion-body px-3">
               <div class="py-2">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirRepisas" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir repisas (espesor 18 mm)</span></label>
-                <div id="panelRepisas" class="ml-6 mt-2 hidden"><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de repisas</label><input type="number" id="cantRepisas" value="1" min="1" max="20" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirRepisas" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir repisas (espesor 18 mm)</span></label>
+                <div id="panelRepisas" class="ml-6 mt-2 hidden"><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad de repisas</label><input type="number" id="cantRepisas" value="1" min="1" max="20" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
               </div>
             </div>
           </div>
@@ -542,46 +546,46 @@
             </button>
             <div id="acc-panel-finta-rodapie" class="accordion-body px-3">
               <div class="py-2 space-y-3">
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirPanel" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir panel</span></label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirPanel" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir panel</span></label>
                 <div id="panelPanel" class="ml-6 space-y-3 hidden">
                   <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho (mm)</label><input type="number" id="anchoPanel" value="600" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto (mm)</label><input type="number" id="altoPanel" value="720" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho (mm)</label><input type="number" id="anchoPanel" value="600" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto (mm)</label><input type="number" id="altoPanel" value="720" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                   </div>
                   <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantPanel" value="1" min="1" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantPanel" value="1" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
-                      <select id="espesorPanel" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                      <select id="espesorPanel" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
                         <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
                       </select></div>
                   </div>
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionPanel" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionPanel" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                 </div>
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirFinta" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir finta</span></label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirFinta" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir finta</span></label>
                 <div id="panelFinta" class="ml-6 space-y-3 hidden">
                   <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho (mm)</label><input type="number" id="anchoFinta" value="600" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto (mm)</label><input type="number" id="altoFinta" value="80" min="1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Ancho (mm)</label><input type="number" id="anchoFinta" value="600" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Alto (mm)</label><input type="number" id="altoFinta" value="80" min="1" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                   </div>
                   <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantFinta" value="1" min="1" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantFinta" value="1" min="1" max="100" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
-                      <select id="espesorFinta" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                      <select id="espesorFinta" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
                         <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
                       </select></div>
                   </div>
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionFinta" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionFinta" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                 </div>
-                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirRodapie" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir rodapié (alto 150 mm)</span></label>
+                <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="incluirRodapie" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500"><span class="text-sm font-medium text-slate-700">Incluir rodapié (alto 150 mm)</span></label>
                 <div id="panelRodapie" class="ml-6 space-y-3 hidden">
                   <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantRodapie" value="1" min="1" max="20" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                    <div><label class="block text-xs font-medium text-slate-600 mb-1">Cantidad</label><input type="number" id="cantRodapie" value="1" min="1" max="20" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                     <div><label class="block text-xs font-medium text-slate-600 mb-1">Espesor (mm)</label>
-                      <select id="espesorRodapie" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                      <select id="espesorRodapie" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
                         <option value="15">15 mm</option><option value="18" selected>18 mm</option><option value="22">22 mm</option><option value="25">25 mm</option>
                       </select></div>
                   </div>
-                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionRodapie" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
+                  <div><label class="block text-xs font-medium text-slate-600 mb-1">Descripción (opcional)</label><input type="text" id="descripcionRodapie" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none"></div>
                 </div>
               </div>
             </div>
@@ -591,18 +595,18 @@
         <!-- NUEVO: Campo cantidad de muebles -->
         <div class="bg-amber-100 p-3 rounded-lg border border-amber-300">
           <label class="block text-sm font-bold text-amber-900 mb-1">Cantidad de muebles a agregar (mismo código)</label>
-          <input type="number" id="cantMuebles" value="1" min="1" max="100" class="w-full px-3 py-2 border border-amber-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-lg font-bold">
+          <input type="number" id="cantMuebles" value="1" min="1" max="100" class="ds-input w-full px-3 py-2 border border-amber-400 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none text-lg font-bold">
         </div>
 
         <label class="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" id="guardarEnCatalogo" class="w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500">
+          <input type="checkbox" id="guardarEnCatalogo" class="ds-check w-4 h-4 text-amber-600 border-slate-300 rounded focus:ring-amber-500">
           <span class="text-sm font-medium text-slate-700">Guardar también en el catálogo</span>
         </label>
 
-        <button type="submit" id="btnSubmitMueble" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2.5 rounded-lg transition shadow-sm">
+        <button type="submit" id="btnSubmitMueble" class="ds-btn ds-btn-primary w-full">
           <i class="fa-solid fa-plus mr-2"></i><span id="btnSubmitTexto">Calcular y agregar mueble</span>
         </button>
-        <button type="button" onclick="limpiarTodo()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium py-2 rounded-lg transition text-sm">
+        <button type="button" onclick="limpiarTodo()" class="ds-btn w-full">
           <i class="fa-solid fa-trash-alt mr-2"></i>Limpiar todo
         </button>
       </form>
@@ -616,7 +620,7 @@
 
     <!-- ===================== LISTA DE MUEBLES ===================== -->
     <div class="lg:col-span-2 space-y-6">
-      <div class="bg-white p-5 rounded-xl shadow-md border border-slate-200">
+      <div class="ds-card bg-white p-5 rounded-xl shadow-md border border-slate-200">
         <h2 class="text-xl font-semibold mb-4 text-slate-800">
           <i class="fa-solid fa-list-check text-amber-600 mr-2"></i>Despiece por mueble
           <span id="contadorMuebles" class="text-sm font-normal text-slate-500 ml-2"></span>
@@ -636,7 +640,7 @@
           </h2>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm">
+          <table class="ds-table w-full text-sm">
             <thead class="bg-sky-900 text-white"><tr>
               <th class="text-left py-2 px-3">Mueble</th><th class="text-left py-2 px-3">Pieza</th>
               <th class="text-center py-2 px-3">Cant.</th><th class="text-center py-2 px-3">Cantos</th>
@@ -670,7 +674,7 @@
           <div class="bg-white rounded-lg p-3 border border-emerald-300 shadow-sm"><p class="text-[11px] text-slate-500 uppercase tracking-wide">Costo total</p><p class="text-lg font-bold text-emerald-700" id="costoTotal">$0.00</p></div>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm">
+          <table class="ds-table w-full text-sm">
             <thead class="bg-slate-800 text-white"><tr>
               <th class="text-left py-2 px-3">Mueble</th>
               <th class="text-center py-2 px-3">Piezas</th>
@@ -731,7 +735,7 @@
           </h2>
         </div>
         <div class="overflow-x-auto">
-          <table class="w-full text-sm">
+          <table class="ds-table w-full text-sm">
             <thead class="bg-slate-800 text-white"><tr>
               <th class="text-left py-2 px-3">Componente / Herraje</th>
               <th class="text-center py-2 px-3">Cant. total</th>
@@ -790,42 +794,42 @@
     </div>
     <div class="p-5 overflow-y-auto space-y-3">
       <div class="grid grid-cols-2 gap-3">
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Código *</label><input type="text" id="ncCodigo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm uppercase focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-solid fa-align-left text-emerald-600 mr-1"></i>Descripción breve *</label><input type="text" id="ncDescripcion" maxlength="120" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Código *</label><input type="text" id="ncCodigo" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm uppercase focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1"><i class="fa-solid fa-align-left text-emerald-600 mr-1"></i>Descripción breve *</label><input type="text" id="ncDescripcion" maxlength="120" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
       </div>
       <div class="grid grid-cols-2 gap-3">
         <div><label class="block text-xs font-semibold text-slate-700 mb-1">Categoría *</label>
-          <select id="ncCategoria" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <select id="ncCategoria" class="ds-select w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
             <option value="bases">Bases</option><option value="aereos">Aéreos</option><option value="columnas">Columnas</option><option value="armarios">Armarios</option>
           </select></div>
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tipo</label><input type="text" id="ncTipo" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Tipo</label><input type="text" id="ncTipo" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
       </div>
-      <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nombre / Descripción larga</label><input type="text" id="ncNombre" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+      <div><label class="block text-xs font-semibold text-slate-700 mb-1">Nombre / Descripción larga</label><input type="text" id="ncNombre" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
       <div class="grid grid-cols-3 gap-3">
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Alto (mm)</label><input type="number" id="ncAlto" value="720" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Ancho (mm)</label><input type="number" id="ncAncho" value="600" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Prof. (mm)</label><input type="number" id="ncProf" value="580" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Alto (mm)</label><input type="number" id="ncAlto" value="720" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Ancho (mm)</label><input type="number" id="ncAncho" value="600" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Prof. (mm)</label><input type="number" id="ncProf" value="580" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
       </div>
       <div class="grid grid-cols-2 gap-3">
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Precio ($)</label><input type="number" id="ncPrecio" value="0" step="0.01" min="0" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
-        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Características</label><input type="text" id="ncCaracteristicas" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Precio ($)</label><input type="number" id="ncPrecio" value="0" step="0.01" min="0" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-slate-700 mb-1">Características</label><input type="text" id="ncCaracteristicas" class="ds-input w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"></div>
       </div>
       <div class="border-t border-slate-200 pt-3">
         <p class="text-xs font-bold text-slate-700 mb-2">Componentes</p>
         <div class="grid grid-cols-2 gap-3">
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncPuertas" class="w-4 h-4 text-emerald-600 rounded"> Puertas <input type="number" id="ncCantPuertas" value="1" min="1" max="6" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncGavetas" class="w-4 h-4 text-emerald-600 rounded"> Gavetas <input type="number" id="ncCantGavetas" value="2" min="1" max="10" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncRepisas" class="w-4 h-4 text-emerald-600 rounded"> Repisas <input type="number" id="ncCantRepisas" value="1" min="1" max="10" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncPanel" class="w-4 h-4 text-emerald-600 rounded"> Panel</label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncFinta" class="w-4 h-4 text-emerald-600 rounded"> Finta</label>
-          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncRodapie" class="w-4 h-4 text-emerald-600 rounded"> Rodapié</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncPuertas" class="ds-check w-4 h-4 text-emerald-600 rounded"> Puertas <input type="number" id="ncCantPuertas" value="1" min="1" max="6" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncGavetas" class="ds-check w-4 h-4 text-emerald-600 rounded"> Gavetas <input type="number" id="ncCantGavetas" value="2" min="1" max="10" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncRepisas" class="ds-check w-4 h-4 text-emerald-600 rounded"> Repisas <input type="number" id="ncCantRepisas" value="1" min="1" max="10" class="w-16 px-2 py-1 border border-slate-300 rounded text-xs ml-auto"></label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncPanel" class="ds-check w-4 h-4 text-emerald-600 rounded"> Panel</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncFinta" class="ds-check w-4 h-4 text-emerald-600 rounded"> Finta</label>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="ncRodapie" class="ds-check w-4 h-4 text-emerald-600 rounded"> Rodapié</label>
         </div>
       </div>
       <div id="ncMensaje" class="text-xs font-semibold"></div>
     </div>
     <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex gap-2 justify-end">
-      <button onclick="cerrarAgregarCodigo()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm">Cancelar</button>
-      <button onclick="guardarNuevoCodigo()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium"><i class="fa-solid fa-save mr-1"></i>Guardar</button>
+      <button onclick="cerrarAgregarCodigo()" class="ds-btn">Cancelar</button>
+      <button onclick="guardarNuevoCodigo()" class="ds-btn ds-btn-primary"><i class="fa-solid fa-save mr-1"></i>Guardar</button>
     </div>
   </div>
 </div>
